@@ -3,7 +3,8 @@ import {
   LayoutDashboard, Bell, Filter, Download, TrendingUp, TrendingDown, 
   DollarSign, Package, Calendar as CalendarIcon, RefreshCw, 
   User as UserIcon, Building2, ChevronRight, Search, Map as MapIcon,
-  Wifi, WifiOff, CheckCircle2, AlertCircle, FileText, Printer, X
+  Wifi, WifiOff, CheckCircle2, AlertCircle, FileText, Printer, X,
+  Menu, ChevronDown, SlidersHorizontal
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -29,10 +30,12 @@ export default function App() {
   const [loading, setLoading] = useState(false);
   const [apiStatus, setApiStatus] = useState<'online' | 'offline' | 'checking'>('checking');
   const [lastUpdate, setLastUpdate] = useState<Date>(new Date());
-  const [startDate, setStartDate] = useState<Date | undefined>(); // Sem data inicial por padrão para carregar todo o histórico do Sienge
+  const [startDate, setStartDate] = useState<Date | undefined>();
   const [endDate, setEndDate] = useState<Date | undefined>(new Date());
   const [isPrinting, setIsPrinting] = useState(false);
   const [newOrderAlert, setNewOrderAlert] = useState<PurchaseOrder | null>(null);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const knownOrderIdsRef = useRef<Set<number>>(new Set());
 
   type ReportType = 'pagar' | 'receber' | 'abertos' | null;
@@ -645,158 +648,224 @@ export default function App() {
     <div className={cn("min-h-screen bg-[#0F0F10] text-gray-100 font-sans selection:bg-orange-500/30", reportType ? "print:hidden" : "")}>
       {/* Header */}
       <header className="border-b border-white/5 bg-[#161618]/80 backdrop-blur-xl sticky top-0 z-50 print:hidden">
-        <div className="w-full max-w-[98%] 2xl:max-w-[1800px] mx-auto px-6 h-20 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-orange-700 rounded-2xl flex items-center justify-center shadow-lg shadow-orange-500/20">
-              <Building2 className="text-white" size={28} />
+        <div className="w-full max-w-[98%] 2xl:max-w-[1800px] mx-auto px-4 sm:px-6 h-16 sm:h-20 flex items-center justify-between gap-3">
+          {/* Logo */}
+          <div className="flex items-center gap-3 shrink-0">
+            <div className="w-9 h-9 sm:w-12 sm:h-12 bg-gradient-to-br from-orange-500 to-orange-700 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-lg shadow-orange-500/20">
+              <Building2 className="text-white" size={20} />
             </div>
             <div>
-              <h1 className="text-2xl font-black tracking-tighter text-white uppercase">Dinamica</h1>
+              <h1 className="text-lg sm:text-2xl font-black tracking-tighter text-white uppercase">Dinamica</h1>
               <div className="flex items-center gap-2">
-                <p className="text-[10px] font-bold tracking-[0.2em] text-orange-500 uppercase opacity-80">Dashboard Financeiro</p>
+                <p className="hidden sm:block text-[10px] font-bold tracking-[0.2em] text-orange-500 uppercase opacity-80">Dashboard Financeiro</p>
                 {apiStatus === 'online' && (
                   <span className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-[9px] font-bold text-emerald-500 uppercase tracking-wider">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                    Sienge
+                    Live
                   </span>
                 )}
               </div>
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
-            <nav className="flex items-center bg-black/40 p-1 rounded-xl border border-white/5 mr-4">
-              {[
-                { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-                { id: 'finance', label: 'Financeiro', icon: DollarSign },
-                { id: 'alerts', label: 'Alertas', icon: Bell },
-                { id: 'map', label: 'Mapa de Obras', icon: MapIcon },
-              ].map((tab) => (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id as any)}
-                  className={cn(
-                    "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all",
-                    activeTab === tab.id 
-                      ? "bg-orange-600 text-white shadow-lg shadow-orange-600/20" 
-                      : "text-gray-400 hover:text-white hover:bg-white/5"
-                  )}
-                >
-                  <tab.icon size={16} />
-                  <span className="hidden md:inline">{tab.label}</span>
-                </button>
-              ))}
-            </nav>
+          {/* Desktop Nav */}
+          <nav className="hidden md:flex items-center bg-black/40 p-1 rounded-xl border border-white/5">
+            {[
+              { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+              { id: 'finance', label: 'Financeiro', icon: DollarSign },
+              { id: 'alerts', label: 'Alertas', icon: Bell },
+              { id: 'map', label: 'Mapa de Obras', icon: MapIcon },
+            ].map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id as any)}
+                className={cn(
+                  "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all",
+                  activeTab === tab.id 
+                    ? "bg-orange-600 text-white shadow-lg shadow-orange-600/20" 
+                    : "text-gray-400 hover:text-white hover:bg-white/5"
+                )}
+              >
+                <tab.icon size={16} />
+                <span>{tab.label}</span>
+              </button>
+            ))}
+          </nav>
+
+          {/* Desktop Actions */}
+          <div className="hidden md:flex items-center gap-3">
             <Button 
               onClick={downloadData}
               variant="outline"
-              className="bg-orange-600/10 text-orange-500 border-orange-600/20 hover:bg-orange-600 hover:text-white font-bold rounded-xl h-11 px-6 gap-2"
+              className="bg-orange-600/10 text-orange-500 border-orange-600/20 hover:bg-orange-600 hover:text-white font-bold rounded-xl h-11 px-4 gap-2"
             >
-              <Download size={18} />
-              Baixar Dados
+              <Download size={16} />
+              <span className="hidden lg:inline">Baixar Dados</span>
             </Button>
             <Button 
               onClick={syncSienge} 
               disabled={loading}
-              className="bg-white text-black hover:bg-gray-200 font-bold rounded-xl h-11 px-6 gap-2"
+              className="bg-white text-black hover:bg-gray-200 font-bold rounded-xl h-11 px-4 gap-2"
             >
-              <RefreshCw size={18} className={cn(loading && "animate-spin")} />
-              {loading ? "Sincronizando..." : "Sincronizar API"}
+              <RefreshCw size={16} className={cn(loading && "animate-spin")} />
+              <span className="hidden lg:inline">{loading ? "Sincronizando..." : "Sincronizar"}</span>
             </Button>
+          </div>
+
+          {/* Mobile Action Buttons */}
+          <div className="flex md:hidden items-center gap-2">
+            <button
+              onClick={syncSienge}
+              disabled={loading}
+              className="w-9 h-9 flex items-center justify-center rounded-xl bg-white/10 text-white"
+            >
+              <RefreshCw size={16} className={cn(loading && "animate-spin")} />
+            </button>
+            <button
+              onClick={downloadData}
+              className="w-9 h-9 flex items-center justify-center rounded-xl bg-orange-600/20 text-orange-500"
+            >
+              <Download size={16} />
+            </button>
           </div>
         </div>
       </header>
 
-      <main className="w-full max-w-[98%] 2xl:max-w-[1800px] mx-auto px-6 py-10">
-        {/* Global Date Filter */}
-        <div className="mb-10 flex flex-wrap items-end gap-6 bg-[#161618] p-6 rounded-2xl border border-white/5 shadow-xl print:hidden">
-          <div className="space-y-2">
-            <Label className="text-[10px] font-black uppercase tracking-widest text-orange-500">Data Inicial</Label>
-            <Popover>
-              <PopoverTrigger className={cn(buttonVariants({ variant: "outline" }), "w-[180px] h-12 justify-start bg-black/40 border-white/10 rounded-xl text-white font-bold")}>
-                <CalendarIcon className="mr-3 h-5 w-5 text-orange-500" />
-                {startDate ? format(startDate, "dd/MM/yyyy") : "Início"}
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0 bg-[#161618] border-white/10" align="start">
-                <Calendar
-                  mode="single"
-                  selected={startDate}
-                  onSelect={(date: any) => date && setStartDate(date)}
-                  className="text-white"
-                />
-              </PopoverContent>
-            </Popover>
-          </div>
-
-          <div className="space-y-2">
-            <Label className="text-[10px] font-black uppercase tracking-widest text-orange-500">Data Final</Label>
-            <Popover>
-              <PopoverTrigger className={cn(buttonVariants({ variant: "outline" }), "w-[180px] h-12 justify-start bg-black/40 border-white/10 rounded-xl text-white font-bold")}>
-                <CalendarIcon className="mr-3 h-5 w-5 text-orange-500" />
-                {endDate ? format(endDate, "dd/MM/yyyy") : "Fim"}
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0 bg-[#161618] border-white/10" align="start">
-                <Calendar
-                  mode="single"
-                  selected={endDate}
-                  onSelect={(date: any) => date && setEndDate(date)}
-                  className="text-white"
-                />
-              </PopoverContent>
-            </Popover>
-          </div>
-
-          <div className="space-y-2">
-            <Label className="text-[10px] font-black uppercase tracking-widest text-orange-500">Obra</Label>
-            <Select value={selectedBuilding} onValueChange={setSelectedBuilding}>
-              <SelectTrigger className="w-[200px] bg-black/40 border-white/10 h-12 rounded-xl text-white font-bold">
-                <SelectValue placeholder="Todas" />
-              </SelectTrigger>
-              <SelectContent className="bg-[#161618] border-white/10 text-white">
-                <SelectItem value="all">Todas as Obras</SelectItem>
-                {buildings.map(b => (
-                  <SelectItem key={b.id} value={String(b.id)}>{b.name}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="space-y-2">
-            <Label className="text-[10px] font-black uppercase tracking-widest text-orange-500">Comprador</Label>
-            <Select value={selectedUser} onValueChange={setSelectedUser}>
-              <SelectTrigger className="w-[200px] bg-black/40 border-white/10 h-12 rounded-xl text-white font-bold">
-                <SelectValue placeholder="Todos" />
-              </SelectTrigger>
-              <SelectContent className="bg-[#161618] border-white/10 text-white">
-                <SelectItem value="all">Todos os Compradores</SelectItem>
-                {users.map(u => (
-                  <SelectItem key={u.id} value={String(u.id)}>{u.name}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="space-y-2">
-            <Label className="text-[10px] font-black uppercase tracking-widest text-orange-500">Solicitante</Label>
-            <Select value={selectedRequester} onValueChange={setSelectedRequester}>
-              <SelectTrigger className="w-[200px] bg-black/40 border-white/10 h-12 rounded-xl text-white font-bold">
-                <SelectValue placeholder="Todos" />
-              </SelectTrigger>
-              <SelectContent className="bg-[#161618] border-white/10 text-white">
-                <SelectItem value="all">Todos os Solicitantes</SelectItem>
-                {requesters.map(r => (
-                  <SelectItem key={`req-${r.id}`} value={String(r.id)}>{r.name}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <Button 
-            onClick={refreshData} 
-            className="h-12 px-8 bg-orange-600 hover:bg-orange-700 text-white font-black rounded-xl shadow-lg shadow-orange-600/20"
+      {/* Mobile Bottom Navigation */}
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-[#161618]/95 backdrop-blur-xl border-t border-white/5 flex print:hidden">
+        {[
+          { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+          { id: 'finance', label: 'Financeiro', icon: DollarSign },
+          { id: 'alerts', label: 'Alertas', icon: Bell },
+          { id: 'map', label: 'Mapa', icon: MapIcon },
+        ].map((tab) => (
+          <button
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id as any)}
+            className={cn(
+              "flex-1 flex flex-col items-center justify-center py-2 gap-1 text-[10px] font-bold transition-all",
+              activeTab === tab.id ? "text-orange-500" : "text-gray-500"
+            )}
           >
-            Filtrar Dados
-          </Button>
+            <tab.icon size={20} />
+            <span>{tab.label}</span>
+          </button>
+        ))}
+      </nav>
+
+      <main className="w-full max-w-[98%] 2xl:max-w-[1800px] mx-auto px-4 sm:px-6 py-6 sm:py-10 pb-24 md:pb-10">
+        {/* Global Date Filter - Mobile Collapsible */}
+        <div className="mb-6 sm:mb-10 bg-[#161618] rounded-2xl border border-white/5 shadow-xl print:hidden overflow-hidden">
+          {/* Filter Header - Mobile Toggle */}
+          <button
+            onClick={() => setMobileFiltersOpen(!mobileFiltersOpen)}
+            className="w-full flex items-center justify-between p-4 sm:p-6 md:cursor-default"
+          >
+            <div className="flex items-center gap-3">
+              <SlidersHorizontal size={16} className="text-orange-500" />
+              <span className="text-sm font-black uppercase tracking-widest text-orange-500">Filtros</span>
+              {(selectedBuilding !== 'all' || selectedUser !== 'all' || selectedRequester !== 'all' || startDate) && (
+                <span className="bg-orange-600 text-white text-[9px] font-black px-2 py-0.5 rounded-full uppercase">Ativo</span>
+              )}
+            </div>
+            <ChevronDown
+              size={16}
+              className={cn("text-gray-500 transition-transform md:hidden", mobileFiltersOpen && "rotate-180")}
+            />
+          </button>
+
+          {/* Filter Body */}
+          <div className={cn("md:block", mobileFiltersOpen ? "block" : "hidden")}>
+            <div className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-end gap-4 px-4 sm:px-6 pb-4 sm:pb-6 pt-0">
+              <div className="space-y-2 flex-1 sm:flex-none">
+                <Label className="text-[10px] font-black uppercase tracking-widest text-orange-500">Data Inicial</Label>
+                <Popover>
+                  <PopoverTrigger className={cn(buttonVariants({ variant: "outline" }), "w-full sm:w-[160px] h-11 justify-start bg-black/40 border-white/10 rounded-xl text-white font-bold")}>
+                    <CalendarIcon className="mr-2 h-4 w-4 text-orange-500" />
+                    {startDate ? format(startDate, "dd/MM/yyyy") : "Início"}
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0 bg-[#161618] border-white/10" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={startDate}
+                      onSelect={(date: any) => date && setStartDate(date)}
+                      className="text-white"
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
+
+              <div className="space-y-2 flex-1 sm:flex-none">
+                <Label className="text-[10px] font-black uppercase tracking-widest text-orange-500">Data Final</Label>
+                <Popover>
+                  <PopoverTrigger className={cn(buttonVariants({ variant: "outline" }), "w-full sm:w-[160px] h-11 justify-start bg-black/40 border-white/10 rounded-xl text-white font-bold")}>
+                    <CalendarIcon className="mr-2 h-4 w-4 text-orange-500" />
+                    {endDate ? format(endDate, "dd/MM/yyyy") : "Fim"}
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0 bg-[#161618] border-white/10" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={endDate}
+                      onSelect={(date: any) => date && setEndDate(date)}
+                      className="text-white"
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
+
+              <div className="space-y-2 flex-1 sm:flex-none">
+                <Label className="text-[10px] font-black uppercase tracking-widest text-orange-500">Obra</Label>
+                <Select value={selectedBuilding} onValueChange={setSelectedBuilding}>
+                  <SelectTrigger className="w-full sm:w-[180px] bg-black/40 border-white/10 h-11 rounded-xl text-white font-bold">
+                    <SelectValue placeholder="Todas" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-[#161618] border-white/10 text-white">
+                    <SelectItem value="all">Todas as Obras</SelectItem>
+                    {buildings.map(b => (
+                      <SelectItem key={b.id} value={String(b.id)}>{b.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2 flex-1 sm:flex-none">
+                <Label className="text-[10px] font-black uppercase tracking-widest text-orange-500">Comprador</Label>
+                <Select value={selectedUser} onValueChange={setSelectedUser}>
+                  <SelectTrigger className="w-full sm:w-[180px] bg-black/40 border-white/10 h-11 rounded-xl text-white font-bold">
+                    <SelectValue placeholder="Todos" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-[#161618] border-white/10 text-white">
+                    <SelectItem value="all">Todos os Compradores</SelectItem>
+                    {users.map(u => (
+                      <SelectItem key={u.id} value={String(u.id)}>{u.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2 flex-1 sm:flex-none">
+                <Label className="text-[10px] font-black uppercase tracking-widest text-orange-500">Solicitante</Label>
+                <Select value={selectedRequester} onValueChange={setSelectedRequester}>
+                  <SelectTrigger className="w-full sm:w-[180px] bg-black/40 border-white/10 h-11 rounded-xl text-white font-bold">
+                    <SelectValue placeholder="Todos" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-[#161618] border-white/10 text-white">
+                    <SelectItem value="all">Todos os Solicitantes</SelectItem>
+                    {requesters.map(r => (
+                      <SelectItem key={`req-${r.id}`} value={String(r.id)}>{r.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <Button 
+                onClick={() => { refreshData(); setMobileFiltersOpen(false); }} 
+                className="h-11 px-6 bg-orange-600 hover:bg-orange-700 text-white font-black rounded-xl shadow-lg shadow-orange-600/20 w-full sm:w-auto"
+              >
+                Filtrar Dados
+              </Button>
+            </div>
+          </div>
         </div>
 
         <AnimatePresence mode="wait">
@@ -809,7 +878,7 @@ export default function App() {
               className="space-y-8"
             >
               {/* KPI Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
                 {[
                   { label: 'COMPRAS EFETUADAS', value: `R$ ${stats.total.toLocaleString('pt-BR', { maximumFractionDigits: 0 })}`, description: `${orders.length} pedidos processados`, icon: TrendingUp, color: 'orange' },
                   { label: 'Saldo Financeiro (R-P)', value: `R$ ${stats.balance.toLocaleString('pt-BR', { maximumFractionDigits: 0 })}`, description: 'Receber - Pagar', icon: DollarSign, color: stats.balance >= 0 ? 'green' : 'red' },
@@ -817,16 +886,16 @@ export default function App() {
                   { label: 'Pedidos Solicitados', value: orders.length, description: 'Pedidos processados no período', icon: Package, color: 'orange' },
                 ].map((kpi, i) => (
                   <Card key={i} className="bg-[#161618] border-white/5 shadow-2xl overflow-hidden relative group">
-                    <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                      <kpi.icon size={64} className="text-orange-500" />
+                    <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
+                      <kpi.icon size={40} className="text-orange-500" />
                     </div>
-                    <CardHeader className="pb-2">
-                      <CardDescription className="text-[10px] font-black uppercase tracking-widest text-orange-500/70">{kpi.label}</CardDescription>
-                      <CardTitle className={cn("text-3xl font-black tracking-tighter", kpi.color === 'red' ? 'text-red-500' : kpi.color === 'green' ? 'text-green-500' : 'text-white')}>
+                    <CardHeader className="pb-2 p-4 sm:p-6">
+                      <CardDescription className="text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-orange-500/70 leading-tight">{kpi.label}</CardDescription>
+                      <CardTitle className={cn("text-xl sm:text-3xl font-black tracking-tighter mt-1", kpi.color === 'red' ? 'text-red-500' : kpi.color === 'green' ? 'text-green-500' : 'text-white')}>
                         {kpi.value}
                       </CardTitle>
                       {kpi.description && (
-                         <div className="text-xs text-gray-400 mt-2 font-bold">{kpi.description}</div>
+                         <div className="hidden sm:block text-xs text-gray-400 mt-2 font-bold">{kpi.description}</div>
                       )}
                     </CardHeader>
                     <div className="h-1 w-full bg-orange-600/20">
@@ -837,46 +906,46 @@ export default function App() {
               </div>
 
               {/* Financial Quick Summary */}
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
                 <Card className="bg-gradient-to-br from-orange-600 to-orange-800 border-none shadow-2xl shadow-orange-900/20">
-                  <CardContent className="p-8 flex items-center justify-between">
+                  <CardContent className="p-5 sm:p-8 flex items-center justify-between">
                     <div>
-                      <p className="text-orange-200 text-xs font-black uppercase tracking-widest mb-2">Volume de Compras</p>
-                      <h3 className="text-4xl font-black text-white">R$ {stats.total.toLocaleString('pt-BR', { maximumFractionDigits: 0 })}</h3>
+                      <p className="text-orange-200 text-[10px] sm:text-xs font-black uppercase tracking-widest mb-1 sm:mb-2">Volume de Compras</p>
+                      <h3 className="text-2xl sm:text-4xl font-black text-white">R$ {stats.total.toLocaleString('pt-BR', { maximumFractionDigits: 0 })}</h3>
                     </div>
-                    <div className="bg-white/20 p-4 rounded-2xl">
-                      <Package className="text-white" size={32} />
+                    <div className="bg-white/20 p-3 sm:p-4 rounded-xl sm:rounded-2xl">
+                      <Package className="text-white" size={24} />
                     </div>
                   </CardContent>
                 </Card>
                 
                 <Card className="bg-[#161618] border-white/5 shadow-2xl">
-                  <CardContent className="p-8 flex items-center justify-between">
+                  <CardContent className="p-5 sm:p-8 flex items-center justify-between">
                     <div>
-                      <p className="text-gray-500 text-xs font-black uppercase tracking-widest mb-2">Contas a Pagar</p>
-                      <h3 className="text-4xl font-black text-red-500">R$ {stats.fTotal.toLocaleString('pt-BR', { maximumFractionDigits: 0 })}</h3>
+                      <p className="text-gray-500 text-[10px] sm:text-xs font-black uppercase tracking-widest mb-1 sm:mb-2">Contas a Pagar</p>
+                      <h3 className="text-2xl sm:text-4xl font-black text-red-500">R$ {stats.fTotal.toLocaleString('pt-BR', { maximumFractionDigits: 0 })}</h3>
                     </div>
-                    <div className="bg-red-500/10 p-4 rounded-2xl">
-                      <TrendingDown className="text-red-500" size={32} />
+                    <div className="bg-red-500/10 p-3 sm:p-4 rounded-xl sm:rounded-2xl">
+                      <TrendingDown className="text-red-500" size={24} />
                     </div>
                   </CardContent>
                 </Card>
 
                 <Card className="bg-[#161618] border-white/5 shadow-2xl">
-                  <CardContent className="p-8 flex items-center justify-between">
+                  <CardContent className="p-5 sm:p-8 flex items-center justify-between">
                     <div>
-                      <p className="text-gray-500 text-xs font-black uppercase tracking-widest mb-2">Contas a Receber</p>
-                      <h3 className="text-4xl font-black text-green-500">R$ {stats.rTotal.toLocaleString('pt-BR', { maximumFractionDigits: 0 })}</h3>
+                      <p className="text-gray-500 text-[10px] sm:text-xs font-black uppercase tracking-widest mb-1 sm:mb-2">Contas a Receber</p>
+                      <h3 className="text-2xl sm:text-4xl font-black text-green-500">R$ {stats.rTotal.toLocaleString('pt-BR', { maximumFractionDigits: 0 })}</h3>
                     </div>
-                    <div className="bg-green-500/10 p-4 rounded-2xl">
-                      <TrendingUp className="text-green-500" size={32} />
+                    <div className="bg-green-500/10 p-3 sm:p-4 rounded-xl sm:rounded-2xl">
+                      <TrendingUp className="text-green-500" size={24} />
                     </div>
                   </CardContent>
                 </Card>
               </div>
 
               {/* Main Charts Row */}
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-8">
                 <Card className="lg:col-span-2 bg-[#161618] border-white/5 shadow-2xl">
                   <CardHeader className="flex flex-row items-center justify-between">
                     <div>
@@ -887,7 +956,7 @@ export default function App() {
                       <Badge className="bg-orange-600/10 text-orange-500 border-none">2026</Badge>
                     </div>
                   </CardHeader>
-                  <CardContent className="h-[350px] pt-4">
+                  <CardContent className="h-[220px] sm:h-[350px] pt-4">
                     <ResponsiveContainer width="100%" height="100%">
                       <AreaChart data={chartData}>
                         <defs>
@@ -916,7 +985,7 @@ export default function App() {
                     <CardTitle className="text-lg font-black uppercase tracking-tight text-white">Forma de Pagamento</CardTitle>
                     <CardDescription className="text-gray-500">Distribuição por modalidade</CardDescription>
                   </CardHeader>
-                  <CardContent className="h-[350px]">
+                  <CardContent className="h-[220px] sm:h-[350px]">
                     <ResponsiveContainer width="100%" height="100%">
                       <PieChart>
                         <Pie
@@ -941,12 +1010,12 @@ export default function App() {
               </div>
 
               {/* Bottom Row */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-8">
                 <Card className="bg-[#161618] border-white/5 shadow-2xl">
                   <CardHeader>
                     <CardTitle className="text-lg font-black uppercase tracking-tight text-white">Faturamento por Fornecedor</CardTitle>
                   </CardHeader>
-                  <CardContent className="h-[300px]">
+                  <CardContent className="h-[220px] sm:h-[300px]">
                     <ResponsiveContainer width="100%" height="100%">
                       <BarChart data={supplierData} layout="vertical">
                         <XAxis type="number" hide />
@@ -1016,25 +1085,26 @@ export default function App() {
               exit={{ opacity: 0, scale: 0.95 }}
               className="w-full space-y-6"
             >
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-2xl font-black text-white flex items-center gap-3">
-                  <Bell className="text-orange-500" size={28} />
-                  Variações de Preço Detectadas
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+                <h3 className="text-xl sm:text-2xl font-black text-white flex items-center gap-3">
+                  <Bell className="text-orange-500" size={24} />
+                  Variações de Preço
                 </h3>
-                <div className="flex items-center gap-4">
-                  <Badge className="bg-orange-600 text-white font-black px-4 py-1 print:hidden">
-                    {priceAlerts.length} {priceAlerts.length === 1 ? 'ALERTA ATIVO' : 'ALERTAS ATIVOS'}
+                <div className="flex items-center gap-3">
+                  <Badge className="bg-orange-600 text-white font-black px-3 py-1 print:hidden text-xs">
+                    {priceAlerts.length} {priceAlerts.length === 1 ? 'ALERTA' : 'ALERTAS'}
                   </Badge>
                   <Button 
                     onClick={handlePrint}
-                    className="bg-white text-black hover:bg-gray-200 font-black tracking-tight rounded-xl print:hidden"
+                    className="bg-white text-black hover:bg-gray-200 font-black tracking-tight rounded-xl print:hidden text-sm h-9"
                   >
-                    Gerar PDF / Imprimir Lista
+                    <Printer size={14} className="mr-2" />
+                    PDF
                   </Button>
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
                 {priceAlerts.slice(0, 8).map((alert, i) => (
                   <Card key={i} className="bg-[#161618] border-white/5 shadow-lg overflow-hidden relative">
                     <div className="absolute top-0 left-0 w-1.5 h-full bg-orange-600" />
@@ -1084,7 +1154,7 @@ export default function App() {
                 <CardHeader className="print:hidden">
                   <CardTitle className="text-lg font-black uppercase tracking-tight text-white">Relatório / Alertas de Itens</CardTitle>
                 </CardHeader>
-                <CardContent className="p-0 overflow-x-auto overflow-y-auto max-h-[600px] custom-scrollbar print:overflow-visible print:max-h-none">
+                <CardContent className="p-0 overflow-x-auto overflow-y-auto max-h-[500px] sm:max-h-[600px] custom-scrollbar print:overflow-visible print:max-h-none">
                   <Table className="print:text-black relative">
                     <TableHeader className="bg-black/80 sticky top-0 z-10 backdrop-blur-md print:bg-gray-100 print:relative border-b border-white/10">
                       <TableRow className="border-none print:border-gray-200">
@@ -1200,7 +1270,7 @@ export default function App() {
                 
                 return (
                   <>
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6">
                       <Card className="bg-[#161618] border-white/5 shadow-2xl relative group">
                         <CardHeader className="pt-4 pr-16">
                           <CardDescription className="text-[10px] font-black uppercase text-orange-500">Total a Pagar</CardDescription>
@@ -1238,8 +1308,8 @@ export default function App() {
                       </Card>
                     </div>
 
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                      <Card className="bg-[#161618] border-white/5 shadow-2xl flex flex-col h-[500px]">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-8">
+                      <Card className="bg-[#161618] border-white/5 shadow-2xl flex flex-col h-[400px] sm:h-[500px]">
                         <CardHeader className="pb-4 flex flex-row items-center justify-between">
                           <CardTitle className="text-lg font-black uppercase text-white">Contas a Pagar</CardTitle>
                           <button onClick={() => setReportType('pagar')} className="bg-white/5 hover:bg-white/10 text-white rounded-md px-3 py-1.5 flex items-center gap-2 text-xs font-bold uppercase transition-colors"><FileText size={14}/> Gerar Relatório</button>
@@ -1285,7 +1355,7 @@ export default function App() {
                         </CardContent>
                       </Card>
 
-                      <Card className="bg-[#161618] border-white/5 shadow-2xl flex flex-col h-[500px]">
+                      <Card className="bg-[#161618] border-white/5 shadow-2xl flex flex-col h-[400px] sm:h-[500px]">
                         <CardHeader className="pb-4 flex flex-row items-center justify-between">
                           <CardTitle className="text-lg font-black uppercase text-white">Contas a Receber</CardTitle>
                           <button onClick={() => setReportType('receber')} className="bg-white/5 hover:bg-white/10 text-white rounded-md px-3 py-1.5 flex items-center gap-2 text-xs font-bold uppercase transition-colors"><FileText size={14}/> Gerar Relatório</button>
@@ -1342,7 +1412,7 @@ export default function App() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="grid grid-cols-1 lg:grid-cols-4 gap-6 h-[600px]"
+              className="grid grid-cols-1 lg:grid-cols-4 gap-4 sm:gap-6 min-h-[400px] sm:h-[600px]"
             >
               {/* 1. Lista de Obras */}
               <Card className="lg:col-span-1 bg-[#161618] border-white/5 shadow-2xl flex flex-col h-full">
