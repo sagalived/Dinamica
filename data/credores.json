@@ -1,0 +1,3978 @@
+[
+  {
+    "id": 5,
+    "nome": "R R COMERCIO DE MADEIRAS LTDA ME"
+  },
+  {
+    "id": 10,
+    "nome": "RAMACON DIST DE MAT.P/ CONST.LTDA"
+  },
+  {
+    "id": 98,
+    "nome": "WELLINGTON LOURENÇO DOS SANTOS - MEI"
+  },
+  {
+    "id": 99,
+    "nome": "SOURE COMÉRCIO DE MATERIAL DE CONSTRUÇÃO LTDA"
+  },
+  {
+    "id": 69,
+    "nome": "PYLA PEDREIRA YOLITA LTDA"
+  },
+  {
+    "id": 53,
+    "nome": "COM IND DE CIMENTO APODI"
+  },
+  {
+    "id": 27,
+    "nome": "ACO CEARENSE COMECIAL LTDA "
+  },
+  {
+    "id": 101,
+    "nome": "JOSÉ MARIA ARAÚJO NETO - ME"
+  },
+  {
+    "id": 15,
+    "nome": "APIGUANA MÁQUINAS E FERRAMENTAS LTDA "
+  },
+  {
+    "id": 11,
+    "nome": "COMERCIAL MAIA LTDA"
+  },
+  {
+    "id": 103,
+    "nome": "BARATÃO MATERIAL DE CONSTRUÇÃO LTDA"
+  },
+  {
+    "id": 102,
+    "nome": "ARAÚJO CABRAL E ALVES LTDA"
+  },
+  {
+    "id": 105,
+    "nome": "MARILAC MOREIRA DOS SANTOS"
+  },
+  {
+    "id": 7,
+    "nome": "SV COMERCIO DE MATERIAL ELETRICO LTDA FILIAL"
+  },
+  {
+    "id": 12,
+    "nome": "MADEIREIRA PADRE CICERO LTDA"
+  },
+  {
+    "id": 109,
+    "nome": "ELENILDO AUGUSTO DA SILVA"
+  },
+  {
+    "id": 75,
+    "nome": "REDE MAQUINAS"
+  },
+  {
+    "id": 18,
+    "nome": "SOARES MOURAO COMERCIO DE TINTAS LTDA"
+  },
+  {
+    "id": 9,
+    "nome": "CARLOS ALBERTO RIBEIRO PARENTE "
+  },
+  {
+    "id": 113,
+    "nome": "FORTEX INDÚSTRIA QUIMICA LTDA"
+  },
+  {
+    "id": 110,
+    "nome": "FILINTO BRAZ DE OLIVEIRA"
+  },
+  {
+    "id": 90,
+    "nome": "EDIMOCA ALUGUEL DE EQUIPAMENTOS E COM DE MAQUINAS LTDA"
+  },
+  {
+    "id": 128,
+    "nome": "CASA FERREIRA LTDA"
+  },
+  {
+    "id": 70,
+    "nome": "JORGE ANTONIO LOPES LIRA"
+  },
+  {
+    "id": 108,
+    "nome": "ATACADAO DAS FERRAMENTAS"
+  },
+  {
+    "id": 136,
+    "nome": "MOTOBOMBAS IRRIGAÇÃO MAQUINAS E SERVICOS LTDA"
+  },
+  {
+    "id": 138,
+    "nome": "MARIA DE JESUS DA SILVA EQUIPAMENTOS"
+  },
+  {
+    "id": 114,
+    "nome": "AÇO SHOPPING COMÉRCIO LTDA."
+  },
+  {
+    "id": 17,
+    "nome": "CARMEHIL COMERCIAL ELETRICA LTDA"
+  },
+  {
+    "id": 21,
+    "nome": "COMPANHIA INDUSTRIAL DE CIMENTO APODI"
+  },
+  {
+    "id": 145,
+    "nome": "MEGALUX COMERCIO DE MATERIAIS ELETRICOS E HIDRAULICOS LTDA - ME"
+  },
+  {
+    "id": 144,
+    "nome": "TINTAS HIDRACOR S/A"
+  },
+  {
+    "id": 126,
+    "nome": "CATATAU ACO LTDA"
+  },
+  {
+    "id": 13,
+    "nome": "JAGUAR COMÉRCIO DE TINTAS "
+  },
+  {
+    "id": 162,
+    "nome": "LOCACAO DE MAQUINAS DE RODAGENS "
+  },
+  {
+    "id": 167,
+    "nome": "CERÂMICA CAMPO VERDE LTDA"
+  },
+  {
+    "id": 171,
+    "nome": "M. ELIZABETE L. DUARTE"
+  },
+  {
+    "id": 173,
+    "nome": "ANTONIO ADAILTON ROCHA ME"
+  },
+  {
+    "id": 39,
+    "nome": "J B INDUSTRIA E COMERCIO DE ARGAMASSA EIRELI EPP"
+  },
+  {
+    "id": 93,
+    "nome": "GRAMAF, GRANITOS E MARMORES FORTALEZA LTDA"
+  },
+  {
+    "id": 50,
+    "nome": "ART IMPRESSAO EIRELI ME"
+  },
+  {
+    "id": 180,
+    "nome": "SERRA E SILVA COMERCIO DE MADEIRAS LTDA"
+  },
+  {
+    "id": 68,
+    "nome": "D M M S CAMPELO MAIA EPP"
+  },
+  {
+    "id": 133,
+    "nome": "LOJAO DOS PARAFUSOS CEARA EIRELI "
+  },
+  {
+    "id": 182,
+    "nome": "RAIMUNDO OSSIAN ALVES F"
+  },
+  {
+    "id": 183,
+    "nome": "LUIZ HENRIQUE DE SOUZA"
+  },
+  {
+    "id": 181,
+    "nome": "RP CONSTRUCOES LTDA"
+  },
+  {
+    "id": 191,
+    "nome": "BRUNO UCHÔA DE OLIVEIRA"
+  },
+  {
+    "id": 48,
+    "nome": "CEARA COMERCIAL DE ALUMINIO LTDA"
+  },
+  {
+    "id": 58,
+    "nome": "CARAJAS MAT DE CONSTRUÇAO LTDA"
+  },
+  {
+    "id": 147,
+    "nome": "SANTELMO CARNEIRO DOS SANTOS JUNIOR "
+  },
+  {
+    "id": 217,
+    "nome": "LOJAO DA INDUSTRIA LTDA"
+  },
+  {
+    "id": 6,
+    "nome": "ARCELORMITAL BRASIL S.A "
+  },
+  {
+    "id": 87,
+    "nome": "E. J. RABELO SILVA"
+  },
+  {
+    "id": 86,
+    "nome": "ROGERIO VASCONCELOS - ME"
+  },
+  {
+    "id": 32,
+    "nome": "FRIGELAR COMERCIO E DISTRIBUIÇÃO "
+  },
+  {
+    "id": 76,
+    "nome": "TECNO IND E COM DE COMPUTADORES"
+  },
+  {
+    "id": 46,
+    "nome": "JJ IMPORTAÇAO E EXPORTAÇAO DE FORROS E DIVISORIAS EIRELI"
+  },
+  {
+    "id": 215,
+    "nome": "CESTAS DE ALIMENTOS SAO TOME EIRELI ME"
+  },
+  {
+    "id": 220,
+    "nome": "JIR SANTIAGO ME"
+  },
+  {
+    "id": 62,
+    "nome": "CERAMICA BRASILEIRA CERBRAS LTDA"
+  },
+  {
+    "id": 163,
+    "nome": "RDF SUPRIMENTOS DE INFORMATICA LTDA ME"
+  },
+  {
+    "id": 132,
+    "nome": "SODINE SOC.DIST.DO NE LTDA"
+  },
+  {
+    "id": 226,
+    "nome": " CEARA DIESEL S A"
+  },
+  {
+    "id": 227,
+    "nome": "JS DISTRIBUIDORA DE PECAS S/A"
+  },
+  {
+    "id": 229,
+    "nome": "FRANCISCO KLEVER ROCHA NEVES ME"
+  },
+  {
+    "id": 231,
+    "nome": "DEUVENIR SANTIAGO DE OLIVEIRA ME"
+  },
+  {
+    "id": 56,
+    "nome": "CASA SOARES MAT DE CONSTRUÇAO LTDA"
+  },
+  {
+    "id": 54,
+    "nome": "RIVEL IND E COM DE MOVEIS EIRELI"
+  },
+  {
+    "id": 14,
+    "nome": "A PAULO DA SILVA PARAFUSOS - EPP"
+  },
+  {
+    "id": 222,
+    "nome": "A J S GOMES PREMOLDADOS"
+  },
+  {
+    "id": 236,
+    "nome": "S M DA COSTA"
+  },
+  {
+    "id": 238,
+    "nome": "EVALDO PARENTE GUIMARAES"
+  },
+  {
+    "id": 228,
+    "nome": "FRANCISCO CLEANDRO DOS SANTOS 03078532330"
+  },
+  {
+    "id": 219,
+    "nome": "HELIO RODRIGUES XAVIER"
+  },
+  {
+    "id": 239,
+    "nome": "A CONRADO MINERACAO INDUSTRIAL LTDA"
+  },
+  {
+    "id": 157,
+    "nome": "JOSÉ TEIXEIRA DE MELO FILHO TELAS"
+  },
+  {
+    "id": 55,
+    "nome": "BARATAO MATERIAL DE CONSTRUÇAO LTDA"
+  },
+  {
+    "id": 244,
+    "nome": "F LUIZITO RODRIGUES - ME"
+  },
+  {
+    "id": 247,
+    "nome": "PEDREIRA ITATIBA LTDA"
+  },
+  {
+    "id": 237,
+    "nome": "DISTRIBUIDORA MAIA DE MATERIAL DE CONSTRUÇÃO LTDA"
+  },
+  {
+    "id": 120,
+    "nome": "ALCONORT ALUMINIO LTDA"
+  },
+  {
+    "id": 255,
+    "nome": "JOSÉ CÉLIO PEREIRA"
+  },
+  {
+    "id": 122,
+    "nome": "LOCADORA COMERCIAL LTDA EPP "
+  },
+  {
+    "id": 257,
+    "nome": "R M C Comercio E Representacoes Limitada"
+  },
+  {
+    "id": 185,
+    "nome": "TRANSFORTECH ENGENHARIA LTDA"
+  },
+  {
+    "id": 225,
+    "nome": "CEQUIP IMPORTACAO E COMERCIO LTDA "
+  },
+  {
+    "id": 262,
+    "nome": "FRANCISCO ATAÍDE ARAÚJO DA SILVA"
+  },
+  {
+    "id": 265,
+    "nome": "FARDANOVA UNIFORMES PROFISSIONAIS LTDA EPP"
+  },
+  {
+    "id": 268,
+    "nome": "HENRIQUE SILVA DE ARAUJO"
+  },
+  {
+    "id": 269,
+    "nome": "FRANCISCO MAGELO P COSTA"
+  },
+  {
+    "id": 276,
+    "nome": "FRANCISCO VALDIR HOLANDA CAMARA"
+  },
+  {
+    "id": 278,
+    "nome": "GUERRA METAIS INDUSTRIA METALURGICA E COMERCIO LTDA"
+  },
+  {
+    "id": 16,
+    "nome": "MAGNA LOCAÇOES LTDA"
+  },
+  {
+    "id": 23,
+    "nome": "HIPERFERRO COMERCIAL DE ACOS LTDA"
+  },
+  {
+    "id": 280,
+    "nome": "ANTONIO DOS SANTOS"
+  },
+  {
+    "id": 275,
+    "nome": "MICHELLY FREIRES NAU"
+  },
+  {
+    "id": 285,
+    "nome": "FRANKLIN CAVALCANTE LOPES 01016418426"
+  },
+  {
+    "id": 286,
+    "nome": "ANTONIO ROBSON RUFINO ALVES"
+  },
+  {
+    "id": 287,
+    "nome": "ALAILSON DE LIMA RODRIGUES"
+  },
+  {
+    "id": 288,
+    "nome": "WILSON TAHIM PINTO & CIA LTDA"
+  },
+  {
+    "id": 289,
+    "nome": "LIDER MATERIAIS DE CONSTRUCOES LTDA"
+  },
+  {
+    "id": 290,
+    "nome": "JOSE GILMARIO DE OLIVEIRA"
+  },
+  {
+    "id": 292,
+    "nome": "WJF CAMPOS COMERCIAL DE FERRAGENS LTDA"
+  },
+  {
+    "id": 161,
+    "nome": "TICKET SOLUÇOES HDFGT SA"
+  },
+  {
+    "id": 296,
+    "nome": "TALIMPO COMERCIO PRODUTOS DE LIMPEZA LTDA"
+  },
+  {
+    "id": 304,
+    "nome": "JOHN LENNO FERREIRA DE SOUSA MECANICA"
+  },
+  {
+    "id": 291,
+    "nome": "RENOVADORA DE PNEUS MATOS LTDA"
+  },
+  {
+    "id": 307,
+    "nome": "SAMPAIO COMERCIO DE MATERIAL PARA CONSTRUCAO LTDA"
+  },
+  {
+    "id": 310,
+    "nome": "ANDRE IRAIRDES S SILVA"
+  },
+  {
+    "id": 311,
+    "nome": "FABIO WEYMER SILVA DO NASCIMENTO"
+  },
+  {
+    "id": 308,
+    "nome": "CHARLENE KELLY BEZERRA ALVES 04893440381"
+  },
+  {
+    "id": 313,
+    "nome": "C B BATERIAS LTDA"
+  },
+  {
+    "id": 314,
+    "nome": "AUTO PECAS PADRE CICERO LTDA"
+  },
+  {
+    "id": 317,
+    "nome": "JONATHAN ROCHA VIANA"
+  },
+  {
+    "id": 319,
+    "nome": "V BELEM CAVALCANTE CERAMICA"
+  },
+  {
+    "id": 321,
+    "nome": "FORTALEZA COMERCIO DE VIDROS E ACESSORIOS LTDA"
+  },
+  {
+    "id": 324,
+    "nome": "FRANCISCO FÁBIO CAVALCANTE CARLOS"
+  },
+  {
+    "id": 325,
+    "nome": "POINT CENTER COMERCIAL LTDA"
+  },
+  {
+    "id": 322,
+    "nome": "FORTALEZA RETIFICA DE MOTORES E SERVICOS LTDA"
+  },
+  {
+    "id": 326,
+    "nome": "CENTRO DE SERVICOS AUTOMOTIVOS NENE OFF ROAD LTDA"
+  },
+  {
+    "id": 329,
+    "nome": "EMBALAX COMERCIO DE EMBALAGENS LTDA"
+  },
+  {
+    "id": 336,
+    "nome": "DANIELLI PIRES DA ROCHA AGUIAR"
+  },
+  {
+    "id": 334,
+    "nome": "INAE EVANGELISTA RODRIGUES"
+  },
+  {
+    "id": 332,
+    "nome": "MARIA VALDINEIA COSTA DOS SANTOS"
+  },
+  {
+    "id": 339,
+    "nome": "MARCELO JOSÉ DO NASCIMENTO DUARTE"
+  },
+  {
+    "id": 340,
+    "nome": "FRANKLEN CANDIDO ASSUNÇÃO"
+  },
+  {
+    "id": 342,
+    "nome": "PONTUAL COMERCIO VAREJISTA DE MATERIAL DE CONSTRUCAO LTDA"
+  },
+  {
+    "id": 223,
+    "nome": "TRG TRANSPORTE LOCACAO CONSTRUCAO COMERCIO E SERVICOS LTDA E"
+  },
+  {
+    "id": 347,
+    "nome": "LEAO DOS RETENTORES E ROLAMENTOS LTDA"
+  },
+  {
+    "id": 353,
+    "nome": "NEW DIAMOND PRODUTOS DIAMANTADOS LTDA."
+  },
+  {
+    "id": 356,
+    "nome": "JOSÉ MARIA DE SOUZA ARAÚJO"
+  },
+  {
+    "id": 358,
+    "nome": "FOSFATEC INDUSTRIA E COMERCIO LTDA"
+  },
+  {
+    "id": 361,
+    "nome": "RAFAEL DA SILVA FROTA 78101387234"
+  },
+  {
+    "id": 362,
+    "nome": "CERAMICA SOBARRO LTDA"
+  },
+  {
+    "id": 331,
+    "nome": "J S DA SILVA TRANSPORTES E SERVICOS DA CONSTRUCAO"
+  },
+  {
+    "id": 364,
+    "nome": "J. R. DE LIMA FILHO"
+  },
+  {
+    "id": 82,
+    "nome": "TRANSFAX TRANSPORTES LTDA - EPP"
+  },
+  {
+    "id": 346,
+    "nome": "D MENDONCA LUBRIFICANTES"
+  },
+  {
+    "id": 366,
+    "nome": "MARCOS VINICIUS BENTO CLEMENTE"
+  },
+  {
+    "id": 367,
+    "nome": "MOTA COMERCIO E SERVICOS DE PNEUS LTDA"
+  },
+  {
+    "id": 368,
+    "nome": "GERARDO BASTOS PNEUS E PECAS LTDA"
+  },
+  {
+    "id": 369,
+    "nome": "SUCATA AEROPORTO COMERCIO DE PECAS EIRELI"
+  },
+  {
+    "id": 370,
+    "nome": "CARDAN FORTALEZA LTDA"
+  },
+  {
+    "id": 371,
+    "nome": "J3 METALURGICA E SERVICOS LTDA"
+  },
+  {
+    "id": 213,
+    "nome": "MERCADOPAGO.COM REPRESENTAÇÕES LTDA"
+  },
+  {
+    "id": 373,
+    "nome": "M S SOUZA BRITO"
+  },
+  {
+    "id": 316,
+    "nome": "KELVIA SILVA ALVES"
+  },
+  {
+    "id": 164,
+    "nome": "COMERCIAL DE FERRO GAVINCHA JUNIOR LTDA - EPP"
+  },
+  {
+    "id": 374,
+    "nome": "ANA CLEICIANE CARNEIRO"
+  },
+  {
+    "id": 378,
+    "nome": "SHOPPING DA CONSTRUCAO IMPORTACAO E COMERCIO EIRELI"
+  },
+  {
+    "id": 381,
+    "nome": "M JOSE CARVALHO DE AMORIM"
+  },
+  {
+    "id": 379,
+    "nome": "COMERCIAL A PORTA LARGA LTDA"
+  },
+  {
+    "id": 382,
+    "nome": "ANTONIO FERREIRA DE MELO MATERIAL DE CONSTRUCAO"
+  },
+  {
+    "id": 230,
+    "nome": "TRANSFORMADORES LEAL LTDA"
+  },
+  {
+    "id": 197,
+    "nome": "LIRAMAC MATERIAIS DE CONSTRUÇÃO LTDA"
+  },
+  {
+    "id": 29,
+    "nome": "R CHAGAS & CIA LTDA "
+  },
+  {
+    "id": 389,
+    "nome": "MOURA CAMPOS INDUSTRIA E COMERCIO DE ARGAMASSA LTDA"
+  },
+  {
+    "id": 390,
+    "nome": "FRANCISCO DE S . L. ALMEIDA"
+  },
+  {
+    "id": 52,
+    "nome": "COMERCIAL CASA DO CIMENTO LTDA"
+  },
+  {
+    "id": 393,
+    "nome": "MARCOS THIAGO NOGUEIRA GURGEL"
+  },
+  {
+    "id": 394,
+    "nome": "E L DE ALMEIDA CONSTRUCOES E SERVICOS"
+  },
+  {
+    "id": 395,
+    "nome": "DISTRIBUIDORA DE ARTIGOS PARA A CONSTRUCAO CIVIL LTDA"
+  },
+  {
+    "id": 216,
+    "nome": "GM FERREIRA INDUSTRIA DE TREFILADOS EIRELI"
+  },
+  {
+    "id": 396,
+    "nome": "EVALDO FERREIRA COMERCIAL EIRELI"
+  },
+  {
+    "id": 397,
+    "nome": "JOAO MORAES DOS SANTOS"
+  },
+  {
+    "id": 398,
+    "nome": "ANTONIO DENAIR LIMA SILVA"
+  },
+  {
+    "id": 399,
+    "nome": "JOAO ISRAEL NERES SOUSA"
+  },
+  {
+    "id": 400,
+    "nome": "SODINE SOCIEDADE DISTRIBUIDORA DO NORDESTE LTDA"
+  },
+  {
+    "id": 401,
+    "nome": "FORTALEZA INDUSTRIA DE ADESIVOS LTDA"
+  },
+  {
+    "id": 403,
+    "nome": "RITA AMÉLIA MENDES BRANDÃO ROSA"
+  },
+  {
+    "id": 404,
+    "nome": "SANDRA MARIA FERREIRA"
+  },
+  {
+    "id": 405,
+    "nome": "AMILCO BEZERRA SILVEIRA"
+  },
+  {
+    "id": 406,
+    "nome": "MARIA SILVANIR SILVA DE PAULO"
+  },
+  {
+    "id": 407,
+    "nome": "ARTE FINAL PONTO MIDIA LTDA"
+  },
+  {
+    "id": 386,
+    "nome": "OTONIEL ISAAC LUCETTI LUNA DUQUE 02592888373"
+  },
+  {
+    "id": 408,
+    "nome": "COMERCIAL ABRANTES LTDA"
+  },
+  {
+    "id": 409,
+    "nome": "CHEGOU AGUA DISTRIBUIDORA EIRELI"
+  },
+  {
+    "id": 414,
+    "nome": "JOSE ULISCIO FILHO"
+  },
+  {
+    "id": 415,
+    "nome": "GLAUCIONE DOS SANTOS "
+  },
+  {
+    "id": 416,
+    "nome": "GERALDO FERREIRA DE FREITAS"
+  },
+  {
+    "id": 419,
+    "nome": "ELIANE S/A - REVESTIMENTOS CERAMICOS"
+  },
+  {
+    "id": 420,
+    "nome": "CERAMUS BAHIA SA PRODUTOS CERAMICOS"
+  },
+  {
+    "id": 421,
+    "nome": "MARCOS PAULO DE JESUS SOTERO"
+  },
+  {
+    "id": 177,
+    "nome": "PREMOLAJE COMERCIO E INDUSTRIA DE PRE-MOLDADOS LTDA-ME "
+  },
+  {
+    "id": 425,
+    "nome": "FRIOVIX COMERCIO DE REFRIGERACAO LTDA"
+  },
+  {
+    "id": 426,
+    "nome": "J. C. M. NITEROI REFRIGERACAO LTDA"
+  },
+  {
+    "id": 429,
+    "nome": "CARLOS ALBERTO DA SILVA PAULO FILHO 06601599379"
+  },
+  {
+    "id": 430,
+    "nome": "ACO BOM PRECO COMERCIAL LTDA"
+  },
+  {
+    "id": 431,
+    "nome": "LOJAO VISCONDE DO RIO BRANCO LTDA"
+  },
+  {
+    "id": 432,
+    "nome": "MERIZETE BRAZ DE SOUSA"
+  },
+  {
+    "id": 433,
+    "nome": "KELVEN DE ARAÚJO PAIVA"
+  },
+  {
+    "id": 435,
+    "nome": "B A BRITAS MATERIAIS REFORMAS E CONSTRUCOES LTDA"
+  },
+  {
+    "id": 437,
+    "nome": "AGUIA LIDER TRANSPORTE RODOVIARIO LTDA"
+  },
+  {
+    "id": 428,
+    "nome": "AMBIENTAR COMERCIO DE MATERIAL DE CONSTRUCAO EIRELI"
+  },
+  {
+    "id": 8,
+    "nome": "DTS - COM DE EQU DE SEG ELE EIRELI"
+  },
+  {
+    "id": 452,
+    "nome": "RAFAEL LOPES DE OLIVEIRA"
+  },
+  {
+    "id": 453,
+    "nome": "M. DE L. MACEDO FERREIRA"
+  },
+  {
+    "id": 343,
+    "nome": "LYRA AGROPECUARIA LTDA"
+  },
+  {
+    "id": 106,
+    "nome": "MB COMÉRCIO DE MATERIAIS DE CONSTRUÇÃO LTDA"
+  },
+  {
+    "id": 455,
+    "nome": "OPCAO CARDAN COMERCIO DE PECAS E SERVICOS LTDA"
+  },
+  {
+    "id": 456,
+    "nome": "ALESSON DOS SANTOS DE SENA"
+  },
+  {
+    "id": 457,
+    "nome": "DANIEL DE OLIVEIRA"
+  },
+  {
+    "id": 458,
+    "nome": "KIACO COMERCIAL DE ACO LTDA"
+  },
+  {
+    "id": 459,
+    "nome": "ANTONIO LUIS BARRETO PEREIRA JUNIOR"
+  },
+  {
+    "id": 461,
+    "nome": "FRANCISCO EDIVAR ROCHA"
+  },
+  {
+    "id": 464,
+    "nome": "LUCAS BARBOSA MOREIRA"
+  },
+  {
+    "id": 466,
+    "nome": "WOSHINGTON DE SOUZA ALVES"
+  },
+  {
+    "id": 467,
+    "nome": "LETICIA FACO BARRETO BEZERRA"
+  },
+  {
+    "id": 468,
+    "nome": "COMERCIAL DE MADEIRAS SAFRA LTDA"
+  },
+  {
+    "id": 471,
+    "nome": "E M ALMEIDA TELAS"
+  },
+  {
+    "id": 472,
+    "nome": "JME MATERIAIS DE CONSTRUCAO LTDA"
+  },
+  {
+    "id": 385,
+    "nome": "JOAO CRISOSTOMO DE MENEZES SOARES JUNIOR"
+  },
+  {
+    "id": 477,
+    "nome": "JOAO EVANGELISTA DE ARAUJO 94392781372"
+  },
+  {
+    "id": 482,
+    "nome": "V B CAVALCANTE CERAMICA"
+  },
+  {
+    "id": 489,
+    "nome": "FONTANELLA LOGISTICA & TRANSPORTES LTDA"
+  },
+  {
+    "id": 490,
+    "nome": "HIDROFORTAL COMERCIO DE MATERIAIS HIDRAULICOS LTDA"
+  },
+  {
+    "id": 491,
+    "nome": "M. A. FROTA & CIA LTDA"
+  },
+  {
+    "id": 486,
+    "nome": "VIP TINTAS LTDA"
+  },
+  {
+    "id": 20,
+    "nome": "COFEMIL COM.DE FERR.E MAT.INDL LTDA"
+  },
+  {
+    "id": 487,
+    "nome": "D P BARBOSA MAQUINAS E FERRAMENTAS LTDA"
+  },
+  {
+    "id": 497,
+    "nome": "ANTONIO CÉSAR DA COSTA ALEXANDRE"
+  },
+  {
+    "id": 496,
+    "nome": "ECO ENGENHARIA E DISTRIBUICAO LTDA"
+  },
+  {
+    "id": 500,
+    "nome": "DECORAFIO COMERCIO DE PISOS FORROS E DIVISORIAS LTDA"
+  },
+  {
+    "id": 502,
+    "nome": "MADEIREIRA SOL POENTE LTDA"
+  },
+  {
+    "id": 493,
+    "nome": "BRITACET BRITA COMERCIO E TRANSPORTE LTDA"
+  },
+  {
+    "id": 504,
+    "nome": "VEDACIT DO NORDESTE S/A"
+  },
+  {
+    "id": 74,
+    "nome": "AÇO CEARENSE INDUSTRIAL LTDA"
+  },
+  {
+    "id": 495,
+    "nome": "COMERCIAL DRAGAO LTDA"
+  },
+  {
+    "id": 507,
+    "nome": "A T S VARELA TRANSPORTES"
+  },
+  {
+    "id": 22,
+    "nome": "PEDREIRA NATASHA LTDA"
+  },
+  {
+    "id": 511,
+    "nome": "T & C INDUSTRIAL E COMERCIAL DE PRODUTOS SINTETICOS PARA CONSTRUCAO LTDA"
+  },
+  {
+    "id": 515,
+    "nome": "SALVECAR LOCACOES DE REBOQUE E MAQUINAS EIRELI"
+  },
+  {
+    "id": 518,
+    "nome": "CARLOS RAFAEL FIGUEIRA MOURAO"
+  },
+  {
+    "id": 520,
+    "nome": "JONATHAN VALCI RODRIGUES DE SOUSA"
+  },
+  {
+    "id": 521,
+    "nome": "JOÃO FERREIRA DA SILVA (EUDES)"
+  },
+  {
+    "id": 525,
+    "nome": "JOSÉ NICODEMOS CRUZ DE LIMA"
+  },
+  {
+    "id": 526,
+    "nome": "S V COMERCIO DE MATERIAL ELETRICO LTDA"
+  },
+  {
+    "id": 519,
+    "nome": "FLACAR LOCACAO DE MAQUINAS E SERVICOS PARA CONSTRUCAO LTDA"
+  },
+  {
+    "id": 529,
+    "nome": "EXTRUTEC EXTRUSAO E CONSULTORIA EIRELI"
+  },
+  {
+    "id": 530,
+    "nome": "M G OLIVEIRA NETO"
+  },
+  {
+    "id": 535,
+    "nome": "IMAGEM SERVICOS E COMERCIO DE EQUIPAMENTOS DE SEGURANCA EIRELI"
+  },
+  {
+    "id": 528,
+    "nome": "CLARUS COMERCIO DE EPI'S E FERRAMENTAS LTDA"
+  },
+  {
+    "id": 333,
+    "nome": "JOSE OZEAS CAETANO RAMOS"
+  },
+  {
+    "id": 537,
+    "nome": "TP  COMERCIAL DE PISOS FORROS E DIVISORIAS LTDA EIRELI"
+  },
+  {
+    "id": 545,
+    "nome": "RODRIGO BOAVENTURA GUIMARAES"
+  },
+  {
+    "id": 546,
+    "nome": "MANOEL BELO DE ARAUJO FILHO"
+  },
+  {
+    "id": 548,
+    "nome": "JOSÉ ISRAEL SILVA MARQUES"
+  },
+  {
+    "id": 479,
+    "nome": "MARCELO LUIZ DA SILVA"
+  },
+  {
+    "id": 551,
+    "nome": "PETROMAX COMERCIO DE FERRAGENS LTDA"
+  },
+  {
+    "id": 552,
+    "nome": "NORDESTE MINERACAO LTDA"
+  },
+  {
+    "id": 555,
+    "nome": "NORDESTE LOCACOES DE EQUIPAMENTOS LTDA"
+  },
+  {
+    "id": 498,
+    "nome": "FRANCISCO DE ASSIS OLIVEIRA FREITAS 83062076372"
+  },
+  {
+    "id": 559,
+    "nome": "VALDENIR PREMOLDADOS LTDA"
+  },
+  {
+    "id": 560,
+    "nome": "CERAMICA CONTINO EIRELI"
+  },
+  {
+    "id": 569,
+    "nome": "F. DUTRA PEREIRA EIRELI"
+  },
+  {
+    "id": 564,
+    "nome": "CARMAL INDUSTRIA E COMERCIO DE MADEIRAS LTDA"
+  },
+  {
+    "id": 574,
+    "nome": "C & P LUNA MATERIAL DE CONSTRUCAO LTDA"
+  },
+  {
+    "id": 575,
+    "nome": "IGOR VICTOR GOMES DOS SANTOS"
+  },
+  {
+    "id": 576,
+    "nome": "REFRIGERACAO DUFRIO COMERCIO E IMPORTACAO LTDA"
+  },
+  {
+    "id": 41,
+    "nome": "PROLUX COMERCIO LTDA"
+  },
+  {
+    "id": 572,
+    "nome": "TELEACO COMERCIO DE MATERIAIS INDUSTRIAIS LTDA"
+  },
+  {
+    "id": 588,
+    "nome": "J. GOMES DE OLIVEIRA MATERIAL DE CONSTRUCAO"
+  },
+  {
+    "id": 25,
+    "nome": "M.A FROTA E CIA LTDA"
+  },
+  {
+    "id": 591,
+    "nome": "FAXQUIMICA - INDUSTRIA E COMERCIO DE MATERIAIS DE LIMPEZA LTDA"
+  },
+  {
+    "id": 592,
+    "nome": "TARCILENE MARIA ALMEIDA DOS ANJOS"
+  },
+  {
+    "id": 599,
+    "nome": "LEDA MARIA BEZERRA DE SOUZA"
+  },
+  {
+    "id": 47,
+    "nome": "S. DIAS BRAGA - ME"
+  },
+  {
+    "id": 596,
+    "nome": "MIL MADEIRAS COMERCIAL DE MADEIRAS LTDA"
+  },
+  {
+    "id": 601,
+    "nome": "FORTCOLOR TINTAS E VERNIZES LTDA"
+  },
+  {
+    "id": 609,
+    "nome": "COMERCIAL MAB EIRELI"
+  },
+  {
+    "id": 523,
+    "nome": "MULTIFORMAS COMERCIO DE MATERIAIS DE CONSTRUCAO LTDA"
+  },
+  {
+    "id": 612,
+    "nome": "JANIO FERREIRA DE CASTRO"
+  },
+  {
+    "id": 597,
+    "nome": "ATHENAS COMERCIO E INSTALACOES EIRELI"
+  },
+  {
+    "id": 617,
+    "nome": "MARCOS ROBERTO DA ROCHA MATIAS"
+  },
+  {
+    "id": 618,
+    "nome": "FRANCISCO JOSÉLIO DOMINGOS DA SILVA"
+  },
+  {
+    "id": 619,
+    "nome": "FRANCISCO ANTONIO DA SILVA"
+  },
+  {
+    "id": 620,
+    "nome": "PEDRO COSMO DA SILVA JUNIOR"
+  },
+  {
+    "id": 621,
+    "nome": "Letícia Feitosa Gonçalves"
+  },
+  {
+    "id": 622,
+    "nome": "V B CAVALCANTE"
+  },
+  {
+    "id": 517,
+    "nome": "RAFAEL JOSE LIMA BRAGA"
+  },
+  {
+    "id": 614,
+    "nome": "MAPA IMPRESSAO DIGITAL LTDA"
+  },
+  {
+    "id": 270,
+    "nome": "AUTO PECAS CAMPINA GRANDE LTDa"
+  },
+  {
+    "id": 639,
+    "nome": "RONALD DAVID TAVEIRA DE LIMA"
+  },
+  {
+    "id": 640,
+    "nome": "BARRETOS DISTRIBUIDORA DE ALIMENTOS LTDA"
+  },
+  {
+    "id": 645,
+    "nome": "JORGE UBIRAJARA CAMPOS FERNANDES"
+  },
+  {
+    "id": 646,
+    "nome": "MARCOS PVC EIRELI"
+  },
+  {
+    "id": 647,
+    "nome": "MANOEL ALMADA MONTEIRO"
+  },
+  {
+    "id": 648,
+    "nome": "HIDROFORTAL COMERCIO DE MATERIAIS HIDRAULICOS LTDA"
+  },
+  {
+    "id": 651,
+    "nome": "C. COMERCIAL DE ALIMENTOS BEBIDAS MATERIAIS ELETRO ELETRONICOS "
+  },
+  {
+    "id": 650,
+    "nome": "SIMPLIFIQUE COMERCIO DE MATERIAL DE CONSTRUCAO LTDA"
+  },
+  {
+    "id": 653,
+    "nome": "BONZAO - COMERCIO E INDUSTRIA DE MADEIRA LTDA"
+  },
+  {
+    "id": 668,
+    "nome": "SUPERFIBRA INDUSTRIA E COMERCIO DE ISOLANTES ELETRICOS LTDA"
+  },
+  {
+    "id": 670,
+    "nome": "ANTONIO FABIO A MORAIS"
+  },
+  {
+    "id": 671,
+    "nome": "FORT VIDROS INDUSTRIA E COM DE MOLDURAS E ESPELHOS LTDA"
+  },
+  {
+    "id": 673,
+    "nome": "R P COMERCIO DE MERCADORIAS EM GERAL EIRELI"
+  },
+  {
+    "id": 690,
+    "nome": "CÍCERO OZÓRIO SOUZA"
+  },
+  {
+    "id": 202,
+    "nome": "JOSENI F MAIA - ME "
+  },
+  {
+    "id": 726,
+    "nome": "CASSYMYRO MARCYO NETO MAIA"
+  },
+  {
+    "id": 727,
+    "nome": "MARACANAU COMERCIO DE MATERIAL DE CONSTRUCAO EIRELI"
+  },
+  {
+    "id": 729,
+    "nome": "A. G. MOREIRA LIMA"
+  },
+  {
+    "id": 735,
+    "nome": "LIBERATO SILVA DE SOUSA"
+  },
+  {
+    "id": 736,
+    "nome": "CINCOL CERAMICA INDUSTRIAL COMERCIAL LIMITADA"
+  },
+  {
+    "id": 125,
+    "nome": "ORLANDO SILVIO COSTA"
+  },
+  {
+    "id": 742,
+    "nome": "AMES - ILUMINACAO E INSTALACOES ELETRICAS LTDA"
+  },
+  {
+    "id": 751,
+    "nome": "PATRÍCIA COSTA O. CASTRO"
+  },
+  {
+    "id": 752,
+    "nome": "RAIMUNDO NONATO DA SILVA FILHO"
+  },
+  {
+    "id": 758,
+    "nome": "FRANCISCO T DA SILVA MOURA"
+  },
+  {
+    "id": 765,
+    "nome": "LUIZ CARLOS DE SOUZA EIRELI"
+  },
+  {
+    "id": 762,
+    "nome": "J. L. COSTA TRANSPORTES"
+  },
+  {
+    "id": 770,
+    "nome": "JOSÉ FARIAS HONORATO"
+  },
+  {
+    "id": 773,
+    "nome": "MARIA L S CHAVES FERRAGENS"
+  },
+  {
+    "id": 96,
+    "nome": "FGF AUTOMACAO INDUSTRIAL LTDA"
+  },
+  {
+    "id": 780,
+    "nome": "VINOX INDUSTRIAL E COMERCIO DE ARTEFATOS DE ACO INOX LTDA"
+  },
+  {
+    "id": 793,
+    "nome": "HIDROMART COMERCIO VAREJISTA DE TINTAS E MATERIAIS DE CONSTRUCAO LTDA"
+  },
+  {
+    "id": 798,
+    "nome": "MANUEL ARAÚJO DE AZEVEDO"
+  },
+  {
+    "id": 784,
+    "nome": "RAIMUNDO GONCALVES MONTEIRO JUNIOR"
+  },
+  {
+    "id": 78,
+    "nome": "AÇO COMERCIAL LTDA"
+  },
+  {
+    "id": 51,
+    "nome": "F. M. DE JESUS GESSO"
+  },
+  {
+    "id": 802,
+    "nome": "LEROY MERLIN COMPANHIA BRASILEIRA DE BRICOLAGEM"
+  },
+  {
+    "id": 536,
+    "nome": "ELETRONICA APOLO ALDEOTA LTDA"
+  },
+  {
+    "id": 63,
+    "nome": "R. CHAGAS E CIA LTDA"
+  },
+  {
+    "id": 811,
+    "nome": "LUCIVANIA FREITAS BORGES"
+  },
+  {
+    "id": 814,
+    "nome": "FÁBIO AMARO SOARES"
+  },
+  {
+    "id": 815,
+    "nome": "LUMINACO COMERCIAL DE ACO E ALUMINIO LTDA"
+  },
+  {
+    "id": 817,
+    "nome": "A. M. DE A. DOS SANTOS"
+  },
+  {
+    "id": 819,
+    "nome": "MARCELO RODRIGUES DE MESQUITA"
+  },
+  {
+    "id": 822,
+    "nome": "ITALO ALENCAR VIANA MENEZES CONSTRUÇÕES"
+  },
+  {
+    "id": 825,
+    "nome": "FRANCISCO TIAGO FERREIRA GOMES 03154256369"
+  },
+  {
+    "id": 827,
+    "nome": "JOSE EDUARDO BITENCOURT DOS SANTOS ATHAN EIRELI"
+  },
+  {
+    "id": 836,
+    "nome": "RECICLAFOR RECICLAGENS COMERCIO E SERVICOS GRAFICOS LTDA"
+  },
+  {
+    "id": 850,
+    "nome": "ADMA SOARES DE VASCONCELOS"
+  },
+  {
+    "id": 847,
+    "nome": "IMAX DOS SANTOS ROCHA 05352378390"
+  },
+  {
+    "id": 852,
+    "nome": "MAIQUEL FREIRE BRUNO EIRELI"
+  },
+  {
+    "id": 868,
+    "nome": "EDUARDO FERNANDES DE SOUZA 00238126307"
+  },
+  {
+    "id": 856,
+    "nome": "FRANCISCO GILLIARD RODRIGUES 22308272864"
+  },
+  {
+    "id": 866,
+    "nome": "CERAMICA NOVA OLINDA LTDA"
+  },
+  {
+    "id": 870,
+    "nome": "PIERINI REVESTIMENTOS CERAMICOS LTDA"
+  },
+  {
+    "id": 862,
+    "nome": "JOAO BARROSO DE SOUZA NETO 04905927323"
+  },
+  {
+    "id": 872,
+    "nome": "M. F. U. DE OLIVEIRA REFRIGERACAO"
+  },
+  {
+    "id": 91,
+    "nome": "FRANCISCO ALEF SILVEIRA JOVINO - ME"
+  },
+  {
+    "id": 873,
+    "nome": "REQUINTE INDUSTRIA E COMERCIO DE CONFECCAO LTDA"
+  },
+  {
+    "id": 881,
+    "nome": "SKINA DA CONSTRUCAO EIRELI"
+  },
+  {
+    "id": 563,
+    "nome": "OLIVEIRA E CUNHA INDUSTRIA E COMERCIO DE MADEIRAS LTDA"
+  },
+  {
+    "id": 886,
+    "nome": "DANTAS DISTRIBUIDORA DE MATERIAL ESCOLAR E ESCRITORIO LTDA"
+  },
+  {
+    "id": 888,
+    "nome": "RITA MACIEUDA ARAUJO DA SILVA 00413711358"
+  },
+  {
+    "id": 891,
+    "nome": "REJANE FERNANDES DE ALCANTARA"
+  },
+  {
+    "id": 893,
+    "nome": "I. FRUTUOZO DE OLIVEIRA"
+  },
+  {
+    "id": 28,
+    "nome": "METALMECANICA MAIA LTDA"
+  },
+  {
+    "id": 274,
+    "nome": "M3 PREMOLDADOS INDUSTRIAL EIRELI"
+  },
+  {
+    "id": 910,
+    "nome": "JOSE AURELIO MENDES LOPES"
+  },
+  {
+    "id": 914,
+    "nome": "FRANCISCA GILDANIA DOS SANTOS BARBOSA 00348363303"
+  },
+  {
+    "id": 919,
+    "nome": "MARCELO DE PAIVA MOTA"
+  },
+  {
+    "id": 924,
+    "nome": "RKV COMERCIO DE ARTIGOS DE ILUMINACAO LTDA"
+  },
+  {
+    "id": 925,
+    "nome": "PEDRO TERTO DE ARAÚJO"
+  },
+  {
+    "id": 928,
+    "nome": "HBR COMERCIO DE PNEUMATICOS E FERRAMENTAS LTDA"
+  },
+  {
+    "id": 904,
+    "nome": "J.G COMERCIO DE MATERIAIS DE CONSTRUCAO E TRANSPORTES LTDA"
+  },
+  {
+    "id": 946,
+    "nome": "MARIA DE LOURDES DA SILVA DUTRA"
+  },
+  {
+    "id": 949,
+    "nome": "JOSE IVAN BARBOZA CONSTRUCOES"
+  },
+  {
+    "id": 952,
+    "nome": "F. LOPES DOS SANTOS CERAMICA"
+  },
+  {
+    "id": 955,
+    "nome": "J. FELISBERTO DE OLIVEIRA FILHO"
+  },
+  {
+    "id": 930,
+    "nome": "BRINEL COMERCIO & SERVICOS LTDA"
+  },
+  {
+    "id": 961,
+    "nome": "ADESIVA SIGN SINALIZACAO E COMUNICACAO VISUAL LTDA"
+  },
+  {
+    "id": 963,
+    "nome": "CASA DO ELETRICISTA LTDA"
+  },
+  {
+    "id": 969,
+    "nome": "COMERCIAL EDINA ASSUNCAO LTDA"
+  },
+  {
+    "id": 970,
+    "nome": "DEPÓSITO JR"
+  },
+  {
+    "id": 974,
+    "nome": "JOSÉ ALBERTO MATIAS DE LIMA JUNIOR"
+  },
+  {
+    "id": 977,
+    "nome": "DEPOSITO COLOMBO LTDA"
+  },
+  {
+    "id": 245,
+    "nome": "FRANCISCO FÍDIAS CARVALHO E FONTENELE ME"
+  },
+  {
+    "id": 981,
+    "nome": "FRANCISCO CIRO JUNIOR SOUZA"
+  },
+  {
+    "id": 984,
+    "nome": "AGUA VIVA TRANSPORTES LTDA"
+  },
+  {
+    "id": 499,
+    "nome": "R CHAGAS E CIA LTDA"
+  },
+  {
+    "id": 989,
+    "nome": "R7 PLAST INDUSTRIA E COMERCIO DE PLASTICOS LTDA"
+  },
+  {
+    "id": 992,
+    "nome": "AIRTON DE A DA SILVA COMERCIO"
+  },
+  {
+    "id": 996,
+    "nome": "COMERCIO E INDUSTRIA DE PREMOLDADOS AMERICO LTDA"
+  },
+  {
+    "id": 998,
+    "nome": "PRISCILLA MENEZES SOARES DE FREITAS"
+  },
+  {
+    "id": 1000,
+    "nome": "JOSÉ FLÁVIO RODRIGUES DE OLIVEIRA "
+  },
+  {
+    "id": 1005,
+    "nome": "MARIA ROSIANE DA SILVA LEANDRO 05536351311"
+  },
+  {
+    "id": 1007,
+    "nome": "JUACO COMERCIO ATACADISTA DE FERRAGENS LTDA"
+  },
+  {
+    "id": 1008,
+    "nome": "JUAZEIRO PARAFUSOS E FERRAGENS LTDA"
+  },
+  {
+    "id": 1009,
+    "nome": "CLAUDIR FRANCISCO CASSOL"
+  },
+  {
+    "id": 1010,
+    "nome": "NERY CONSTRUÇÕES LTDA"
+  },
+  {
+    "id": 1015,
+    "nome": "FRANCISCO PINTO DE SANTANA ME "
+  },
+  {
+    "id": 1024,
+    "nome": "CICERO MACHADO DE SOUSA"
+  },
+  {
+    "id": 1027,
+    "nome": "PONTUACO COMERCIO VAREJISTA DE MATERIAL DE CONSTRUCAO LTDA"
+  },
+  {
+    "id": 1031,
+    "nome": "MARIA HELENA DUARTE CRISPIM"
+  },
+  {
+    "id": 1034,
+    "nome": "FRANCISCO EVANDO JACO"
+  },
+  {
+    "id": 1035,
+    "nome": "MARIA SOCORRO DE SOUZA MATERIAL DE CONSTRUCAO"
+  },
+  {
+    "id": 1037,
+    "nome": "JUDERLANIO RANGEL DE SOUZA"
+  },
+  {
+    "id": 1042,
+    "nome": "RENATO DE OLIVEIRA TEIXEIRA 03366683333"
+  },
+  {
+    "id": 1032,
+    "nome": "F. E. COMERCIO DE MATERIAIS DE CONSTRUCAO PARAIPABA LTDA"
+  },
+  {
+    "id": 1049,
+    "nome": "R J COMERCIO VAREJISTA DE GAS LTDA"
+  },
+  {
+    "id": 1050,
+    "nome": "M. PRAXEDES MARTINS"
+  },
+  {
+    "id": 1053,
+    "nome": "FRANCISCA EDLEUSA PEREIRA CUNHA 04191001302"
+  },
+  {
+    "id": 1059,
+    "nome": "PMP INDUSTRIA DE PRE-MOLDADOS PADRE CICERO EIRELI"
+  },
+  {
+    "id": 1061,
+    "nome": "SG PREMOLDADOS LTDA"
+  },
+  {
+    "id": 1065,
+    "nome": "MARIA SOCORRO VIANA MACEDO"
+  },
+  {
+    "id": 1067,
+    "nome": "VALERIA DE LIMA RAMOS"
+  },
+  {
+    "id": 1073,
+    "nome": "CAROLINE DE PAULA ALVES"
+  },
+  {
+    "id": 865,
+    "nome": "METALURGICA F C EIRELI"
+  },
+  {
+    "id": 1074,
+    "nome": "ANTONIO EDMILSON DOS SANTOS"
+  },
+  {
+    "id": 1060,
+    "nome": "JOSE FERNANDES SOBRINHO FILHO"
+  },
+  {
+    "id": 1082,
+    "nome": "RAIMUNDO ELEUSES DA SILVA NUNES"
+  },
+  {
+    "id": 1083,
+    "nome": "APEFERR COMERCIO DE FERRAMENTAS, EPIS E MAQUINAS LTDA"
+  },
+  {
+    "id": 1085,
+    "nome": "FEROL FERRAMENTAS E ROLAMENTOS COMERCIO E IMPORTACAO LTDA"
+  },
+  {
+    "id": 1091,
+    "nome": "ELIZABETH PORCELANATO S/A"
+  },
+  {
+    "id": 1069,
+    "nome": "VALKA INDUSTRIA E COMERCIO DE CERCAS LTDA"
+  },
+  {
+    "id": 1092,
+    "nome": "JUA GARDEN PLANTAS & JARDINS LTDA."
+  },
+  {
+    "id": 1096,
+    "nome": "ELISANGELA CABRAL ESTEVAO"
+  },
+  {
+    "id": 1098,
+    "nome": "JOEL FÉLIX DA SILVA "
+  },
+  {
+    "id": 1099,
+    "nome": "VICENTE GONCALVES DE OLIVEIRA"
+  },
+  {
+    "id": 1103,
+    "nome": "ANTONIA ELIANE BARBOSA SILVA"
+  },
+  {
+    "id": 943,
+    "nome": "ACO NORONHA COMERCIO E SERVICO DE FERRO LTDA"
+  },
+  {
+    "id": 1111,
+    "nome": "ATB CONSTRUCOES E ARQUITETURA LTDA"
+  },
+  {
+    "id": 1114,
+    "nome": "TELPLASTIC FORTAL INDUSTRIA E COMERCIO DE PLASTICOS E ARTEFATOS LTDA"
+  },
+  {
+    "id": 1081,
+    "nome": "SOL COMERCIO DE FERRAMGENS FERRAMENTAS LTDA"
+  },
+  {
+    "id": 1125,
+    "nome": "KINGSPAN - ISOESTE CONSTRUTIVOS ISOTERMICOS S/A"
+  },
+  {
+    "id": 1127,
+    "nome": "A. B. ALMEIDA CONSTRUCAO"
+  },
+  {
+    "id": 1135,
+    "nome": "MAURÍCIO DA SILVA SOUZA"
+  },
+  {
+    "id": 715,
+    "nome": "DALWAN COMERCIO E INDUSTRIA LTDA"
+  },
+  {
+    "id": 1139,
+    "nome": "M. R. SILVA IMOVEIS"
+  },
+  {
+    "id": 1142,
+    "nome": "G. W. VIEIRA QUEIROZ PEDRAS"
+  },
+  {
+    "id": 1144,
+    "nome": "TARCISIO CARDOSO "
+  },
+  {
+    "id": 35,
+    "nome": "EZEM COMÉRCIO DE MATERIAIS DE CONSTRUÇÕES LTDA"
+  },
+  {
+    "id": 165,
+    "nome": "PETRAL COMERCIO DE FERRO E ACO LTDA"
+  },
+  {
+    "id": 1150,
+    "nome": "AIRTON EBERTON LIMA FIDELES"
+  },
+  {
+    "id": 1152,
+    "nome": "POLIMIX CONCRETO LTDA"
+  },
+  {
+    "id": 1154,
+    "nome": "V F COMERCIO DE FIBRAS EIRELI"
+  },
+  {
+    "id": 1153,
+    "nome": "CLAUDIO R F RODRIGUES"
+  },
+  {
+    "id": 1157,
+    "nome": "SUPER SUPPY DISTRIBUIDORA LTDA "
+  },
+  {
+    "id": 1160,
+    "nome": "CERAMICA CAJAZEIRAS LTDA"
+  },
+  {
+    "id": 1004,
+    "nome": "VANESSA BARBOSA DA SILVA"
+  },
+  {
+    "id": 1166,
+    "nome": "TERMOTECNICA INDUSTRIA E COMERCIO LTDA"
+  },
+  {
+    "id": 1167,
+    "nome": "ACERT SOLUCOES CONSTRUTIVAS LTDA"
+  },
+  {
+    "id": 1168,
+    "nome": "MADRAL COMERCIO DE MADEIRAS LTDA"
+  },
+  {
+    "id": 598,
+    "nome": "R. DE ARAUJO"
+  },
+  {
+    "id": 1170,
+    "nome": "CERAMICA ASSUNCAO LTDA"
+  },
+  {
+    "id": 1173,
+    "nome": "B2W  COMPANHIA DIGITAL"
+  },
+  {
+    "id": 1175,
+    "nome": "CARLOS ALBERTO DE SOUSA CUNHA"
+  },
+  {
+    "id": 734,
+    "nome": "M J DINIZ & CIA LTDA"
+  },
+  {
+    "id": 1180,
+    "nome": "METAL COMERCIO LTDA"
+  },
+  {
+    "id": 1184,
+    "nome": "LOURDENIA MARIA GURGEL REIS"
+  },
+  {
+    "id": 154,
+    "nome": "SHOPPING DAS TELAS INDUSTRIA E COMERCIO LTDA"
+  },
+  {
+    "id": 1068,
+    "nome": "J A MATERIAL DE CONSTRUCAO LTDA"
+  },
+  {
+    "id": 1186,
+    "nome": "R N BRITAGEM EIRELI"
+  },
+  {
+    "id": 1182,
+    "nome": "ROGERIO VIEIRA BATISTA "
+  },
+  {
+    "id": 1193,
+    "nome": "DADA LIMA MATERIAL DE CONSTRUCAO LTDA"
+  },
+  {
+    "id": 769,
+    "nome": "ESTRUTURAL COMERCIO E SERVICOS LTDA"
+  },
+  {
+    "id": 1197,
+    "nome": "SOLUCAO PRODUTOS PARA CONSTRUCAO LTDA"
+  },
+  {
+    "id": 1189,
+    "nome": "FRANCISCO LINDENBERG DE OLIVEIRA PEREIRA"
+  },
+  {
+    "id": 1198,
+    "nome": "ALUMIL COMERCIO E REPRESENTACAO EIRELI"
+  },
+  {
+    "id": 1204,
+    "nome": "L e L INDUSTRIA DE PRE-MOLDADOS E MATERIAL DE CONSTRUCOES LTDA"
+  },
+  {
+    "id": 1213,
+    "nome": "PETROBRITA INDUSTRIA DE BRITAGEM DO CARIRI LTDA"
+  },
+  {
+    "id": 1214,
+    "nome": "TELE ELETRONICA COMERCIO VAREJISTA EIRELI"
+  },
+  {
+    "id": 1216,
+    "nome": "IVANILDO DO REAL DOS SANTOS SUPRIMENTOS DE INFORMATICA"
+  },
+  {
+    "id": 1217,
+    "nome": "M. D. RIBEIRO DE OLIVEIRA"
+  },
+  {
+    "id": 1220,
+    "nome": "KABUM COMERCIO ELETRONICO S.A."
+  },
+  {
+    "id": 1223,
+    "nome": "ACC GAS ASSISTENCIA TECNICA E SERVICOS EIRELI"
+  },
+  {
+    "id": 1224,
+    "nome": "CASA CONSTRUCAO LTDA."
+  },
+  {
+    "id": 738,
+    "nome": "ACO ALUMINIO COMERCIAL - EIRELI"
+  },
+  {
+    "id": 1209,
+    "nome": "SAINT-GOBAIN DO BRASIL PRODUTOS INDUSTRIAIS E PARA CONSTRUCAO LTDA"
+  },
+  {
+    "id": 1225,
+    "nome": "P F D DISTRIBUIDORA DE PISOS FORROS E DIVISORIAS LTDA"
+  },
+  {
+    "id": 1226,
+    "nome": "A C Q COMERCIO E REPRESENTACOES LTDA"
+  },
+  {
+    "id": 1185,
+    "nome": "BRASCOLA LTDA - EM RECUPERACAO JUDICIAL"
+  },
+  {
+    "id": 1130,
+    "nome": "HARD PRODUTOS PARA CONSTRUCAO LTDA"
+  },
+  {
+    "id": 1234,
+    "nome": "JOAO RODRIGUES DA SILVA 02932829351"
+  },
+  {
+    "id": 1028,
+    "nome": "META LOCACOES DE VEICULOS LTDA"
+  },
+  {
+    "id": 1244,
+    "nome": "CRIATEL CERAMICA RIATE LTDA"
+  },
+  {
+    "id": 1247,
+    "nome": "F. DA SILVA VASCONCELOS"
+  },
+  {
+    "id": 1248,
+    "nome": "FRANCISCO ALBUQUERQUE DE SOUSA "
+  },
+  {
+    "id": 1250,
+    "nome": "SPRINGER CARRIER LTDA"
+  },
+  {
+    "id": 1251,
+    "nome": "ELAINE CRISTINA ALVES DE OLIVEIRA"
+  },
+  {
+    "id": 485,
+    "nome": "FORTCOLOR TINTAS E VERNIZES LTDA"
+  },
+  {
+    "id": 1255,
+    "nome": "JOSE ABRAO MAMONI 26017854895"
+  },
+  {
+    "id": 1261,
+    "nome": "ANA PAULA MENESES BARROS"
+  },
+  {
+    "id": 1196,
+    "nome": "MARVA ENGENHARIA MANUTENCAO E SERVICOS LTDA"
+  },
+  {
+    "id": 1263,
+    "nome": "DIMAPOL DISTRIB DE MATERIAL DE LIMPEZA E PAPEL LTDA"
+  },
+  {
+    "id": 1265,
+    "nome": "MONKEY COMUNICAÇÃO VISUAL"
+  },
+  {
+    "id": 1101,
+    "nome": "COSIACO REPRESENTACOES COMERCIAIS LTDA"
+  },
+  {
+    "id": 1271,
+    "nome": "GINAST EQUIPAMENTOS METALURGICOS EIRELI"
+  },
+  {
+    "id": 1273,
+    "nome": "NORDESTE MANUTENCAO E COMERCIO DE EQUIPAMENTOS LTDA"
+  },
+  {
+    "id": 1276,
+    "nome": "CEARA CERAMICA LTDA"
+  },
+  {
+    "id": 858,
+    "nome": "ELAJES SOLUCOES EM CONCRETO E SERVICOS EIRELI"
+  },
+  {
+    "id": 1281,
+    "nome": "MONTEIRO E COSTA COMERCIO DE MATERIAIS DE CONSTRUCAO S/A"
+  },
+  {
+    "id": 1283,
+    "nome": "PREMOACO LTDA"
+  },
+  {
+    "id": 1002,
+    "nome": "MIKEIAS AUGUSTO SILVA DE SOUSA"
+  },
+  {
+    "id": 1285,
+    "nome": "ARCROFLEX INDUSTRIA E COMERCIO DE ADITIVOS PARA USO INDUSTRIAL LTDA"
+  },
+  {
+    "id": 626,
+    "nome": "ZEUS DO BRASIL LTDA"
+  },
+  {
+    "id": 1282,
+    "nome": "LOURIVAL DE MELO BALBINO"
+  },
+  {
+    "id": 1295,
+    "nome": "ANTÔNIO NOGUEIRA BARROS NETO"
+  },
+  {
+    "id": 1087,
+    "nome": "POWER COMERCIO DE EQUIPAMENTOS E MATERIAIS LTDA"
+  },
+  {
+    "id": 1296,
+    "nome": "ROLITEC COMERCIO ROCHA LIMA LTDA"
+  },
+  {
+    "id": 1300,
+    "nome": "PROJEART INDUSTRIA DE ESTRUTURAS METALICAS LTDA"
+  },
+  {
+    "id": 1301,
+    "nome": "AMAZON SERVICOS DE VAREJO DO BRASIL LTDA."
+  },
+  {
+    "id": 218,
+    "nome": "GESDRALL GESSO"
+  },
+  {
+    "id": 1304,
+    "nome": "F. E. CRUZ DA SILVEIRA FLORICULTURA"
+  },
+  {
+    "id": 1306,
+    "nome": "ELETRONICA CENTRAL EC EIRELI"
+  },
+  {
+    "id": 1311,
+    "nome": "COMPACTO PRE MOLDADOS INDUSTRIA CERAMICA LTDA"
+  },
+  {
+    "id": 1310,
+    "nome": "J E A CONSTRUCOES, COMERCIO E LOCACAO DE VEICULOS LTDA"
+  },
+  {
+    "id": 1313,
+    "nome": "LOKMAIS LOCACAO DE MAQUINAS E EQUIPAMENTOS, TRANSPORTES LTDA"
+  },
+  {
+    "id": 186,
+    "nome": "COMPANHIA IND. DE CIMENTO APODI"
+  },
+  {
+    "id": 233,
+    "nome": "MADEIREIRA LUAN LTDA"
+  },
+  {
+    "id": 1317,
+    "nome": "ECOBLOKUS PRE-MOLDADOS EIRELI"
+  },
+  {
+    "id": 991,
+    "nome": "A B R DE OLIVEIRA & CIA LTDA"
+  },
+  {
+    "id": 1322,
+    "nome": "ELIANE MARIA BUCCIERI - ALUMINIO"
+  },
+  {
+    "id": 1329,
+    "nome": "FR LOCACOES E SERVICOS EIRELI"
+  },
+  {
+    "id": 1332,
+    "nome": "ETIENE DE SOUSA SILVA"
+  },
+  {
+    "id": 1340,
+    "nome": "ELIZEU JERONIMO CORREIA JUNIOR"
+  },
+  {
+    "id": 1335,
+    "nome": "LUIZ A DE SOUZA EUFRASIO"
+  },
+  {
+    "id": 1337,
+    "nome": "PRELOC- SOLUCAO EM LOCACOES LTDA"
+  },
+  {
+    "id": 1341,
+    "nome": "GERMANO RIBEIRO GOMES DE MATOS"
+  },
+  {
+    "id": 1342,
+    "nome": "RONALDO MOURA RIBEIRO"
+  },
+  {
+    "id": 1349,
+    "nome": "PEDREIRAS COITE LTDA"
+  },
+  {
+    "id": 1359,
+    "nome": "JS REGULARIZACOES E CONSTRUCOES LTDA"
+  },
+  {
+    "id": 1235,
+    "nome": "CLAUDIO MACIEL GADELHA DA SILVA"
+  },
+  {
+    "id": 1366,
+    "nome": "ELIARDO COSTA MATIAS 01023069318"
+  },
+  {
+    "id": 1361,
+    "nome": "CONCRETOMAC MASSAS E CONCRETO PARA CONSTRUCOES EIRELI"
+  },
+  {
+    "id": 1369,
+    "nome": "ALPES ACESSORIOS DE PARA-RAIOS LTDA."
+  },
+  {
+    "id": 1379,
+    "nome": "JOSE NILSON BRAGA ALVES"
+  },
+  {
+    "id": 1380,
+    "nome": "PREMOLDADOS TIBAU LTDA"
+  },
+  {
+    "id": 1382,
+    "nome": "I M PEREIRA"
+  },
+  {
+    "id": 1318,
+    "nome": "MATHEUS TELES CARNEIRO "
+  },
+  {
+    "id": 1063,
+    "nome": "JOSE ELANO MAIA DE SOUZA"
+  },
+  {
+    "id": 1386,
+    "nome": "JOSE VANDEYBERG DA SILVA MOREIRA"
+  },
+  {
+    "id": 1388,
+    "nome": "RONALDO FERNANDES DE ALCANTARA"
+  },
+  {
+    "id": 1389,
+    "nome": "SANNY COMERCIO DE GESSO E PLACAS LTDA"
+  },
+  {
+    "id": 1390,
+    "nome": "SPOT JAGUARA INDUSTRIA E COMERCIO LTDA"
+  },
+  {
+    "id": 1309,
+    "nome": "THIAGO NOGUEIRA DE ARAUJO EIRELI"
+  },
+  {
+    "id": 1401,
+    "nome": "ELTECH CNC COMERCIO E INDUSTRIA LTDA"
+  },
+  {
+    "id": 1408,
+    "nome": "MARCOS FERNANDO DE FARIAS SANTOS 02717856323"
+  },
+  {
+    "id": 1412,
+    "nome": "ROGER CONSTRUCOES COMERCIAL LTDA"
+  },
+  {
+    "id": 1410,
+    "nome": "GERDAU ACOS LONGOS S.A."
+  },
+  {
+    "id": 1208,
+    "nome": "ETERNIT S.A  EM RECUPERACAO JUDICIAL"
+  },
+  {
+    "id": 1420,
+    "nome": "FRANCISCO FABIO ESMERALDO ALVES"
+  },
+  {
+    "id": 1417,
+    "nome": "PANELAS FERREIRA E SILVA EIRELI"
+  },
+  {
+    "id": 1419,
+    "nome": "GARCIAS E KALICHEWSKI EXTINTORES LTDA"
+  },
+  {
+    "id": 966,
+    "nome": "VTK TUBOS E CONEXOES EM ACO LTDA"
+  },
+  {
+    "id": 1425,
+    "nome": "ROSE PISOS LTDA"
+  },
+  {
+    "id": 1426,
+    "nome": "JOSE MARCILIO PEREIRA COSTA"
+  },
+  {
+    "id": 1473,
+    "nome": "MACEL LIMA PONTES"
+  },
+  {
+    "id": 1447,
+    "nome": "SUPERMIX CONCRETO S/A"
+  },
+  {
+    "id": 1468,
+    "nome": "JAB COMERCIO E DISTRIBUICAO DE ELETRO E ELETRONICO LTDA"
+  },
+  {
+    "id": 1576,
+    "nome": "FRANCISCO MATIAS FILHO"
+  },
+  {
+    "id": 1477,
+    "nome": "ANTONIO JOSE ESMERALDO ALVES"
+  },
+  {
+    "id": 1458,
+    "nome": "ANTONIO IVAN SOUSA SILVINO"
+  },
+  {
+    "id": 1315,
+    "nome": "LUCILANE LAUREANO"
+  },
+  {
+    "id": 1415,
+    "nome": "CONSTRUTORA MACON EIRELI"
+  },
+  {
+    "id": 1508,
+    "nome": "G. CAVALCANTE BARROS"
+  },
+  {
+    "id": 1501,
+    "nome": "ODESIO CUNHA FILHO E CIA LTDA"
+  },
+  {
+    "id": 1245,
+    "nome": "CERAMICA TORRES LTDA"
+  },
+  {
+    "id": 1507,
+    "nome": "FRANCISCO NATIVO ALVES"
+  },
+  {
+    "id": 1535,
+    "nome": "CORREIA DE OLIVEIRA COMERCIO DE MAT PARA CONSTRUCAO LTDA"
+  },
+  {
+    "id": 1565,
+    "nome": "ALGE METALURGICA LTDA"
+  },
+  {
+    "id": 1567,
+    "nome": "ZE DOS PARAFUSOS LTDA"
+  },
+  {
+    "id": 1579,
+    "nome": "CONCRETO TECMIX LTDA"
+  },
+  {
+    "id": 1583,
+    "nome": "DCS DISTRIBUICAO DE MATERIAIS DE CONSTRUCAO A SECO LTDA"
+  },
+  {
+    "id": 1370,
+    "nome": "LINSELETRICA LTDA"
+  },
+  {
+    "id": 1479,
+    "nome": "LEDVANCE BRASIL COMERCIO DE PRODUTOS DE ILUMINACAO LTDA."
+  },
+  {
+    "id": 1589,
+    "nome": "GROWTH INDUSTRIA E COMERCIO DE CONDUTORES ELETRICOS LTDA"
+  },
+  {
+    "id": 1572,
+    "nome": "TECPANEL SOLUCOES CONSTRUTIVAS LTDA"
+  },
+  {
+    "id": 1496,
+    "nome": "PLATINUM METAIS COMERCIAL LTDA - EM RECUPERACAO JUDICIAL"
+  },
+  {
+    "id": 1591,
+    "nome": "BR DISTRIBUIDORA DE CIMENTO LTDA"
+  },
+  {
+    "id": 1593,
+    "nome": "NOVOBLOCO COMERCIO DE CONSTRUCAO LTDA"
+  },
+  {
+    "id": 1595,
+    "nome": "SUERDA MARIA NOBRE PAIVA"
+  },
+  {
+    "id": 1597,
+    "nome": "FORTALEZA COMPENSADOS "
+  },
+  {
+    "id": 1559,
+    "nome": "RODRIGUES MATERIAL DE CONSTRUCOES LTDA"
+  },
+  {
+    "id": 1603,
+    "nome": "J E M COMERCIO DE EXTINTORES E SERVICOS DE MANUTENCAO LTDA"
+  },
+  {
+    "id": 1070,
+    "nome": "REPRESENTACOES ELMO LIMITADA"
+  },
+  {
+    "id": 1606,
+    "nome": "ALINE LOPES DE OLIVEIRA 60759537364"
+  },
+  {
+    "id": 1608,
+    "nome": "BORGES COMERCIAL LTDA"
+  },
+  {
+    "id": 1188,
+    "nome": "ANTONIO CLEBER RODRIGUES DA CUNHA "
+  },
+  {
+    "id": 1619,
+    "nome": "CARLOS CESAR MONTEIRO GOMES "
+  },
+  {
+    "id": 1616,
+    "nome": "ISI TRADING COMERCIO ATACADISTA DE PRODUTOS QUIMICOS LTDA"
+  },
+  {
+    "id": 1110,
+    "nome": "A M P DA SILVA"
+  },
+  {
+    "id": 1621,
+    "nome": "VALTER CLAUDINO DA SILVA JUNIOR 00626361389"
+  },
+  {
+    "id": 1604,
+    "nome": "JMX SOLUCOES EM LED EIRELI"
+  },
+  {
+    "id": 565,
+    "nome": "SOPREMOL INDUSTRIA E COMERCIO DE PREMOLDADOS LTDA"
+  },
+  {
+    "id": 1634,
+    "nome": "IRISMAR O. LIMA"
+  },
+  {
+    "id": 791,
+    "nome": "ARGAMASSAS COLAMIX EIRELI"
+  },
+  {
+    "id": 1602,
+    "nome": "TELES SOLUCOES EM IMOVEIS EIRELI"
+  },
+  {
+    "id": 1636,
+    "nome": "COBREFLEX INDUSTRIA, DISTRIBUICAO E COMERCIO DE FIOS E CABOS LTDA"
+  },
+  {
+    "id": 1641,
+    "nome": "COMERCIAL ELETRICA P.J.LTDA"
+  },
+  {
+    "id": 1652,
+    "nome": "F. F. A. DE ALENCAR"
+  },
+  {
+    "id": 1649,
+    "nome": "J T S DE QUEIROZ"
+  },
+  {
+    "id": 1650,
+    "nome": "GLC COMERCIO DE PECAS PARA REFRIGERACAO LTDA"
+  },
+  {
+    "id": 1655,
+    "nome": "JEVERSON NOVAIS LOPES 21250317878"
+  },
+  {
+    "id": 1665,
+    "nome": "MG BRANDAO"
+  },
+  {
+    "id": 1671,
+    "nome": "RANGEL NORONHA BRASIL"
+  },
+  {
+    "id": 1407,
+    "nome": "J L INDUSTRIA DE PLACAS LTDA"
+  },
+  {
+    "id": 1664,
+    "nome": "BARBARA BONFIM QUARIGUASI RAMOS VIEIRA"
+  },
+  {
+    "id": 1681,
+    "nome": "TECNOGRES REVESTIMENTOS CERAMICOS LTDA."
+  },
+  {
+    "id": 1472,
+    "nome": "MINERMAC MINERACOES LTDA"
+  },
+  {
+    "id": 1695,
+    "nome": "CARLOS ROBERTO BATISTA COSTA"
+  },
+  {
+    "id": 1702,
+    "nome": "WALTER SALES FARIAS 08966415466"
+  },
+  {
+    "id": 1701,
+    "nome": "ANTONIO NUNES DA CRUZ"
+  },
+  {
+    "id": 1713,
+    "nome": "MAIS CIMENTAO COMERCIO ATACADISTA E VAREJISTA DE CIMENTO LTDA"
+  },
+  {
+    "id": 1703,
+    "nome": "MACENA MATERIAL DE CONSTRUCAO LTDA"
+  },
+  {
+    "id": 1714,
+    "nome": "CERAMICA FREI DAMIAO LTDA ME"
+  },
+  {
+    "id": 1724,
+    "nome": "COMERCIAL ACO BOMPRECO LTDA"
+  },
+  {
+    "id": 1731,
+    "nome": "SANDRO LUIS ARAUJO ALVES FILHO LTDA"
+  },
+  {
+    "id": 1736,
+    "nome": "MARCIA ROSANGELA COSTA SILVEIRA"
+  },
+  {
+    "id": 1738,
+    "nome": "SOBREIRA E LOPES COMERCIO DE EPI E FERRAMENTAS LTDA"
+  },
+  {
+    "id": 1748,
+    "nome": "ANTONIA JACINTA DIAS MOTA 03450442317"
+  },
+  {
+    "id": 1751,
+    "nome": "ITOGRASS AGRICOLA NORDESTE LTDA"
+  },
+  {
+    "id": 1747,
+    "nome": "SUPER TRAFO MANUTENCAO ELETRICA INDUSTRIAL LTDA"
+  },
+  {
+    "id": 1757,
+    "nome": "MARIA PALHANO DE ALCANTARA"
+  },
+  {
+    "id": 1667,
+    "nome": "RECICLES COMERCIO DE COLETORES E REPRESENTACOES EIRELI"
+  },
+  {
+    "id": 1759,
+    "nome": "ERLIM OLIVEIRA DOS REIS SERVICOS"
+  },
+  {
+    "id": 1763,
+    "nome": "JOSE ALVES DOS SANTOS E CIA LTDA"
+  },
+  {
+    "id": 1766,
+    "nome": "ACO BRAZIL COMERCIO LTDA"
+  },
+  {
+    "id": 1772,
+    "nome": "ANTONIO WELLINGTON PEREIRA DA SILVA "
+  },
+  {
+    "id": 1764,
+    "nome": "MARIA ALAIDE SOUZA DOS SANTOS"
+  },
+  {
+    "id": 1781,
+    "nome": "ROGERIO PIRES RIOS"
+  },
+  {
+    "id": 1783,
+    "nome": "EDVANIO DE JESUS SOUZA 00671963570"
+  },
+  {
+    "id": 1776,
+    "nome": "M V S CAVALCANTE MATERIAL DE CONSTRUCAO EIRELI"
+  },
+  {
+    "id": 1786,
+    "nome": "POTY LOCACAO DE MAQUINAS E EQUIPAMENTOS LTDA"
+  },
+  {
+    "id": 1796,
+    "nome": "COMERCIAL CAMPINA CIMENTOS COMERCIO VAREJISTA DE MATERIAIS DE CONSTRUCOES"
+  },
+  {
+    "id": 1794,
+    "nome": "COMERCIAL GOIANO MATERIAL DE CONSTRUCAO LTDA"
+  },
+  {
+    "id": 1791,
+    "nome": "MBP ISOBLOCK SISTEMAS TERMOISOLANTES S/A"
+  },
+  {
+    "id": 1802,
+    "nome": "ODAIR"
+  },
+  {
+    "id": 1798,
+    "nome": "KRONA TUBOS E CONEXOES LTDA"
+  },
+  {
+    "id": 1801,
+    "nome": "MM CONSTRUTORA E SOLUCOES LTDA"
+  },
+  {
+    "id": 1805,
+    "nome": "ELETRICA NOVA BAHIA COMERCIO DE MATERIAIS ELETRICOS LTDA"
+  },
+  {
+    "id": 1820,
+    "nome": "JORGE GUTHERMES FREIRE CHAVES 02058449363"
+  },
+  {
+    "id": 1755,
+    "nome": "ATACADAO DA MADEIRA LTDA"
+  },
+  {
+    "id": 1833,
+    "nome": "COMPANHIA DE CIMENTO DA PARAIBA - CCP"
+  },
+  {
+    "id": 1826,
+    "nome": "HD FERRO COMERCIAL DE ACOS LTDA"
+  },
+  {
+    "id": 1830,
+    "nome": "INCOPOST - INDUSTRIA DE PREMOLDADOS LTDA"
+  },
+  {
+    "id": 1839,
+    "nome": "FERRAGENS CONQUISTA ATACADO E VAREJO DE FERRAMENTAS LTDA"
+  },
+  {
+    "id": 1842,
+    "nome": "HIPERFER COMERCIO DE FERRAMENTAS E ARTIGOS EIRELI"
+  },
+  {
+    "id": 1286,
+    "nome": "QUALITY TUBOS COMERCIO DE FERRO E ACO LTDA"
+  },
+  {
+    "id": 1850,
+    "nome": "ESTOQUE LAR LTDA"
+  },
+  {
+    "id": 1853,
+    "nome": "MEGAMAMUTE COMERCIO ON LINE DE ELETRONICOS E INFORMATICA LTDA"
+  },
+  {
+    "id": 585,
+    "nome": "TRIFASICA ELETRICA - COMERCIO DE MATERIAL ELETRICO LTDA."
+  },
+  {
+    "id": 1867,
+    "nome": "MACHADO MATERIAIS PARA CONSTRUCAO LTDA"
+  },
+  {
+    "id": 1869,
+    "nome": "EMANUEL BASILIO E SILVA FERRAMENTAS"
+  },
+  {
+    "id": 1873,
+    "nome": "ICEVA - INDUSTRIA DE CERAMICA VALE DO ACARAU EIRELI"
+  },
+  {
+    "id": 1884,
+    "nome": "VS EQUIPAMENTOS DE SEGURANCA LTDA"
+  },
+  {
+    "id": 1891,
+    "nome": "ANDRAORT COMERCIO DE TINTAS E FERRAMENTAS LTDA"
+  },
+  {
+    "id": 1889,
+    "nome": "CENTRAL IMPORT DISTRIBUICAO DE FERRAGENS EIRELI"
+  },
+  {
+    "id": 1896,
+    "nome": "PORTAL FERRAMENTAS VENDAS E SERVICOS LTDA"
+  },
+  {
+    "id": 1899,
+    "nome": "J F A TECNOLOGIA E INSTALACOES ELETRICAS LTDA"
+  },
+  {
+    "id": 1855,
+    "nome": "IVNA FREITAS DE SOUSA ALVES"
+  },
+  {
+    "id": 1901,
+    "nome": "DESTAK FERRAMENTAS SOROCABA LTDA"
+  },
+  {
+    "id": 1930,
+    "nome": "CIMENTACO MATERIAIS DE CONSTRUCAO LTDA"
+  },
+  {
+    "id": 1926,
+    "nome": "SMART CENTER COMERCIO DE MATERIAIS DE CONSTRUCAO LTDA"
+  },
+  {
+    "id": 1904,
+    "nome": "A.M.J LOCACOES, COMERCIO E SERVICOS EIRELI"
+  },
+  {
+    "id": 1908,
+    "nome": "WCR - DISTRIBUIDORA DE MATERIAL ELETRICO LTDA"
+  },
+  {
+    "id": 1909,
+    "nome": "HIPER MORADA NOVA CONSTRUCAO LTDA"
+  },
+  {
+    "id": 1911,
+    "nome": "B.ZANGRANDE FILHO TUBOS"
+  },
+  {
+    "id": 1912,
+    "nome": "MARSCHALL INDUSTRIA ,COMERCIO IMPORTACAO E EXPORTACAO LTDA"
+  },
+  {
+    "id": 1913,
+    "nome": "HOMELY LTDA"
+  },
+  {
+    "id": 1914,
+    "nome": "ACONOX DISTRIBUIDORA E COMERCIO DE PIAS E CUBAS EIRELI"
+  },
+  {
+    "id": 1915,
+    "nome": "CAROLINE FERNANDA FERREIRA 44403982867"
+  },
+  {
+    "id": 1917,
+    "nome": "GF CASA DECOR EIRELI"
+  },
+  {
+    "id": 66,
+    "nome": "F A MARQUES DA SILVA FERRAGENS"
+  },
+  {
+    "id": 1931,
+    "nome": "A. J. F. DA SILVA"
+  },
+  {
+    "id": 1937,
+    "nome": "L BESERRA FRANCA"
+  },
+  {
+    "id": 1013,
+    "nome": "F A DE OLIVEIRA NETO"
+  },
+  {
+    "id": 1945,
+    "nome": "R M PAULINO CONSTRUCAO"
+  },
+  {
+    "id": 1950,
+    "nome": "MANFRIN , CASSEB E CIA LTDA"
+  },
+  {
+    "id": 1993,
+    "nome": "CORES D TINTAS E ACESSORIOS EIRELI"
+  },
+  {
+    "id": 1951,
+    "nome": "IRMAOS ROCHA PEREIRA COMERCIO LTDA"
+  },
+  {
+    "id": 1962,
+    "nome": "MAGAZINE CENTRAL SANTA EFIGENIA EIRELI"
+  },
+  {
+    "id": 1957,
+    "nome": "JOSE VIEIRA DA SILVA EIRELI"
+  },
+  {
+    "id": 1959,
+    "nome": "ISMAFER COMERCIAL DE FERRAGENS LTDA"
+  },
+  {
+    "id": 1960,
+    "nome": "OK  COMERCIO DE FERRAGENS E FERRAMENTAS LTDA"
+  },
+  {
+    "id": 1961,
+    "nome": "INOVACAO - COMERCIO E IMPORTACAO DE ARTIGOS DE PERFUMARIA E TOUCADOR - EIRELI"
+  },
+  {
+    "id": 1969,
+    "nome": "PREMAZON PREMOLDADOS DE CONCRETO E FIBRA LTDA."
+  },
+  {
+    "id": 1966,
+    "nome": "QUALLY GRAMA COMERCIO LTDA"
+  },
+  {
+    "id": 1994,
+    "nome": "LRF ARGAMASSAS E TINTAS EIRELI"
+  },
+  {
+    "id": 1888,
+    "nome": "JOSENILDO AVELINO GOMES"
+  },
+  {
+    "id": 1979,
+    "nome": "TUBASEG EQUIPAMENTOS DE PROTECAO INDIVIDUAL LTDA"
+  },
+  {
+    "id": 1988,
+    "nome": "DUTRA - MATERIAIS PARA CONSTRUCOES LTDA"
+  },
+  {
+    "id": 1982,
+    "nome": "CINCO FIVE CINQ BRANDS INDUSTRIAL, COMERCIAL E REPRESENTACAO LTDA."
+  },
+  {
+    "id": 1985,
+    "nome": "M.S VASCONCELOS COMERCIO DE MATERIAIS DE CONSTRUCAO LTDA"
+  },
+  {
+    "id": 1775,
+    "nome": "KARLLA KAROLLYNNE MELGACO FELIX ULISCIO 06594406361"
+  },
+  {
+    "id": 1991,
+    "nome": "EMBACLEAN EMBALAGENS E PRODUTOS DE LIMPEZA LTDA"
+  },
+  {
+    "id": 1698,
+    "nome": "EDVALDO NOBREGA ARAUJO"
+  },
+  {
+    "id": 1992,
+    "nome": "GUIMEPA SUPRIMENTOS INDUSTRIAIS LTDA"
+  },
+  {
+    "id": 1851,
+    "nome": "CONDEX INDUSTRIA E COMERCIO DE CONDUTORES ELETRICOS LTDA"
+  },
+  {
+    "id": 2001,
+    "nome": "FRANCISCO MAURO RIBEIRO DA SILVA 01946272337"
+  },
+  {
+    "id": 2002,
+    "nome": "DESAFIO PRODUTOS PARA MARMORARIA LTDA"
+  },
+  {
+    "id": 2006,
+    "nome": "ISOFLEX COMERCIO E DISTRIBUICAO LTDA"
+  },
+  {
+    "id": 1829,
+    "nome": "CRISTIANO RAMALHO CAVALCANTI"
+  },
+  {
+    "id": 2008,
+    "nome": "MINERACAO LAGOA SANTA LTDA"
+  },
+  {
+    "id": 2011,
+    "nome": "FERDINANDO ADILIO ASCOLI"
+  },
+  {
+    "id": 1968,
+    "nome": "FORTE COMERCIO DE MATERIAL DE CONSTRUCAO EIRELI"
+  },
+  {
+    "id": 2064,
+    "nome": "ESPAÇO SMART COMERCIO DE MATERIAIS DE CONTRUÇÃO LTDA"
+  },
+  {
+    "id": 2019,
+    "nome": "HIPERFERRO COMERCIAL DE ACOS LTDA"
+  },
+  {
+    "id": 1183,
+    "nome": "ROCA BRASIL LTDA."
+  },
+  {
+    "id": 2022,
+    "nome": "IRIA SODETE SCHERER"
+  },
+  {
+    "id": 2029,
+    "nome": "MASSAFORTE ARGAMASSAS EIRELI"
+  },
+  {
+    "id": 1860,
+    "nome": "PALACIO DAS FERRAMENTAS E PARAFUSOS LTDA"
+  },
+  {
+    "id": 2030,
+    "nome": "ZOTTI DISTRIBUIDORA LTDA"
+  },
+  {
+    "id": 1975,
+    "nome": "FCJ REPRESENTACOES LTDA"
+  },
+  {
+    "id": 2031,
+    "nome": "FIXAR INDUSTRIAL DE FIXADORES EIRELI"
+  },
+  {
+    "id": 2032,
+    "nome": "TITANIUM DO BRASIL INDUSTRIA E COMERCIO LTDA"
+  },
+  {
+    "id": 2034,
+    "nome": "NAPOLI COMERCIO DE EMBALAGENS LTDA"
+  },
+  {
+    "id": 2036,
+    "nome": "PFX METAIS SANITARIOS IMPORTACAO E EXPORTACAO LTDA"
+  },
+  {
+    "id": 2037,
+    "nome": "SOLO LOJA DIGITAL LTDA"
+  },
+  {
+    "id": 2043,
+    "nome": "TUDO CLEAN DISTRIBUIDORA DE PRODUTOS DE LIMPEZA E CESTAS BASICAS EIRELI"
+  },
+  {
+    "id": 2046,
+    "nome": "DEGRAUS ANDAIMES, MAQUINAS E EQUIPAMENTOS PARA CONSTRUCAO CIVIL S.A."
+  },
+  {
+    "id": 2047,
+    "nome": "METALCASTY LTDA"
+  },
+  {
+    "id": 2048,
+    "nome": "TECNIBRA COMERCIO E REPRESENTACAO DE ABRASIVOS E FERRAMENTAS LTDA"
+  },
+  {
+    "id": 2049,
+    "nome": "COMERCIAL F. MENEZES EIRELI"
+  },
+  {
+    "id": 2053,
+    "nome": "R.O BRITAGEM LTDA"
+  },
+  {
+    "id": 1971,
+    "nome": "D C ELEVADORES LTDA"
+  },
+  {
+    "id": 2056,
+    "nome": "NETKOLL DISTRIBUIDORA DE ARGAMASSAS E IMPERMEABILIZANTES LTDA"
+  },
+  {
+    "id": 2060,
+    "nome": "MSB LOCACAO DE EQUIPAMENTOS LTDA"
+  },
+  {
+    "id": 2062,
+    "nome": "J L MATERIAIS DE CONSTRUCAO LTDA"
+  },
+  {
+    "id": 2039,
+    "nome": "PEXTRON CONTROLES ELETRONICOS LTDA"
+  },
+  {
+    "id": 2061,
+    "nome": "P R S BARROS SABIA CONSTRUCOES"
+  },
+  {
+    "id": 2063,
+    "nome": "FRANCISCO FERREIRA NETO 08825800355"
+  },
+  {
+    "id": 2068,
+    "nome": "SUZANA TAVARES LEAL DA SILVA 00623638592"
+  },
+  {
+    "id": 1,
+    "nome": "SOFTPLAN PLANEJAMENTO E SISTEMAS LTDA"
+  },
+  {
+    "id": 2033,
+    "nome": "DUTRA MAQUINAS COMERCIAL E TECNICA LTDA"
+  },
+  {
+    "id": 2021,
+    "nome": "F. CHARLES CLEUDO DE QUEIROZ"
+  },
+  {
+    "id": 2082,
+    "nome": "DISTRINOX DISTRIBUIDORA DE ARTEFATOS AGRICOLAS E SEGURANCA EIRELI"
+  },
+  {
+    "id": 2083,
+    "nome": "GLEIDSON MENDES DE OLIVEIRA 37777435850"
+  },
+  {
+    "id": 2086,
+    "nome": "GRAN DAF MARMORARIA E GRANITOS LTDA"
+  },
+  {
+    "id": 2091,
+    "nome": "REFRIGERACAO URSO FORTE LTDA"
+  },
+  {
+    "id": 1974,
+    "nome": "SANTA FE INDUSTRIA DE TINTAS E ARGAMASSAS E COMERCIO DE MAT."
+  },
+  {
+    "id": 2098,
+    "nome": "SANSIL MATERIAIS DE CONSTRUCAO LTDA"
+  },
+  {
+    "id": 2095,
+    "nome": "FENIX INDUSTRIAL LTDA"
+  },
+  {
+    "id": 871,
+    "nome": "MAGAZINE LUIZA S/A"
+  },
+  {
+    "id": 2106,
+    "nome": "JOÃO PAULO DA SILVA LIMA "
+  },
+  {
+    "id": 2108,
+    "nome": "KALUNGA SA"
+  },
+  {
+    "id": 2116,
+    "nome": "CONCEITO METAIS COMERCIO IMPORTACAO E EXPORTACAO LTDA"
+  },
+  {
+    "id": 1893,
+    "nome": "FEIRA TINTAS LTDA"
+  },
+  {
+    "id": 2122,
+    "nome": "MF FERRAGENS EIRELI"
+  },
+  {
+    "id": 2123,
+    "nome": "SBARDELLINI E CIA LTDA"
+  },
+  {
+    "id": 67,
+    "nome": "CLIPPER IND E COM DE CONFECÇOES LTDA"
+  },
+  {
+    "id": 2129,
+    "nome": "COMPANHIA DE CIMENTO DA PARAIBA - CCP"
+  },
+  {
+    "id": 2081,
+    "nome": "JOONGBO QUIMICA DO BRASIL LTDA EM RECUPERACAO JUDICIAL"
+  },
+  {
+    "id": 1662,
+    "nome": "HIDROCOMANDO BOMBAS LTDA"
+  },
+  {
+    "id": 2130,
+    "nome": "MADEIREIRA GEOVANE LTDA"
+  },
+  {
+    "id": 2137,
+    "nome": "ELIZEU PACHECO BRANDAO EIRELI"
+  },
+  {
+    "id": 2149,
+    "nome": "POLITINTAS LTDA"
+  },
+  {
+    "id": 2150,
+    "nome": "OLIST SERVICOS DIGITAIS LTDA"
+  },
+  {
+    "id": 2152,
+    "nome": "CICERO SOUZA DOS SANTOS"
+  },
+  {
+    "id": 2156,
+    "nome": "F DOS S LOPES PREMOLDADOS"
+  },
+  {
+    "id": 2157,
+    "nome": "RENATA DOS REIS GARCIA 26600065800"
+  },
+  {
+    "id": 2153,
+    "nome": "PLUZIE INDUSTRIA E COMERCIO DE MATERIAIS ELETRICOS LTDA"
+  },
+  {
+    "id": 2167,
+    "nome": "FORTIT ARGAMASSAS E IMPERMEABILIZANTES LTDA"
+  },
+  {
+    "id": 2160,
+    "nome": "E. OLIVEIRA ARAUJO"
+  },
+  {
+    "id": 2162,
+    "nome": "EMPORIO DAS VENDAS LTDA"
+  },
+  {
+    "id": 2164,
+    "nome": "DRY CONSTRUCTION SOLUCOES PARA CONSTRUCAO A SECO LTDA"
+  },
+  {
+    "id": 2168,
+    "nome": "53.037.028 MIKAELLY ALVES DA SILVA"
+  },
+  {
+    "id": 2169,
+    "nome": "NADJA DA SILVA BOMFIM 89804457504"
+  },
+  {
+    "id": 2166,
+    "nome": "MAXPLAST INDUSTRIA DE ARTEFATOS DE PLASTICOS LTDA."
+  },
+  {
+    "id": 2177,
+    "nome": "DALTON DONHA FARIA 28644372874"
+  },
+  {
+    "id": 2188,
+    "nome": "JOSE ELCIO DE CARVALHO PORTO"
+  },
+  {
+    "id": 2179,
+    "nome": "BRC REPRESENTACOES E ENCARTELADOS LTDA."
+  },
+  {
+    "id": 2186,
+    "nome": "MERCANTE DIST DE MATERIALS ELET DE CONSTRUCAO LTDA"
+  },
+  {
+    "id": 2191,
+    "nome": "GISLAINE MENDES DE AGUIAR 42020475839"
+  },
+  {
+    "id": 2194,
+    "nome": "SHOPPING MUNDI BRASIL COMERCIO ELETRONICO LTDA"
+  },
+  {
+    "id": 2196,
+    "nome": "SERIT MATERIAIS DE CONSTRUCAO A SECO LTDA"
+  },
+  {
+    "id": 2199,
+    "nome": "SIMONE BRITO DE OLIVEIRA 26424009809"
+  },
+  {
+    "id": 2195,
+    "nome": "EUGÊNIO DO NASCIMENTO ARAÚJO"
+  },
+  {
+    "id": 2200,
+    "nome": "FRANCIELE SALVIANO FERREIRA"
+  },
+  {
+    "id": 2203,
+    "nome": "SOLUWAN COMERCIAL LTDA"
+  },
+  {
+    "id": 2204,
+    "nome": "CEDISA CENTRAL DE ACO S/A"
+  },
+  {
+    "id": 2206,
+    "nome": "NJ ILUMINAÇÃO COMERCIO LTDA"
+  },
+  {
+    "id": 2207,
+    "nome": "SANLUME ILUMINACAO LTDA"
+  },
+  {
+    "id": 2181,
+    "nome": "ANDRE MARCELINO SOARES EIRELI"
+  },
+  {
+    "id": 2212,
+    "nome": "ACPA COMERCIO DE ALUMINIO LTDA"
+  },
+  {
+    "id": 2216,
+    "nome": "FRANCISCO DE ASSIS PEREIRA DE ARAÚJO"
+  },
+  {
+    "id": 2217,
+    "nome": "MORVILLO MATERIAIS PARA CONSTRUCAO LTDA"
+  },
+  {
+    "id": 1730,
+    "nome": "LINDEMBERG CAVALCANTI DA SILVA "
+  },
+  {
+    "id": 2226,
+    "nome": "JOSE FERNANDO GONCALVES 57570779649"
+  },
+  {
+    "id": 2227,
+    "nome": "SOBRAL GARDEN LTDA"
+  },
+  {
+    "id": 2228,
+    "nome": "MFL ACESSORIOS LTDA"
+  },
+  {
+    "id": 2231,
+    "nome": "C M S EVAGELISTA REPRESENTACOES"
+  },
+  {
+    "id": 2235,
+    "nome": "LEONIDAS JOSE ALVERGA DE MEDEIROS"
+  },
+  {
+    "id": 2237,
+    "nome": "DELTA TINTAS LTDA."
+  },
+  {
+    "id": 2238,
+    "nome": "ABRASMAF ABRASIVOS E FERRAMENTAS LTDA"
+  },
+  {
+    "id": 2241,
+    "nome": "DIRECT BORRACHAS INDUSTRIA E COMERCIO DE PRODUTOS PLASTICOS LTDA"
+  },
+  {
+    "id": 2244,
+    "nome": "TUBASA TUBOS DE ACO DE SALVADOR LTDA"
+  },
+  {
+    "id": 2251,
+    "nome": "BASE DA CONSTRUCAO LTDA"
+  },
+  {
+    "id": 2256,
+    "nome": "3P TRANSPORTES E SERVICOS DE CARGAS EIRELI"
+  },
+  {
+    "id": 2262,
+    "nome": "ROBERT BOSCH LIMITADA"
+  },
+  {
+    "id": 2263,
+    "nome": "L.S. SOLUCOES ELETRICAS LTDA"
+  },
+  {
+    "id": 2264,
+    "nome": "VTB SOLUCOES PARA O LAR LTDA"
+  },
+  {
+    "id": 2268,
+    "nome": "LOJAO DUFERRO LTDA"
+  },
+  {
+    "id": 2273,
+    "nome": "C L SCHUCK INSTALACOES"
+  },
+  {
+    "id": 1592,
+    "nome": "MJ COMERCIO E SERVICOS DE INFORMATICA E TELECOMUNICACOES LTDA"
+  },
+  {
+    "id": 2276,
+    "nome": "LTFLEX LTDA"
+  },
+  {
+    "id": 1726,
+    "nome": "SHOPPING DA ELETRICIDADE COMERCIAL LTDA"
+  },
+  {
+    "id": 2255,
+    "nome": "SANTIL COMERCIAL ELETRICA LTDA"
+  },
+  {
+    "id": 2277,
+    "nome": "PADILHA E PADILHA LTDA"
+  },
+  {
+    "id": 2280,
+    "nome": "DANIEL RIBEIRO RANGEL DE SOUZA"
+  },
+  {
+    "id": 2283,
+    "nome": "O C S - MINERACAO E EMPREENDIMENTOS LTDA EM RECUPERACAO JUDICIAL"
+  },
+  {
+    "id": 2284,
+    "nome": "JOSE WILSON AMORIM DA SILVA 53652193920"
+  },
+  {
+    "id": 2286,
+    "nome": "R G DE SOUZA FERRAGENS, FERRAMENTAS E ACESSORIOS"
+  },
+  {
+    "id": 2289,
+    "nome": "RITA DE CASSIA DA SILVEIRA ARRUDA"
+  },
+  {
+    "id": 2287,
+    "nome": "ESTRUTURA PLASTICA INDUSTRIA E COMERCIO LTDA"
+  },
+  {
+    "id": 2290,
+    "nome": "KEIVILANNE COSTA"
+  },
+  {
+    "id": 2295,
+    "nome": "ICASA INDUSTRIA CERAMICA ANDRADENSE S/A"
+  },
+  {
+    "id": 2302,
+    "nome": "COMERCIAL DE MIUDEZAS FREITAS LTDA"
+  },
+  {
+    "id": 2308,
+    "nome": "BWINX COMERCIAL LTDA"
+  },
+  {
+    "id": 2312,
+    "nome": "NOSSA COLA SERVICOS DE PREPARACAO DE MASSAS DE CONCRETO E ARGAMASSA EIRELI"
+  },
+  {
+    "id": 2319,
+    "nome": "GIMAWA COMERCIAL LTDA"
+  },
+  {
+    "id": 2320,
+    "nome": "BASALTO PEDREIRA E PAVIMENTACAO LTDA"
+  },
+  {
+    "id": 2327,
+    "nome": "VALENTIM DA SILVA NETO"
+  },
+  {
+    "id": 2330,
+    "nome": "ASTRO DISTRIBUIDORA EIRELI"
+  },
+  {
+    "id": 2332,
+    "nome": "TUDO OFFICE LTDA."
+  },
+  {
+    "id": 2343,
+    "nome": "TRAEL TRANSFORMADORES ELETRICOS LTDA"
+  },
+  {
+    "id": 2344,
+    "nome": "DANIEL DA CRUZ CHARLES 10042757657"
+  },
+  {
+    "id": 2353,
+    "nome": "ABRAMAX ABRASIVOS LTDA"
+  },
+  {
+    "id": 2354,
+    "nome": "SOBREIRA EXTRACAO E COMERCIO LTDA"
+  },
+  {
+    "id": 2355,
+    "nome": "JASPER TIRES COMERCIO DE PNEUS LTDA"
+  },
+  {
+    "id": 2365,
+    "nome": "CRISTALINA ALIMENTOS E BEBIDAS LTDA"
+  },
+  {
+    "id": 2366,
+    "nome": "MAXI CONCRETAGEM EIRELI"
+  },
+  {
+    "id": 2372,
+    "nome": "YUN COMERCIAL ELETRONICOS LTDA"
+  },
+  {
+    "id": 2378,
+    "nome": "DCS DISTRIBUICAO DE MATERIAIS DE CONSTRUCAO A SECO LTDA"
+  },
+  {
+    "id": 2388,
+    "nome": "ASSA ABLOY BRASIL INDUSTRIA E COMERCIO LTDA"
+  },
+  {
+    "id": 254,
+    "nome": "RAFAEL DE SA CRUZ"
+  },
+  {
+    "id": 2396,
+    "nome": "GK MULTIVENDAS LTDA"
+  },
+  {
+    "id": 2399,
+    "nome": "FRANCISCO MATHEUS DE ARAUJO MARQUES"
+  },
+  {
+    "id": 1381,
+    "nome": "LOJA DO MECANICO FERRAMENTAS EIRELI"
+  },
+  {
+    "id": 2417,
+    "nome": "HELEN COMERCIAL LTDA"
+  },
+  {
+    "id": 2424,
+    "nome": "J L G DO MONTE"
+  },
+  {
+    "id": 2423,
+    "nome": "DIEPI DISTRIBUIDORA DE EPI LTDA"
+  },
+  {
+    "id": 2444,
+    "nome": "PWO SOUSA COMERCIO DE MATERIAIS DE CONSTRUCAO LTDA"
+  },
+  {
+    "id": 839,
+    "nome": "PINHEIRO CONSTRUCOES EIRELI"
+  },
+  {
+    "id": 2432,
+    "nome": "INDUSTRIA COLORTEX BRASIL TINTAS E TEXTURAS LTDA"
+  },
+  {
+    "id": 2438,
+    "nome": "MARCELO SILVERIO DE SOUZA 09425251673"
+  },
+  {
+    "id": 2447,
+    "nome": "PROGRESSO MAQUINAS LTDA"
+  },
+  {
+    "id": 2452,
+    "nome": "NOSSO MATERIAIS PARA CONSTRUCAO LTDA"
+  },
+  {
+    "id": 2454,
+    "nome": "RAZAK ARTEFATOS E PRE -MOLDADOS LTDA"
+  },
+  {
+    "id": 2457,
+    "nome": "CENTRAL DA CONSTRUCAO LTDA"
+  },
+  {
+    "id": 2456,
+    "nome": "TODA TINTA COMERCIO DE MATERIAIS DE CONSTRUCAO LTDA"
+  },
+  {
+    "id": 2462,
+    "nome": "EUROFIX COMERCIO E REPRESENTACOES LTDA"
+  },
+  {
+    "id": 2474,
+    "nome": "KELTON DA COSTA ROCHA"
+  },
+  {
+    "id": 2479,
+    "nome": "FRANCISCO JOSE CORREIA QUEIROZ"
+  },
+  {
+    "id": 2480,
+    "nome": "ATACADO 68 COMERCIO ATACADISTA DE MATERIAIS ELET E DE CONSTRUCAO EM GERAL LTDA"
+  },
+  {
+    "id": 2475,
+    "nome": "LUMA ALMEIDA CAVALCANTE SARAIVA 05646922399"
+  },
+  {
+    "id": 1941,
+    "nome": "TELMIRO SOUZA SANTOS"
+  },
+  {
+    "id": 2502,
+    "nome": "L W AGROPECUARIA E INDUSTRIAL LTDA"
+  },
+  {
+    "id": 2508,
+    "nome": "PLASTICOS E ALUMINIO COMERCIO LTDA"
+  },
+  {
+    "id": 2510,
+    "nome": "BAHIA GYPS COMERCIO LTDA"
+  },
+  {
+    "id": 2497,
+    "nome": "ANTONIO CLAUDIO ANDRADE GOMES"
+  },
+  {
+    "id": 2533,
+    "nome": "VANDO DA ROCHA MOURA 73658677368"
+  },
+  {
+    "id": 2525,
+    "nome": "42.941.546 PHILIP DE OLIVEIRA PAZ"
+  },
+  {
+    "id": 2523,
+    "nome": "RIMACOM LTDA"
+  },
+  {
+    "id": 2538,
+    "nome": "NILO MAIA DISTRIBUIDORA LTDA"
+  },
+  {
+    "id": 2522,
+    "nome": "ALED COMERCIO DE PRODUTOS DE ILUMINACAO LTDA."
+  },
+  {
+    "id": 2546,
+    "nome": "KENEDY RAMILO SILVA SOUSA 02694119336"
+  },
+  {
+    "id": 2547,
+    "nome": "ELETROPARTES - COMERCIAL ELETRICA E ILUMINACAO LTDA"
+  },
+  {
+    "id": 2305,
+    "nome": "MV COMERCIO E REPRESENTACAO COMERCIAL LTDA"
+  },
+  {
+    "id": 2548,
+    "nome": "JEFER ACESSORIOS INDUSTRIAIS LTDA"
+  },
+  {
+    "id": 1895,
+    "nome": "COMERCIO DE FERRAGENS PIRES MARTINS IMPORTACAO E EXPORTACAO LTDA."
+  },
+  {
+    "id": 2549,
+    "nome": "ELETRONICA CENTRAL EC EIRELI"
+  },
+  {
+    "id": 2553,
+    "nome": "CASA DO PARAFUSO COMERCIO E SERVICOS LTDA"
+  },
+  {
+    "id": 2554,
+    "nome": "BICHUETTE PAINEIS LTDA"
+  },
+  {
+    "id": 2556,
+    "nome": "CARTOES  SISTEMAS DE IDENTIFICACAO LTDA"
+  },
+  {
+    "id": 2568,
+    "nome": "O BARATAO DAS BATERIAS LTDA"
+  },
+  {
+    "id": 2572,
+    "nome": "FERMAT DISTRIBUIDORA ECOMMERCE LTDA"
+  },
+  {
+    "id": 2566,
+    "nome": "MADEIREIRA ITAIPU LTDA"
+  },
+  {
+    "id": 2573,
+    "nome": "F C DA SILVA DE CANDEIAS EIRELI"
+  },
+  {
+    "id": 2570,
+    "nome": "GURGELMIX MAQUINAS E FERRAMENTAS S.A."
+  },
+  {
+    "id": 1430,
+    "nome": "D F DOS ANJOS"
+  },
+  {
+    "id": 2582,
+    "nome": "CERAMICA CAMARA LTDA"
+  },
+  {
+    "id": 305,
+    "nome": "DIMALI DISTRIBUIDORA DE MATERIAL DE LIMPEZA LTDA"
+  },
+  {
+    "id": 2597,
+    "nome": "ATACADAO CENTRO COMERCIO DE INSTRUMENTOS MUSICAIS LTDA"
+  },
+  {
+    "id": 2550,
+    "nome": "MARIA GENI DISTRIBUIDORA DE ARTIGOS DE PAPELARIA LTDA"
+  },
+  {
+    "id": 906,
+    "nome": "EDILSON OLIVEIRA MAGALHAES"
+  },
+  {
+    "id": 2610,
+    "nome": "I ALBUQUERQUE DE SOUZA"
+  },
+  {
+    "id": 2615,
+    "nome": "TREVO INDUSTRIAL DE ACARTONADOS S/A"
+  },
+  {
+    "id": 2619,
+    "nome": "VANESSA SILVA ALANO 05800297940"
+  },
+  {
+    "id": 2586,
+    "nome": "DURAFIX INDUSTRIA DE ARGAMASSAS E TINTAS LTDA"
+  },
+  {
+    "id": 2314,
+    "nome": "SUPPLEX COMERCIO DE MATERIAL DE ESCRITORIO E PAPELARIA LTDA"
+  },
+  {
+    "id": 2637,
+    "nome": "JH COMERCIO DE COMPONENTES PARA ESQUADRIAS LTDA"
+  },
+  {
+    "id": 2645,
+    "nome": "SHPS TECNOLOGIA E SERVICOS LTDA."
+  },
+  {
+    "id": 2646,
+    "nome": "DAKAR COMERCIO VAREJISTA LTDA"
+  },
+  {
+    "id": 2649,
+    "nome": "MAGAZINE LUIZA S/A"
+  },
+  {
+    "id": 2652,
+    "nome": "54.327.800 ARIOVALDO COSTA DE OLIVEIRA"
+  },
+  {
+    "id": 2663,
+    "nome": "MULTINOX COMERCIO DE PRODUTOS SIDERURGICOS LTDA"
+  },
+  {
+    "id": 2668,
+    "nome": "MAXIMOS ATACADISTA DE PRODUTOS UTILITARIOS LTDA"
+  },
+  {
+    "id": 1660,
+    "nome": "LED NORDESTE ILUMINACAO LTDA"
+  },
+  {
+    "id": 2655,
+    "nome": "LIGHT SERVICOS DE ELETRICIDADE S A"
+  },
+  {
+    "id": 2673,
+    "nome": "ORLEANS DA SILVA FROTA"
+  },
+  {
+    "id": 49,
+    "nome": "SOLAJE IND E COM DE PREMOLDADOS LTDA"
+  },
+  {
+    "id": 2680,
+    "nome": "55.237.032 MARIA LARISSA NASCIMENTO RODRIGUES"
+  },
+  {
+    "id": 2682,
+    "nome": "CARROSSEL MOVEIS E DECORACOES LTDA"
+  },
+  {
+    "id": 2686,
+    "nome": "TUBOS CAMPINENSE LTDA"
+  },
+  {
+    "id": 2687,
+    "nome": "RCP NORDESTE SERVICOS LTDA"
+  },
+  {
+    "id": 2690,
+    "nome": "HORACIO DA COSTA RAMOS"
+  },
+  {
+    "id": 2692,
+    "nome": "GUARAUTOS VEICULOS E PECAS LTDA"
+  },
+  {
+    "id": 2695,
+    "nome": "ITOGRASS AGRICOLA NORDESTE LTDA"
+  },
+  {
+    "id": 2724,
+    "nome": "MARIA VELZIMAR RODRIGUES AMORIM DE FREITAS"
+  },
+  {
+    "id": 2726,
+    "nome": "JONATAS EVANDRO BELLI"
+  },
+  {
+    "id": 2706,
+    "nome": "J ALVES E OLIVEIRA LTDA"
+  },
+  {
+    "id": 2733,
+    "nome": "MASSA FORT CONCRETOS ESPECIAIS LTDA"
+  },
+  {
+    "id": 2742,
+    "nome": "MONTEIRO E COSTA COMERCIO DE MATERIAIS DE CONSTRUCAO S/A"
+  },
+  {
+    "id": 2746,
+    "nome": "MONTEIRO E COSTA COMERCIO DE MATERIAIS DE CONSTRUCAO S/A"
+  },
+  {
+    "id": 2747,
+    "nome": "CEMA DISTRIBUIDORA, COMERCIO E LOGISTICA DE MATERIAL DE CONSTRUCAO LTDA"
+  },
+  {
+    "id": 2749,
+    "nome": "A3LED COMERCIO DE ILUMINACAO LTDA"
+  },
+  {
+    "id": 2758,
+    "nome": "NELSON DO COUTO GONCALVES 52109917415"
+  },
+  {
+    "id": 2780,
+    "nome": "ANCORA GROUP LTDA."
+  },
+  {
+    "id": 2785,
+    "nome": "INDUSTRIA DRYKO LTDA"
+  },
+  {
+    "id": 474,
+    "nome": "GUSTAVO CARNEIRO MARTINS"
+  },
+  {
+    "id": 2790,
+    "nome": "COMERCIO DE MATERIAL DE CONSTRUCAO MENEZES PARACURU LTDA"
+  },
+  {
+    "id": 2935,
+    "nome": "F L DE ABREU ALMEIDA LOCACOES E CONSTRUCOES EIRELI"
+  },
+  {
+    "id": 2823,
+    "nome": "MARIA SOCORRO DE OLIVEIRA REBOUCAS"
+  },
+  {
+    "id": 2884,
+    "nome": "UNIVERSO IMPORT METAIS LTDA"
+  },
+  {
+    "id": 2895,
+    "nome": "CDC COMERCIO DE CONSTRUCOES LTDA."
+  },
+  {
+    "id": 2904,
+    "nome": "MOFUSO PARAFUSOS LTDA"
+  },
+  {
+    "id": 2922,
+    "nome": "NAFRAME STEEL FRAME E DRYWALL LTDA"
+  },
+  {
+    "id": 2907,
+    "nome": "CATATAU ACO LTDA"
+  },
+  {
+    "id": 2921,
+    "nome": "ROBERTO FARIAS"
+  },
+  {
+    "id": 2379,
+    "nome": "ORLANGIER SILVA SANTOS"
+  },
+  {
+    "id": 2013,
+    "nome": "R THALLES C VALENTIM TELAS"
+  },
+  {
+    "id": 2944,
+    "nome": "F C DA SILVA DE CANDEIAS LTDA"
+  },
+  {
+    "id": 2954,
+    "nome": "CARLOS ANTÔNIO DA COSTA PINHEIRO"
+  },
+  {
+    "id": 2542,
+    "nome": "D U DE MEDEIROS E CIA MOVEIS LTDA"
+  },
+  {
+    "id": 2951,
+    "nome": "50.878.050 MATEUS LEANDRO DE SOUSA"
+  },
+  {
+    "id": 1131,
+    "nome": "CIA INDUSTRIAL H. CARLOS SCHNEIDER"
+  },
+  {
+    "id": 2506,
+    "nome": "JACERAMA PREMOLDADOS LTDA"
+  },
+  {
+    "id": 2962,
+    "nome": "J L DE SOUZA SILVA CONSTRUCOES"
+  },
+  {
+    "id": 2975,
+    "nome": "JS DRYWAL SERVICO E COMERCIO LTDA"
+  },
+  {
+    "id": 2421,
+    "nome": "J GONCALVES DOS SANTOS FILHO E CIA LTDA"
+  },
+  {
+    "id": 2978,
+    "nome": "WALSYWA INDUSTRIA E COMERCIO DE PRODUTOS METALURGICOS LTDA"
+  },
+  {
+    "id": 2982,
+    "nome": "F GARROTE DISTRIBUIDORA DE MATERIAIS DE CONSTRUÇÕES"
+  },
+  {
+    "id": 1298,
+    "nome": "PROPEL - PROJETOS, CONSTRUCOES E PRE-MOLDADOS LTDA"
+  },
+  {
+    "id": 2990,
+    "nome": "FORTLEV INDUSTRIA E COMERCIO DE PLASTICOS LTDA"
+  },
+  {
+    "id": 2973,
+    "nome": "SANNY GESSO COMERCIO E SERVICOS LTDA"
+  },
+  {
+    "id": 155,
+    "nome": "JOAO CRISOSTOMO ROCHA JUNIOR"
+  },
+  {
+    "id": 2950,
+    "nome": "RAIMUNDO BESERRA LIMA PREMOLDADOS"
+  },
+  {
+    "id": 1659,
+    "nome": "M A FROTA COMERCIAL LTDA"
+  },
+  {
+    "id": 3017,
+    "nome": "COMERCIAL CASA DAS BATERIAS LTDA"
+  },
+  {
+    "id": 3018,
+    "nome": "ISOPUR ISOLANTES TERMICOS E ACUSTICOS LTDA"
+  },
+  {
+    "id": 3022,
+    "nome": "JVB BRASIL COMERCIO E SERVICOS EM ELETRODOMESTICOS LTDA"
+  },
+  {
+    "id": 3024,
+    "nome": "DINOPLAST INDUSTRIA E COMERCIO DE PLASTICOS LTDA"
+  },
+  {
+    "id": 1906,
+    "nome": "F R BARROS MELO"
+  },
+  {
+    "id": 3030,
+    "nome": "JOÃO PAULO SILVEIRA"
+  },
+  {
+    "id": 3031,
+    "nome": "GUILHERME LIMA DE SOUZA"
+  },
+  {
+    "id": 2885,
+    "nome": "PAULO RICARDO CORDEIRO DA SILVA"
+  },
+  {
+    "id": 3039,
+    "nome": "MARIA DA PAZ MOTA ALVES 98051466349"
+  },
+  {
+    "id": 375,
+    "nome": "CIDADE NOVA CONSTRUCOES LTDA"
+  },
+  {
+    "id": 3038,
+    "nome": "JPC CONSTRUCAO E IRRIGACAO LTDA"
+  },
+  {
+    "id": 3050,
+    "nome": "ALISSON RODRIGUES DA CONCEICAO 05360926309"
+  },
+  {
+    "id": 2440,
+    "nome": "ALMEIDA COMERCIO DISTRIBUIDOR DE MATERIAIS DE CONSTRUCAO LTDA"
+  },
+  {
+    "id": 3063,
+    "nome": "ISOPURIMP COMERCIO DE ACUSTICOS E ISOLANTES TERMICOS LTDA"
+  },
+  {
+    "id": 111,
+    "nome": "OTILIO INDUSTRIA E COMERCIO LTDA - ME"
+  },
+  {
+    "id": 3060,
+    "nome": "BRASIL STEEL COMPANY REPRESENTACOES LTDA"
+  },
+  {
+    "id": 3068,
+    "nome": "DUROFIX ARGAMASSAS, ADITIVOS E CIMENTOS ESPECIAIS LTDA"
+  },
+  {
+    "id": 3069,
+    "nome": "ACM INOX COMERCIO LTDA"
+  },
+  {
+    "id": 2404,
+    "nome": "JOSE EDVANDRO FERREIRA DA SILVA 14215527368"
+  },
+  {
+    "id": 3117,
+    "nome": "51.020.361 JANDIVALDO DO AMARAL SANTOS"
+  },
+  {
+    "id": 1859,
+    "nome": "GURGELMIX MAQUINAS E FERRAMENTAS S.A."
+  },
+  {
+    "id": 3084,
+    "nome": "VOTORANTIM CIMENTOS N/NE S/A"
+  },
+  {
+    "id": 2955,
+    "nome": "BOM VIZINHO DISTRIBUIDORA DE ALIMENTOS LTDA."
+  },
+  {
+    "id": 2405,
+    "nome": "MARIO CESAR COSTA PEREIRA"
+  },
+  {
+    "id": 3121,
+    "nome": "MONICA XIMENES SOBREIRA"
+  },
+  {
+    "id": 3127,
+    "nome": "PLACO DO BRASIL LTDA"
+  },
+  {
+    "id": 3151,
+    "nome": "CASTRO  CONSTRUCAO LTDA"
+  },
+  {
+    "id": 2448,
+    "nome": "MULTILASER INDUSTRIAL S.A."
+  },
+  {
+    "id": 3157,
+    "nome": "LUMINALUX - COMERCIO DE ILUMINACAO LTDA"
+  },
+  {
+    "id": 2247,
+    "nome": "PARAIBA DRYWALL COMERCIO VAREJISTA DE GESSO EIRELI"
+  },
+  {
+    "id": 971,
+    "nome": "INDUSCABOS CONDUTORES ELETRICOS LIMITADA"
+  },
+  {
+    "id": 3161,
+    "nome": "COLOMBO COMERCIO DE MADEIRAS EIRELI"
+  },
+  {
+    "id": 3164,
+    "nome": "CIA INDUSTRIAL H. CARLOS SCHNEIDER"
+  },
+  {
+    "id": 3170,
+    "nome": "BLUE TINTAS LTDA"
+  },
+  {
+    "id": 3173,
+    "nome": "S. T. COMERCIO DE FERRAGENS MAGALHAES RICARTE LTDA"
+  },
+  {
+    "id": 3163,
+    "nome": "SERVER INDUSTRIA E COMERCIO DE CONFECCOES LTDA"
+  },
+  {
+    "id": 1638,
+    "nome": "FERNANDO TADEU MARTINS JUNIOR"
+  },
+  {
+    "id": 3186,
+    "nome": "SUPRINE COMERCIAL LTDA"
+  },
+  {
+    "id": 3190,
+    "nome": "RR FERNANDES TUBOS E CONEXOES LTDA"
+  },
+  {
+    "id": 3219,
+    "nome": "PREMOLVALE INDUSTRIA DE PREMOLDADOS LTDA"
+  },
+  {
+    "id": 3211,
+    "nome": "BRASIL MIX EPI E FERRAMENTAS LTDA"
+  },
+  {
+    "id": 3229,
+    "nome": "SATFROTA SISTEMAS DE SEGURANCA ELETRONICA LTDA"
+  },
+  {
+    "id": 3244,
+    "nome": "TPX INDUSTRIA DE CADEIRAS E MOVEIS PARA ESCRITORIO LTDA"
+  },
+  {
+    "id": 3251,
+    "nome": "DISTRIBUIDORA FREIRE CONSTRUCOES LTDA"
+  },
+  {
+    "id": 2592,
+    "nome": "PREMIUM DISTRIBUIDORA DE PRODUTOS DE LIMPEZA LTDA"
+  },
+  {
+    "id": 3247,
+    "nome": "NVM COMERCIO DE PRODUTOS DE LIMPEZA LTDA"
+  },
+  {
+    "id": 3256,
+    "nome": "SHOPPING DA MADEIRA FORTALEZA LTDA"
+  },
+  {
+    "id": 3258,
+    "nome": "CHARLES COMERCIO DE PEDRAS LTDA"
+  },
+  {
+    "id": 3108,
+    "nome": "NILO MAIA DISTRIBUIDORA LTDA"
+  },
+  {
+    "id": 3269,
+    "nome": "SUPER OFFICE COMERCIO E DISTRIBUICAO DE MOVEIS E ARTIGOS DE ESCRITORIO LTDA"
+  },
+  {
+    "id": 3267,
+    "nome": "AMS REFRIGERACAO LTDA"
+  },
+  {
+    "id": 119,
+    "nome": "DISTRIBUIÇÃO E COMÉRCIO DE AÇO LTDA"
+  },
+  {
+    "id": 3273,
+    "nome": "ELLO COMERCIO TRANSPORTE E LOGISTICA LTDA"
+  },
+  {
+    "id": 3277,
+    "nome": "CERAMICA ROCHA UNIPESSOAL"
+  },
+  {
+    "id": 638,
+    "nome": "A B NOBRE DA SILVA ROCHA MADEIRAS"
+  },
+  {
+    "id": 3284,
+    "nome": "JOSE ELIAS PEDROSA OLIVEIRA JUNIOR"
+  },
+  {
+    "id": 3272,
+    "nome": "IVANILDO DA CRUZ ARAUJO"
+  },
+  {
+    "id": 3297,
+    "nome": "HYDROS DISTRIBUIDORA DE MEDIDORES E ACESSORIOS LTDA "
+  },
+  {
+    "id": 3302,
+    "nome": "LG TRANSFORMADORES INDUSTRIA E SERVICOS EIRELI"
+  },
+  {
+    "id": 1819,
+    "nome": "ALMEIDA COMERCIO DISTRIBUIDOR DE MATERIAIS DE CONSTRUCAO LTDA"
+  },
+  {
+    "id": 3309,
+    "nome": "JARDESON PEREIRA DA SILVA ME "
+  },
+  {
+    "id": 3322,
+    "nome": "RDS COMERCIO DE MATERIAL DE CONSTRUCAO LTDA"
+  },
+  {
+    "id": 3331,
+    "nome": "I.F.C. INDUSTRIA E COMERCIO DE CONDUTORES ELETRICOS LTDA"
+  }
+]

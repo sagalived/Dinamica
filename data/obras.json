@@ -1,0 +1,682 @@
+[
+  {
+    "id": 25,
+    "nome": "PREFEITURA - MORRINHOS - ESCOLA FNDE"
+  },
+  {
+    "id": 26,
+    "nome": "PREFEITURA MUNICIPAL DE CAUCAIA - CRECHES"
+  },
+  {
+    "id": 21,
+    "nome": "HOSPITAL MUNICIPAL EDVAR SILVEIRA - MORRINHOS "
+  },
+  {
+    "id": 10,
+    "nome": "IFCE MANUTENÇÃO PREDIAL - REITORIA"
+  },
+  {
+    "id": 43,
+    "nome": "IFCE MANUTENÇÃO PREDIAL - CAUCAIA"
+  },
+  {
+    "id": 32,
+    "nome": "PMC- REFORMA DA QUADRA COBERTA DA ESCOLA ANTONIO ALMEIDA LUSTOSA"
+  },
+  {
+    "id": 24,
+    "nome": "\tIFCE MANUTENÇÃO PREDIAL - LIMOEIRO DO NORTE"
+  },
+  {
+    "id": 63,
+    "nome": "IFCE MANUTENÇÃO PREDIAL - UMIRIM"
+  },
+  {
+    "id": 28,
+    "nome": "ALMOXARIFADO DINÂMICA"
+  },
+  {
+    "id": 33,
+    "nome": "PMC - REFORMA DE UMA QUADRA COBERTA DA ESCOLA DOMINGOS DE ABREU BRASILEIRO"
+  },
+  {
+    "id": 39,
+    "nome": "PRAÇA MUNICIPAL EDWAR SILVEIRA - MORRINHOS"
+  },
+  {
+    "id": 23,
+    "nome": "IFCE MANUTENÇÃO PREDIAL - MORADA NOVA"
+  },
+  {
+    "id": 36,
+    "nome": "ESCRITÓRIO NOVO"
+  },
+  {
+    "id": 73,
+    "nome": "VT 03 - CAMINHÃO OKR 8293"
+  },
+  {
+    "id": 70,
+    "nome": "PREFEITURA MUNICIPAL DE CAMOCIM - CONCLUSAO CRECHE"
+  },
+  {
+    "id": 76,
+    "nome": "VT 01 - SAVEIRO PVZ-5019"
+  },
+  {
+    "id": 78,
+    "nome": "VT 05 - SAVEIRO FWX1895"
+  },
+  {
+    "id": 79,
+    "nome": "VT 06 L200 JVA-2907"
+  },
+  {
+    "id": 83,
+    "nome": "AMPLIAÇÃO DO HOSPITAL E MATERNIDADE LUZIA TEODORO DA COSTA NO MUNICÍPIO DE ORÓS"
+  },
+  {
+    "id": 49,
+    "nome": "IFCE MANUTENÇAO SUBESTAÇAO - CAMPUS REITORIA"
+  },
+  {
+    "id": 55,
+    "nome": "IFCE MANUTENÇAO SUBESTAÇAO - CAMPUS UBAJARA"
+  },
+  {
+    "id": 75,
+    "nome": "VT 02 - MONTANA POP-3760"
+  },
+  {
+    "id": 77,
+    "nome": "VT 04 SAVEIRO GGA4519"
+  },
+  {
+    "id": 41,
+    "nome": "ESCRITÓRIO"
+  },
+  {
+    "id": 91,
+    "nome": "REFORMA DE FÓRUM VELHO - ADEQUAÇÃO DE GABINETE - MARACANAÚ"
+  },
+  {
+    "id": 45,
+    "nome": "IFCE MANUTENÇAO SUBESTAÇAO - CAMPUS FORTALEZA"
+  },
+  {
+    "id": 92,
+    "nome": "IFCE MANUTENÇÃO PREDIAL - CRATEUS"
+  },
+  {
+    "id": 38,
+    "nome": "IFCE MANUTENÇÃO PREDIAL - CANINDÉ"
+  },
+  {
+    "id": 97,
+    "nome": "IFCE MANUTENÇÃO PREDIAL - SOBRAL"
+  },
+  {
+    "id": 96,
+    "nome": "IFCE MANUTENÇÃO PREDIAL - ACARAU"
+  },
+  {
+    "id": 101,
+    "nome": "CONSTRUÇÃO DA ESTRUTURA DOS 12 LEITOS DE UTI - COVID19 - CAUCAIA"
+  },
+  {
+    "id": 102,
+    "nome": "REFORMA DO HOSPITAL MUNICIPAL DR. JOÃO ELISIO DE HOLANDA"
+  },
+  {
+    "id": 35,
+    "nome": "ITAITINGA - PAV. PEDRA TOSCA EM RUAS GERERAÚ"
+  },
+  {
+    "id": 108,
+    "nome": "ENROCAMENTO EMERGENCIAL - CAUCAIA"
+  },
+  {
+    "id": 130,
+    "nome": "OBRAS AREA CAUCAIA"
+  },
+  {
+    "id": 111,
+    "nome": "REFORMA DOS CEMITÉRIOS PÚBLICOS EM CAUCAIA - CE"
+  },
+  {
+    "id": 110,
+    "nome": " SERVIÇOS REMANESCENTES DA CRECHE TIPO 01 - PROINFÂNCIA - TABULEIRO DO NORTE"
+  },
+  {
+    "id": 112,
+    "nome": "DUPLICAÇÃO DA ENTRADA DA CIDADE - TABULEIRO DO NORTE"
+  },
+  {
+    "id": 113,
+    "nome": "PAVIMENTAÇÃO E URBANIZAÇÃO DA AV. BEIRA RIO - MORRINHOS "
+  },
+  {
+    "id": 122,
+    "nome": "CONSTRUÇÃO DE QUADRAS - TABULEIRO DO NORTE"
+  },
+  {
+    "id": 121,
+    "nome": "PAVIMENTAÇÃO - CNT MORRINHOS"
+  },
+  {
+    "id": 123,
+    "nome": "IFCE MANUTENÇÃO PREDIAL - MARANGUAPE"
+  },
+  {
+    "id": 127,
+    "nome": "REFORMA DE ESCRITÓRIO"
+  },
+  {
+    "id": 126,
+    "nome": "REFORMA DA PRAÇA DA MATRIZ DO MUNICÍPIO DE GRANJEIRO "
+  },
+  {
+    "id": 119,
+    "nome": "CONTRUÇÃO DE 04 PRAÇAS - MORRINHOS"
+  },
+  {
+    "id": 135,
+    "nome": "3 - SOP - CONSTRUÇÃO DE CEI - MARACANAÚ "
+  },
+  {
+    "id": 129,
+    "nome": "MANUTENÇÃO NO MUNICÍPIO DE PARACURU - CE"
+  },
+  {
+    "id": 142,
+    "nome": "SERVIÇOS REMANESCENTES DA CRECHE TIPO 01 - PROINFÂNCIA - ASSARÉ"
+  },
+  {
+    "id": 143,
+    "nome": "CONSTRUÇÃO DE ESPAÇO EDUCATIVO 06 SALAS - CAMPOS SALES"
+  },
+  {
+    "id": 30001,
+    "nome": "ESCRITORIO POLY STEEL"
+  },
+  {
+    "id": 136,
+    "nome": "4 - SOP - CONSTRUÇÃO DE CEI - ICAPUÍ"
+  },
+  {
+    "id": 144,
+    "nome": "URBANIZAÇÃO DO AÇUDE DO JUNCO - CONSTRUÇÃO DE FONTE GRANJEIRO"
+  },
+  {
+    "id": 147,
+    "nome": "QUADRA POLIESPORTIVA COM COBERTURA E VESTIÁRIOS MODELO 02 - CAMPOS SALES"
+  },
+  {
+    "id": 149,
+    "nome": "REFORMA UBS JARDIM - PARACURU"
+  },
+  {
+    "id": 151,
+    "nome": "REFORMA E AMPLIAÇÃO DA ESCOLA EDMUNDO PEREIRA BARBOSA EMEIF - PARAIPABA"
+  },
+  {
+    "id": 148,
+    "nome": "CONSTRUÇÃO DE ESCOLA 12 SALAS - SENADOR POMPEU"
+  },
+  {
+    "id": 152,
+    "nome": "TJCE - REFORMA TOTAL DO FÓRUM DA COMARCA DE AURORA - TRIBUNAL DE JUSTIÇA"
+  },
+  {
+    "id": 154,
+    "nome": "ESCOLA MUNICIPAL ALDENOR PEREIRA DOS SANTOS EMEIF - PARAIPABA"
+  },
+  {
+    "id": 155,
+    "nome": "COMPLEXO ESCOLAR SETOR C1 EMEIF - PARAIPABA"
+  },
+  {
+    "id": 150,
+    "nome": "CENTRO DE EDUCAÇÃO INFANTIL FRANCISCA DOS SANTOS BARROSO - PARACURU"
+  },
+  {
+    "id": 157,
+    "nome": "CONSTRUÇÃO DE ESPAÇO EDUCATIVO 12 SALAS - CAMPOS SALES"
+  },
+  {
+    "id": 114,
+    "nome": "RAFAEL DE SÁ CRUZ"
+  },
+  {
+    "id": 124,
+    "nome": "OBRA PARCERIA - IFCE"
+  },
+  {
+    "id": 156,
+    "nome": "REFORMA DE EDIFICAÇÃO PARA IMPLANTAÇÃO DA SEDE DO RAIO - DE PENTECOSTE"
+  },
+  {
+    "id": 158,
+    "nome": "REFORMA DA CRECHE SONHOS DE CRIANÇA - POÇO DOCE - PARACURU"
+  },
+  {
+    "id": 160,
+    "nome": "QUADRA POLIESPORTIVA HENRIQUE DOMINGOS BRAGA SANDERS - PARACURU"
+  },
+  {
+    "id": 146,
+    "nome": "CENTRO DE EDUCAÇÃO INFANTIL - CEI IV - CASCAVEL"
+  },
+  {
+    "id": 159,
+    "nome": "REFORMA CALÇADÃO DA ORLA - PARACURU"
+  },
+  {
+    "id": 30002,
+    "nome": "OBRAS PARCERIA POLY STEEL"
+  },
+  {
+    "id": 162,
+    "nome": "4 - REFORMA DA ESCOLA FREI TITO DE ALENCAR LIMA - FORTALEZA"
+  },
+  {
+    "id": 165,
+    "nome": "URBANIZAÇÃO ENTRADA DA CIDADE - GRANJEIRO"
+  },
+  {
+    "id": 168,
+    "nome": "4 - REFORMA E AMPLIAÇÃO DE HOSPITAL - ASSARE"
+  },
+  {
+    "id": 169,
+    "nome": "REFORMA E ADEQUAÇÃO DO SHOWROOM DA  LOJA CLUB COSMÉTICOS"
+  },
+  {
+    "id": 170,
+    "nome": "CONSTRUÇÃO DE UM ESPAÇO EDUCATIVO 12 SALAS DE AULA - JUCAS"
+  },
+  {
+    "id": 171,
+    "nome": "CONSTRUÇÃO DE PASSAGEM MOLHADA - SÍTIO SÃO LORENZO - ASSARE"
+  },
+  {
+    "id": 172,
+    "nome": "CONSTRUÇÃO DE PASSAGEM MOLHADA - SÍTIO MARTINS - ASSARÉ"
+  },
+  {
+    "id": 177,
+    "nome": "CONSTRUÇÃO DE ESPAÇO EDUCATIVO RURAL COM 06 SALAS DE AULA - SENADOR POMPEU"
+  },
+  {
+    "id": 184,
+    "nome": "REF E AMP DA EDIFICAÇÃO DA ESCOLA SUPERIOR DA MAGISTRAT DO EST DO CEARA - ESMEC"
+  },
+  {
+    "id": 183,
+    "nome": "4 - SOP - CONSTRUÇÃO DE CEI - CANINDE"
+  },
+  {
+    "id": 187,
+    "nome": "4 - CONSTRUÇÃO DE ESCOLA VERTICAL 12 SALAS NO BAIRRO ALTO DA BRASILIA - SOBRAL"
+  },
+  {
+    "id": 185,
+    "nome": "4 - REFORMA ESCOLA MUNICIPAL JOSEFA BARROS DE ALENCAR - FORTALEZA"
+  },
+  {
+    "id": 188,
+    "nome": "OBRAS PARCERIAS TABULEIRO CRECHE"
+  },
+  {
+    "id": 190,
+    "nome": "OBRAS PARCERIAS TABULEIRO - QUADRAS"
+  },
+  {
+    "id": 194,
+    "nome": "4 - REFORMA E AMPLIAÇÃO DA ESCOLA MUNICIPAL DIOGO VITAL DE SIQUERA - FORTALEZA"
+  },
+  {
+    "id": 195,
+    "nome": "CONSTRUÇAO DE UMA ESCOLA NO DISTRITO DE MONTE ALVERNE - CRATO"
+  },
+  {
+    "id": 189,
+    "nome": "OBRAS PARCERIAS TABULEIRO - ENTRADA DA CIDADE"
+  },
+  {
+    "id": 30013,
+    "nome": "MARQUISE - UMIRIM"
+  },
+  {
+    "id": 30014,
+    "nome": "COBERTA METALICA - MADALENA"
+  },
+  {
+    "id": 174,
+    "nome": "CONSTRUÇÃO DE PASSAGEM MOLHADA - SÍTIO LAGOA (RIACHO DO DIOGO) - ASSARE"
+  },
+  {
+    "id": 198,
+    "nome": "CONSTRUÇÃO DE GALPÃO INDUSTRIAL - SENADOR POMPEU"
+  },
+  {
+    "id": 200,
+    "nome": "4 - URBANIZAÇÃO CAMPUS UNILAB"
+  },
+  {
+    "id": 30015,
+    "nome": "ESTRUTURA METÁLICA - SOLONÓPOLE"
+  },
+  {
+    "id": 201,
+    "nome": "4 - CONSTRUÇÃO DE CEI - BAIRRO MONDUBIM - FORTALEZA"
+  },
+  {
+    "id": 193,
+    "nome": "CONSTRUÇÃO DE PASSAGEM MOLHADA - SÍTIO LAGOA (AÇUDE DE WALTIM) - ASSARE"
+  },
+  {
+    "id": 175,
+    "nome": "CONSTRUÇÃO DE PASSAGEM MOLHADA - SÍTIO PEDRA PETRA- ASSARE"
+  },
+  {
+    "id": 30016,
+    "nome": "GALPÃO INDUSTRIAL - NP&P "
+  },
+  {
+    "id": 205,
+    "nome": "CONSTRUÇÃO DE BLOCO DE 04 (QUATRO) SALAS DE AULA NA REITORIA - STEEL FRAME "
+  },
+  {
+    "id": 209,
+    "nome": "IFCE - CAMOCIM - SUBESTAÇÃO - GRUPO 02"
+  },
+  {
+    "id": 234,
+    "nome": "IFCE - CAMPUS PECEM - SUBESTAÇÃO - GRUPO 01"
+  },
+  {
+    "id": 219,
+    "nome": "IFCE - CAMPUS ARACATI - SUBESTAÇÃO - GRUPO 03"
+  },
+  {
+    "id": 216,
+    "nome": "IFCE - CAMPUS TAUÁ - SUBESTAÇÃO - GRUPO 02"
+  },
+  {
+    "id": 30021,
+    "nome": "ALMOXARIFADO POLYSTEEL "
+  },
+  {
+    "id": 227,
+    "nome": "IFCE - CAMPUS CAUCAIA - SUBESTAÇÃO - GRUPO 01"
+  },
+  {
+    "id": 255,
+    "nome": "1 - SOP - CONSTRUÇÃO DE CEI - CANINDE"
+  },
+  {
+    "id": 256,
+    "nome": "1 - CONSTRUÇÃO DE ESCOLA VERTICAL 12 SALAS NO BAIRRO ALTO DA BRASILIA - SOBRAL"
+  },
+  {
+    "id": 258,
+    "nome": "1 - SOP - CONSTRUÇÃO DE CEI - ICAPUÍ"
+  },
+  {
+    "id": 261,
+    "nome": "1 - URBANIZAÇÃO CAMPUS UNILAB"
+  },
+  {
+    "id": 269,
+    "nome": "1 - CONSTRUÇÃO SEDE OPERACIONAL PRF - POCINHOS/PB"
+  },
+  {
+    "id": 262,
+    "nome": "1 - UNILAB - CONSTRUÇÃO DOS BLOCOS ANEXOS DO CAMPUS DOS MALÊS"
+  },
+  {
+    "id": 271,
+    "nome": "1 - UNIDADE DE ALIMENTAÇÃO NUTRICIONAL DO CAMPUS ACARAÚ DO IFCE"
+  },
+  {
+    "id": 217,
+    "nome": "IFCE - CAMPUS TIANGUÁ - SUBESTAÇÃO - GRUPO 02"
+  },
+  {
+    "id": 220,
+    "nome": "IFCE - CAMPUS JAGUARIBE - SUBESTAÇÃO - GRUPO 03"
+  },
+  {
+    "id": 264,
+    "nome": "2 - CONSTRUÇÃO DO TIPOS ALVENARIA E/OU LIGHT STEEL FRAME - CAMPUS CRATEUS"
+  },
+  {
+    "id": 241,
+    "nome": "IFCE - CAMPUS CRATO - SUBESTAÇÃO - GRUPO 04"
+  },
+  {
+    "id": 267,
+    "nome": "2 - CONSTRUÇÃO DO TIPOS ALVENARIA E/OU LIGHT STEEL FRAME - TABULEIRO DO NORTE"
+  },
+  {
+    "id": 222,
+    "nome": "IFCE - CAMPUS LIMOEIRO DO NORTE - SUBESTAÇÃO - GRUPO 03"
+  },
+  {
+    "id": 266,
+    "nome": "2 - CONSTRUÇÃO DO TIPOS ALVENARIA E/OU LIGHT STEEL FRAME - CAMPUS MORADA NOVA"
+  },
+  {
+    "id": 265,
+    "nome": "2 - CONSTRUÇÃO DO TIPOS ALVENARIA E/OU LIGHT STEEL FRAME - CAMPUS MARACANAU"
+  },
+  {
+    "id": 268,
+    "nome": "2 - CONSTRUÇÃO DO TIPOS ALVENARIA E/OU LIGHT STEEL FRAME - CAMPUS UBAJARA"
+  },
+  {
+    "id": 224,
+    "nome": "IFCE - CAMPUS QUIXADA - SUBESTAÇÃO - GRUPO 03"
+  },
+  {
+    "id": 211,
+    "nome": "IFCE - CAMPUS BOA VIAGEM - SUBESTAÇÃO - GRUPO 02"
+  },
+  {
+    "id": 213,
+    "nome": "IFCE - CAMPUS CRATEÚS - SUBESTAÇÃO - GRUPO 02"
+  },
+  {
+    "id": 236,
+    "nome": "IFCE - CAMPUS UMIRIM - SUBESTAÇÃO - GRUPO 01"
+  },
+  {
+    "id": 228,
+    "nome": "IFCE - CAMPUS FORTALEZA - SUBESTAÇÃO - GRUPO 01"
+  },
+  {
+    "id": 233,
+    "nome": "IFCE - CAMPUS PARACURU - SUBESTAÇÃO - GRUPO 01"
+  },
+  {
+    "id": 60002,
+    "nome": "CASACOR - BANGALÔ REFÚGIO "
+  },
+  {
+    "id": 60003,
+    "nome": "CASACOR - LOFT"
+  },
+  {
+    "id": 225,
+    "nome": "IFCE - CAMPUS TABULEIRO DO NORTE - SUBESTAÇÃO - GRUPO 03"
+  },
+  {
+    "id": 235,
+    "nome": "IFCE - CAMPUS POLO DE INOVAÇÃO - SUBESTAÇÃO - GRUPO 01"
+  },
+  {
+    "id": 237,
+    "nome": "IFCE - CAMPUS REITORIA - SUBESTAÇÃO"
+  },
+  {
+    "id": 239,
+    "nome": "IFCE - CAMPUS ACOPIARA - SUBESTAÇÃO - GRUPO 04"
+  },
+  {
+    "id": 248,
+    "nome": "CONDOMINIO RESIDENCIAL EM AQUIRAZ DE 152 UNIDADES CASAS - GENESIS"
+  },
+  {
+    "id": 212,
+    "nome": "IFCE - CAMPUS CANINDE - SUBESTAÇÃO - GRUPO 02 "
+  },
+  {
+    "id": 215,
+    "nome": "IFCE - CAMPUS SOBRAL - SUBESTAÇÃO - GRUPO 02"
+  },
+  {
+    "id": 243,
+    "nome": "IFCE - CAMPUS MOMBAÇA - SUBESTAÇÃO - GRUPO 04"
+  },
+  {
+    "id": 276,
+    "nome": "ALMOXARIFADO PROVISORIO DO GENESIS"
+  },
+  {
+    "id": 226,
+    "nome": "IFCE - CAMPUS BATURITE - SUBESTAÇÃO - GRUPO 01"
+  },
+  {
+    "id": 231,
+    "nome": "IFCE - CAMPUS MARACANAU - SUBESTAÇÃO - GRUPO 01"
+  },
+  {
+    "id": 229,
+    "nome": "IFCE - CAMPUS GUARAMIRANGA - SUBESTAÇÃO - GRUPO 01"
+  },
+  {
+    "id": 210,
+    "nome": "IFCE - CAMPUS ACARAÚ - SUBESTAÇÃO - GRUPO 02"
+  },
+  {
+    "id": 181,
+    "nome": "FIAT MOB (06) - SBB0E60"
+  },
+  {
+    "id": 218,
+    "nome": "IFCE - CAMPUS UBAJARA - SUBESTAÇÃO - GRUPO 02"
+  },
+  {
+    "id": 232,
+    "nome": "IFCE - CAMPUS MARANGUAPE - SUBESTAÇÃO - GRUPO 01"
+  },
+  {
+    "id": 221,
+    "nome": "IFCE - CAMPUS JAGUARUANA - SUBESTAÇÃO - GRUPO 03"
+  },
+  {
+    "id": 280,
+    "nome": "UNIDADE NUTRICIONAL DO CAMPUS CAUCAIA - IFCE"
+  },
+  {
+    "id": 282,
+    "nome": "UNIDADE NUTRICIONAL DO CAMPUS HORIZONTE - IFCE "
+  },
+  {
+    "id": 281,
+    "nome": "UNIDADE NUTRICIONAL DO CAMPUS PARACURU - IFCE"
+  },
+  {
+    "id": 286,
+    "nome": "UNIDADE NUTRICIONAL DO CAMPUS MORADA NOVA - IFCE"
+  },
+  {
+    "id": 287,
+    "nome": "UNIDADE NUTRICIONAL DO CAMPUS BATURITÉ - IFCE"
+  },
+  {
+    "id": 223,
+    "nome": "IFCE - CAMPUS MORADA NOVA - SUBESTAÇÃO - GRUPO 03"
+  },
+  {
+    "id": 214,
+    "nome": "IFCE - CAMPUS ITAPIPOCA - SUBESTAÇÃO - GRUPO 02"
+  },
+  {
+    "id": 238,
+    "nome": "IFCE - CAMPUS IGUATU - SUBESTAÇÃO - GRUPO 04"
+  },
+  {
+    "id": 80001,
+    "nome": "ESCRITÓRIO SMN"
+  },
+  {
+    "id": 242,
+    "nome": "IFCE - CAMPUS JUAZEIRO DO NORTE - SUBESTAÇÃO - GRUPO 04"
+  },
+  {
+    "id": 288,
+    "nome": "ALMOXARIFADO DINÂMICA - READEQUADO"
+  },
+  {
+    "id": 283,
+    "nome": "UNIDADE NUTRICIONAL DO CAMPUS TIANGUÁ - IFCE "
+  },
+  {
+    "id": 279,
+    "nome": "UNIDADE NUTRICIONAL DO CAMPUS CAMOCIM - IFCE"
+  },
+  {
+    "id": 284,
+    "nome": "UNIDADE NUTRICIONAL DO CAMPUS UBAJARA - IFCE"
+  },
+  {
+    "id": 178,
+    "nome": "SBS3J50 - CAMINHÃO PEQUENO"
+  },
+  {
+    "id": 166,
+    "nome": "CONSTRUÇÃO DE UNIDADE BASICA DE SAUDE - UBS INDIGENA - CRATEUS"
+  },
+  {
+    "id": 70002,
+    "nome": "CONDOMINIO RESIDENCIAL EM AQUIRAZ DE 152 UNIDADES CASAS - GENESIS"
+  },
+  {
+    "id": 230,
+    "nome": "IFCE - CAMPUS HORIZONTE - SUBESTAÇÃO - GRUPO 01"
+  },
+  {
+    "id": 179,
+    "nome": "SBM1B40 - CAMINHÃO GRANDE"
+  },
+  {
+    "id": 196,
+    "nome": "CENTRO DE GESTÃO INTEGRADA - CGI MUNICIPIO DE TAUA"
+  },
+  {
+    "id": 197,
+    "nome": "CONSTRUÇÃO DE 01 CRECHE TIPO II - DISTRITO CURUPIRA - OCARA CE"
+  },
+  {
+    "id": 199,
+    "nome": "CONSTRUÇÃO DE 01 CRECHE TIPO II - DISTRITO SÃO MARCOS - OCARA CE"
+  },
+  {
+    "id": 204,
+    "nome": "CONSTRUÇÃO DE 01 CRECHE TIPO II - DISTRITO DE SERENO - OCARA CE"
+  },
+  {
+    "id": 207,
+    "nome": "CONSTRUÇÃO DE 01 CRECHE TIPO II - DISTRITO SÃO PEDRO - OCARA CE"
+  },
+  {
+    "id": 20003,
+    "nome": "REFORMA SALA - IFCE MARACANAÚ"
+  },
+  {
+    "id": 20004,
+    "nome": "CASA BOULEVARD "
+  }
+]

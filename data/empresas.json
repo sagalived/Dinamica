@@ -1,0 +1,62 @@
+[
+  {
+    "id": 10,
+    "name": "VILLA SANTORINI",
+    "cnpj": "59.291.630/0001-05",
+    "tradeName": "VILLA SANTORINI"
+  },
+  {
+    "id": 9,
+    "name": "BRASIL STEEL COMPANY REPRESENTACOES LTDA",
+    "cnpj": "60.369.552/0001-01",
+    "tradeName": ""
+  },
+  {
+    "id": 8,
+    "name": "SMN - STEEL MONTAGENS DO NORDESTE LTDA",
+    "cnpj": "59.874.355/0001-52",
+    "tradeName": ""
+  },
+  {
+    "id": 7,
+    "name": "GENESIS EMPREENDIMENTOS SPE LTDA",
+    "cnpj": "52.547.545/0001-16",
+    "tradeName": ""
+  },
+  {
+    "id": 6,
+    "name": "AGORA NEGOCIOS IMOBILIARIOS E PARTICIPACOES LTDA",
+    "cnpj": "53.987.179/0001-89",
+    "tradeName": "AGORA INCORPORACOES"
+  },
+  {
+    "id": 5,
+    "name": "POTENCIAL NEGOCIOS E PARTICIPACOES S.A",
+    "cnpj": "52.858.061/0001-98",
+    "tradeName": "POTENCIAL"
+  },
+  {
+    "id": 4,
+    "name": "THEOROS ASSESSORIA LTDA",
+    "cnpj": "52.475.577/0001-53",
+    "tradeName": "THEOROS ASSESSORIA"
+  },
+  {
+    "id": 3,
+    "name": "METALÚRGICA POLY STEEL",
+    "cnpj": "44.571.294/0001-87",
+    "tradeName": "POLY STEEL"
+  },
+  {
+    "id": 2,
+    "name": "JFK CONSTRUÇÕES LTDA",
+    "cnpj": "30.974.783/0001-75",
+    "tradeName": "JFK CONSTRUÇÕES"
+  },
+  {
+    "id": 1,
+    "name": "DINAMICA EMPREENDIMENTOS E SOLUCOES LTDA",
+    "cnpj": "25.025.604/0001-13",
+    "tradeName": "DINAMICA EMPREENDIMENTOS"
+  }
+]
