@@ -1,66 +1,1202 @@
 [
   {
-    "id": "SANDRONEY",
-    "nome": "SANDRONEY DE SOUSA SILVA"
+    "active": false,
+    "id": "YURI",
+    "email": "yuridasilvapessoal@gmail.com",
+    "links": [
+      {
+        "rel": "groups",
+        "href": "https://api.sienge.com.br/dinamicaempreendimentos/public/api/v1/users/yuri/groups"
+      }
+    ],
+    "name": "YURI DA SILVA FERREIRA"
   },
   {
-    "id": "EMILSON",
-    "nome": "EMILSON"
+    "active": false,
+    "id": "YAGO",
+    "email": "yagooaz@gmail.com",
+    "links": [
+      {
+        "rel": "groups",
+        "href": "https://api.sienge.com.br/dinamicaempreendimentos/public/api/v1/users/yago/groups"
+      }
+    ],
+    "name": "YAGO AZEVEDO CUSTODIO"
   },
   {
-    "id": "ANDRESSA",
-    "nome": "Andressa Marta Braz Marques"
+    "active": true,
+    "id": "WITORIA",
+    "email": "seguranca@dinamicaempreendimentos.com",
+    "links": [
+      {
+        "rel": "groups",
+        "href": "https://api.sienge.com.br/dinamicaempreendimentos/public/api/v1/users/witoria/groups"
+      }
+    ],
+    "name": "Witoria Pereira da Silva Valiante"
   },
   {
-    "id": "MARCELO",
-    "nome": "MARCELO"
+    "active": false,
+    "id": "WESLLEY",
+    "email": "weslleyaalves@gmail.com",
+    "links": [
+      {
+        "rel": "groups",
+        "href": "https://api.sienge.com.br/dinamicaempreendimentos/public/api/v1/users/weslley/groups"
+      }
+    ],
+    "name": "FRANCISCO WESLLEY ALVES FERNANDES"
   },
   {
-    "id": "JACKSON",
-    "nome": "FRANCISCO JACKSON MARTINS MUNIZ"
+    "active": false,
+    "id": "WENDEL",
+    "email": "wendel.luciano@hotmail.com",
+    "links": [
+      {
+        "rel": "groups",
+        "href": "https://api.sienge.com.br/dinamicaempreendimentos/public/api/v1/users/wendel/groups"
+      }
+    ],
+    "name": "WENDEL WESCLEY DE L. LUCIANO"
   },
   {
-    "id": "LARISSA",
-    "nome": "LARISSA"
+    "active": true,
+    "id": "WALISSON",
+    "email": "naoresponder@focoinfo.com.br",
+    "links": [
+      {
+        "rel": "groups",
+        "href": "https://api.sienge.com.br/dinamicaempreendimentos/public/api/v1/users/walisson/groups"
+      }
+    ],
+    "name": "WALISSON PEREIRA NASCIMENTO DA SILVA"
   },
   {
-    "id": "ANDERSON",
-    "nome": "ANDERSON"
+    "active": false,
+    "id": "VITORIA",
+    "email": "naoresponder@focoinfo.com.br",
+    "links": [
+      {
+        "rel": "groups",
+        "href": "https://api.sienge.com.br/dinamicaempreendimentos/public/api/v1/users/vitoria/groups"
+      }
+    ],
+    "name": "VITORIA FORTE DO NASCIMENTO"
   },
   {
-    "id": "FRANCILEUDO",
-    "nome": "FRANCILEUDO RIBEIRO DA SILVA"
+    "active": false,
+    "id": "VITOR",
+    "email": "naoresponder@focoinfo.com.br",
+    "links": [
+      {
+        "rel": "groups",
+        "href": "https://api.sienge.com.br/dinamicaempreendimentos/public/api/v1/users/vitor/groups"
+      }
+    ],
+    "name": "VITOR EMANOEL SOUSA DO NASCIMENTO"
   },
   {
-    "id": "TIAGO",
-    "nome": "TIAGO CASTRO DE SOUZA"
+    "active": false,
+    "id": "VINICIUS",
+    "email": "naoresponder@focoinfo.com.br",
+    "links": [
+      {
+        "rel": "groups",
+        "href": "https://api.sienge.com.br/dinamicaempreendimentos/public/api/v1/users/vinicius/groups"
+      }
+    ],
+    "name": "VINICIUS ROLIM NOLASCO DAS NEVES"
   },
   {
-    "id": "CAIOMARCOS",
-    "nome": "CAIO MARCOS MELO GONCALVES"
-  },
-  {
-    "id": "ICARO",
-    "nome": "ICARO"
-  },
-  {
+    "active": true,
     "id": "VICTORJEFFERSON",
-    "nome": "VICTOR JEFFERSON ARAUJO QUEIROZ"
+    "email": "logistica@dinamicaempreendimentos.com.br",
+    "links": [
+      {
+        "rel": "groups",
+        "href": "https://api.sienge.com.br/dinamicaempreendimentos/public/api/v1/users/victorjefferson/groups"
+      }
+    ],
+    "name": "VICTOR JEFFERSON ARAUJO QUEIROZ"
   },
   {
-    "id": "FRANCISCOVINICIUS",
-    "nome": "FRANCISCO VINICIUS ARAUJO SOUZA"
+    "active": false,
+    "id": "VICTOR",
+    "email": "naoresponder@focoinfo.com.br",
+    "links": [
+      {
+        "rel": "groups",
+        "href": "https://api.sienge.com.br/dinamicaempreendimentos/public/api/v1/users/victor/groups"
+      }
+    ],
+    "name": "VICTOR HUGO TORRES"
   },
   {
-    "id": "ELTONABREU",
-    "nome": "ELTON EMANUEL PEIXOTO DE ABREU"
+    "active": false,
+    "id": "VANIELE",
+    "email": "naoresponder@focoinfo.com.br",
+    "links": [
+      {
+        "rel": "groups",
+        "href": "https://api.sienge.com.br/dinamicaempreendimentos/public/api/v1/users/vaniele/groups"
+      }
+    ],
+    "name": "FRANCISCO VANIELE ALVES"
   },
   {
-    "id": "GEAN",
-    "nome": "GEAN FROTA MOREIRA"
+    "active": false,
+    "id": "VALKSON",
+    "email": "naoresponder@focoinfo.com.br",
+    "links": [
+      {
+        "rel": "groups",
+        "href": "https://api.sienge.com.br/dinamicaempreendimentos/public/api/v1/users/valkson/groups"
+      }
+    ],
+    "name": "VALKSON WYLLIAM ALVES SARAIVA"
   },
   {
-    "id": "HIRLANDA",
-    "nome": "HIRLANDA DE ARAUJO BATISTA PASSOS"
+    "active": false,
+    "id": "VALERIA",
+    "email": "naoresponder@focoinfo.com.br",
+    "links": [
+      {
+        "rel": "groups",
+        "href": "https://api.sienge.com.br/dinamicaempreendimentos/public/api/v1/users/valeria/groups"
+      }
+    ],
+    "name": "VALERIA"
+  },
+  {
+    "active": false,
+    "id": "TONY",
+    "email": "tecnica3@dinamicaempreendimentos.com.br",
+    "links": [
+      {
+        "rel": "groups",
+        "href": "https://api.sienge.com.br/dinamicaempreendimentos/public/api/v1/users/tony/groups"
+      }
+    ],
+    "name": "ANTONIO JOSE GOMES FERREIRA"
+  },
+  {
+    "active": false,
+    "id": "TIAGO",
+    "email": "naoresponder@focoinfo.com.br",
+    "links": [
+      {
+        "rel": "groups",
+        "href": "https://api.sienge.com.br/dinamicaempreendimentos/public/api/v1/users/tiago/groups"
+      }
+    ],
+    "name": "TIAGO CASTRO DE SOUZA"
+  },
+  {
+    "active": false,
+    "id": "THIAGO",
+    "email": "seguranca@dinamicaempreendimentos.com",
+    "links": [
+      {
+        "rel": "groups",
+        "href": "https://api.sienge.com.br/dinamicaempreendimentos/public/api/v1/users/thiago/groups"
+      }
+    ],
+    "name": "THIAGO DANTAS ROCHA"
+  },
+  {
+    "active": false,
+    "id": "TESTE3",
+    "email": "naoresponder@foco.com.br",
+    "links": [
+      {
+        "rel": "groups",
+        "href": "https://api.sienge.com.br/dinamicaempreendimentos/public/api/v1/users/teste3/groups"
+      }
+    ],
+    "name": "TREINAMENTO TESTE3"
+  },
+  {
+    "active": false,
+    "id": "TESTE2",
+    "email": "naoresponder@foco.com.br",
+    "links": [
+      {
+        "rel": "groups",
+        "href": "https://api.sienge.com.br/dinamicaempreendimentos/public/api/v1/users/teste2/groups"
+      }
+    ],
+    "name": "TREINAMENTO TESTE2"
+  },
+  {
+    "active": false,
+    "id": "TESTE1",
+    "email": "naoresponder@foco.com.br",
+    "links": [
+      {
+        "rel": "groups",
+        "href": "https://api.sienge.com.br/dinamicaempreendimentos/public/api/v1/users/teste1/groups"
+      }
+    ],
+    "name": "TREINAMENTO TESTE1"
+  },
+  {
+    "active": false,
+    "id": "TESTE",
+    "email": "TESTE@TESTE.COM",
+    "links": [
+      {
+        "rel": "groups",
+        "href": "https://api.sienge.com.br/dinamicaempreendimentos/public/api/v1/users/teste/groups"
+      }
+    ],
+    "name": "TESTE SIENGE"
+  },
+  {
+    "active": true,
+    "id": "SUZANE.FOCO",
+    "email": "suzane.araujo@focoinfo.com.br",
+    "links": [
+      {
+        "rel": "groups",
+        "href": "https://api.sienge.com.br/dinamicaempreendimentos/public/api/v1/users/suzane.foco/groups"
+      }
+    ],
+    "name": "SUZANE ARAÚJO | FOCO CONSULTORIA SIENGE"
+  },
+  {
+    "active": false,
+    "id": "SUPRIMENTO",
+    "email": "emilsonlj@gmail.com",
+    "links": [
+      {
+        "rel": "groups",
+        "href": "https://api.sienge.com.br/dinamicaempreendimentos/public/api/v1/users/suprimento/groups"
+      }
+    ],
+    "name": "Emilson Junior"
+  },
+  {
+    "active": false,
+    "id": "SUPER",
+    "email": null,
+    "links": [
+      {
+        "rel": "groups",
+        "href": "https://api.sienge.com.br/dinamicaempreendimentos/public/api/v1/users/super/groups"
+      }
+    ],
+    "name": "Super-usuário"
+  },
+  {
+    "active": false,
+    "id": "SOFIA",
+    "email": "naoresponder@focoinfo.com.br",
+    "links": [
+      {
+        "rel": "groups",
+        "href": "https://api.sienge.com.br/dinamicaempreendimentos/public/api/v1/users/sofia/groups"
+      }
+    ],
+    "name": "SOFIA BEZERRA DE QUEIROZ"
+  },
+  {
+    "active": false,
+    "id": "SERGIO",
+    "email": "walissonsergiorh@gmail.com",
+    "links": [
+      {
+        "rel": "groups",
+        "href": "https://api.sienge.com.br/dinamicaempreendimentos/public/api/v1/users/sergio/groups"
+      }
+    ],
+    "name": "WALISSON SERGIO DA SILVA DE SOUZA"
+  },
+  {
+    "active": true,
+    "id": "SARAH",
+    "email": "naoresponder@focoinfo.com.br",
+    "links": [
+      {
+        "rel": "groups",
+        "href": "https://api.sienge.com.br/dinamicaempreendimentos/public/api/v1/users/sarah/groups"
+      }
+    ],
+    "name": "SARAH FERREIRA SILVA"
+  },
+  {
+    "active": false,
+    "id": "SANDRONEY",
+    "email": "naoresponder@focoinfo.com.br",
+    "links": [
+      {
+        "rel": "groups",
+        "href": "https://api.sienge.com.br/dinamicaempreendimentos/public/api/v1/users/sandroney/groups"
+      }
+    ],
+    "name": "SANDRONEY DE SOUSA SILVA"
+  },
+  {
+    "active": false,
+    "id": "SAMUEL",
+    "email": "naoresponder@focoinfo.com.br",
+    "links": [
+      {
+        "rel": "groups",
+        "href": "https://api.sienge.com.br/dinamicaempreendimentos/public/api/v1/users/samuel/groups"
+      }
+    ],
+    "name": "SAMUEL FERNANDES VILAR"
+  },
+  {
+    "active": true,
+    "id": "SAMIA.BASTOS",
+    "email": "naoresponder@focoinfo.com.br",
+    "links": [
+      {
+        "rel": "groups",
+        "href": "https://api.sienge.com.br/dinamicaempreendimentos/public/api/v1/users/samia.bastos/groups"
+      }
+    ],
+    "name": "SAMIA BASTOS | FOCO CONSULORIA SIENGE"
+  },
+  {
+    "active": true,
+    "id": "SAM",
+    "email": "atendimento@agoraincorporacoes.com.br",
+    "links": [
+      {
+        "rel": "groups",
+        "href": "https://api.sienge.com.br/dinamicaempreendimentos/public/api/v1/users/sam/groups"
+      }
+    ],
+    "name": "Samuel Holanda"
+  },
+  {
+    "active": false,
+    "id": "SAIENILY",
+    "email": "naoresponder@focoinfo.com.br",
+    "links": [
+      {
+        "rel": "groups",
+        "href": "https://api.sienge.com.br/dinamicaempreendimentos/public/api/v1/users/saienily/groups"
+      }
+    ],
+    "name": "SAIENILY MAYARA DE LIMA PORTO"
+  },
+  {
+    "active": false,
+    "id": "SADJA",
+    "email": "naoresponder@focoinfo.com.br",
+    "links": [
+      {
+        "rel": "groups",
+        "href": "https://api.sienge.com.br/dinamicaempreendimentos/public/api/v1/users/sadja/groups"
+      }
+    ],
+    "name": "SADJA CLEUNE ALVES CORDEIRO"
+  },
+  {
+    "active": false,
+    "id": "ROGERE",
+    "email": "naoresponder@focoinfo.com.br",
+    "links": [
+      {
+        "rel": "groups",
+        "href": "https://api.sienge.com.br/dinamicaempreendimentos/public/api/v1/users/rogere/groups"
+      }
+    ],
+    "name": "ROGERE DE SOUSA ROCHA "
+  },
+  {
+    "active": false,
+    "id": "ROBELDO",
+    "email": "seguranca@dinamicaemprendimentos.com",
+    "links": [
+      {
+        "rel": "groups",
+        "href": "https://api.sienge.com.br/dinamicaempreendimentos/public/api/v1/users/robeldo/groups"
+      }
+    ],
+    "name": "FRANCISCO ROBELDO SOBRINHO"
+  },
+  {
+    "active": false,
+    "id": "RITA",
+    "email": "tecnica5@dinamicaempreendimentos.com.br",
+    "links": [
+      {
+        "rel": "groups",
+        "href": "https://api.sienge.com.br/dinamicaempreendimentos/public/api/v1/users/rita/groups"
+      }
+    ],
+    "name": "RITA AMELIA MENDES BRANDÃO ROSA"
+  },
+  {
+    "active": true,
+    "id": "RICARDO.FOCO",
+    "email": "ricardo.paiva@focoinfo.com.br",
+    "links": [
+      {
+        "rel": "groups",
+        "href": "https://api.sienge.com.br/dinamicaempreendimentos/public/api/v1/users/ricardo.foco/groups"
+      }
+    ],
+    "name": "RICARDO PAIVA FOCO"
+  },
+  {
+    "active": false,
+    "id": "RENATAVITORIA",
+    "email": "renatavimr@gmail.com.br",
+    "links": [
+      {
+        "rel": "groups",
+        "href": "https://api.sienge.com.br/dinamicaempreendimentos/public/api/v1/users/renatavitoria/groups"
+      }
+    ],
+    "name": "RENATA VITORIA MUNIZ RODRIGUES"
+  },
+  {
+    "active": false,
+    "id": "RENAN",
+    "email": "naoresponder@focoinfo.com.br",
+    "links": [
+      {
+        "rel": "groups",
+        "href": "https://api.sienge.com.br/dinamicaempreendimentos/public/api/v1/users/renan/groups"
+      }
+    ],
+    "name": "IRIS RENAN FERREIRA DA SILVA"
+  },
+  {
+    "active": false,
+    "id": "REGIS",
+    "email": "amomcad@gmail.com",
+    "links": [
+      {
+        "rel": "groups",
+        "href": "https://api.sienge.com.br/dinamicaempreendimentos/public/api/v1/users/regis/groups"
+      }
+    ],
+    "name": "AMOM REGIS MANACEAS MARQUES MOREIRA"
+  },
+  {
+    "active": false,
+    "id": "REGINA",
+    "email": "regina44.celi@uol.com.br",
+    "links": [
+      {
+        "rel": "groups",
+        "href": "https://api.sienge.com.br/dinamicaempreendimentos/public/api/v1/users/regina/groups"
+      }
+    ],
+    "name": "REGINA"
+  },
+  {
+    "active": true,
+    "id": "RAMON",
+    "email": "tecnica20@dinamicaempreendimentos.com.br",
+    "links": [
+      {
+        "rel": "groups",
+        "href": "https://api.sienge.com.br/dinamicaempreendimentos/public/api/v1/users/ramon/groups"
+      }
+    ],
+    "name": "Ramon Pereira Vital"
+  },
+  {
+    "active": false,
+    "id": "RAISSA",
+    "email": "naoresponder@focoinfo.com.br",
+    "links": [
+      {
+        "rel": "groups",
+        "href": "https://api.sienge.com.br/dinamicaempreendimentos/public/api/v1/users/raissa/groups"
+      }
+    ],
+    "name": "RAISSA DE LIMA SOUZA"
+  },
+  {
+    "active": true,
+    "id": "RAFAEL",
+    "email": "naoresponder@focoinfo.com.br",
+    "links": [
+      {
+        "rel": "groups",
+        "href": "https://api.sienge.com.br/dinamicaempreendimentos/public/api/v1/users/rafael/groups"
+      }
+    ],
+    "name": "RAFAEL DE SA CRUZ"
+  },
+  {
+    "active": false,
+    "id": "PEDROPAULO",
+    "email": "pedropaulocavalcante@hotmail.com",
+    "links": [
+      {
+        "rel": "groups",
+        "href": "https://api.sienge.com.br/dinamicaempreendimentos/public/api/v1/users/pedropaulo/groups"
+      }
+    ],
+    "name": "PEDRO PAULO"
+  },
+  {
+    "active": false,
+    "id": "PEDROITALO",
+    "email": "pedrolespo@gmail.com",
+    "links": [
+      {
+        "rel": "groups",
+        "href": "https://api.sienge.com.br/dinamicaempreendimentos/public/api/v1/users/pedroitalo/groups"
+      }
+    ],
+    "name": "PEDRO ITALO MOURA OLIVEIRA"
+  },
+  {
+    "active": false,
+    "id": "PEDRODEIVES",
+    "email": "naoresponder@focoinfo.com.br",
+    "links": [
+      {
+        "rel": "groups",
+        "href": "https://api.sienge.com.br/dinamicaempreendimentos/public/api/v1/users/pedrodeives/groups"
+      }
+    ],
+    "name": "PEDRO DEIVES RODRIGUES CARNEIRO"
+  },
+  {
+    "active": false,
+    "id": "PEDRO",
+    "email": "naoresponder@focoinfo.com.br",
+    "links": [
+      {
+        "rel": "groups",
+        "href": "https://api.sienge.com.br/dinamicaempreendimentos/public/api/v1/users/pedro/groups"
+      }
+    ],
+    "name": "PEDRO HENRIQUE SOUSA PINTO"
+  },
+  {
+    "active": false,
+    "id": "PAULOALVES",
+    "email": "naoresponder@focoinfo.com.br",
+    "links": [
+      {
+        "rel": "groups",
+        "href": "https://api.sienge.com.br/dinamicaempreendimentos/public/api/v1/users/pauloalves/groups"
+      }
+    ],
+    "name": "FRANCISCO PAULO ALVES DODO"
+  },
+  {
+    "active": false,
+    "id": "PAULO",
+    "email": "paulodiogenes1263@gmail.com",
+    "links": [
+      {
+        "rel": "groups",
+        "href": "https://api.sienge.com.br/dinamicaempreendimentos/public/api/v1/users/paulo/groups"
+      }
+    ],
+    "name": "PAULO DIOGENES MOTA NASCIMENTO"
+  },
+  {
+    "active": false,
+    "id": "PATRICIAFONSECA",
+    "email": "patriciasantosfonseca2604@gmail.com",
+    "links": [
+      {
+        "rel": "groups",
+        "href": "https://api.sienge.com.br/dinamicaempreendimentos/public/api/v1/users/patriciafonseca/groups"
+      }
+    ],
+    "name": "PATRICIA SANTOS DA FONSECA"
+  },
+  {
+    "active": false,
+    "id": "PATRICIA",
+    "email": "naoresponder@focoinfo.com.br",
+    "links": [
+      {
+        "rel": "groups",
+        "href": "https://api.sienge.com.br/dinamicaempreendimentos/public/api/v1/users/patricia/groups"
+      }
+    ],
+    "name": "PATRICIA CORREIA DE SOUSA"
+  },
+  {
+    "active": false,
+    "id": "NETO",
+    "email": "naoresponder@focoinfo.com.br",
+    "links": [
+      {
+        "rel": "groups",
+        "href": "https://api.sienge.com.br/dinamicaempreendimentos/public/api/v1/users/neto/groups"
+      }
+    ],
+    "name": "JOSE WENY LINO ALVES NETO"
+  },
+  {
+    "active": false,
+    "id": "NELSON",
+    "email": "naoresponder@focoinfo.com.br",
+    "links": [
+      {
+        "rel": "groups",
+        "href": "https://api.sienge.com.br/dinamicaempreendimentos/public/api/v1/users/nelson/groups"
+      }
+    ],
+    "name": "NELSON FERREIRA"
+  },
+  {
+    "active": false,
+    "id": "NATHALIA",
+    "email": "naoresponder@focoinfo.com.br",
+    "links": [
+      {
+        "rel": "groups",
+        "href": "https://api.sienge.com.br/dinamicaempreendimentos/public/api/v1/users/nathalia/groups"
+      }
+    ],
+    "name": "NATHALIA PEREIRA GOMES"
+  },
+  {
+    "active": false,
+    "id": "NATALIA",
+    "email": "nataliassousa97@gmail.com",
+    "links": [
+      {
+        "rel": "groups",
+        "href": "https://api.sienge.com.br/dinamicaempreendimentos/public/api/v1/users/natalia/groups"
+      }
+    ],
+    "name": "NATALIA DA SILVA SOUSA"
+  },
+  {
+    "active": true,
+    "id": "NARALOBAO",
+    "email": "comercial@dinamicaempreendimentos.com.br",
+    "links": [
+      {
+        "rel": "groups",
+        "href": "https://api.sienge.com.br/dinamicaempreendimentos/public/api/v1/users/naralobao/groups"
+      }
+    ],
+    "name": "Nara Ingrid Lobão Gomes"
+  },
+  {
+    "active": false,
+    "id": "NAJILA",
+    "email": "naoresponder@focoinfo.com.br",
+    "links": [
+      {
+        "rel": "groups",
+        "href": "https://api.sienge.com.br/dinamicaempreendimentos/public/api/v1/users/najila/groups"
+      }
+    ],
+    "name": "NAJILA LESSA LIMA"
+  },
+  {
+    "active": false,
+    "id": "NADIEL",
+    "email": "naoresponder@focoinfo.com.br",
+    "links": [
+      {
+        "rel": "groups",
+        "href": "https://api.sienge.com.br/dinamicaempreendimentos/public/api/v1/users/nadiel/groups"
+      }
+    ],
+    "name": "NADIEL DE ALMEIDA OLIVEIRA JUNIOR"
+  },
+  {
+    "active": false,
+    "id": "MONICA",
+    "email": "naoresponder@focoinfo.com.br",
+    "links": [
+      {
+        "rel": "groups",
+        "href": "https://api.sienge.com.br/dinamicaempreendimentos/public/api/v1/users/monica/groups"
+      }
+    ],
+    "name": "MONICA CAVALCANTE PONTES"
+  },
+  {
+    "active": false,
+    "id": "MOAB",
+    "email": "naoresponder@focoinfo.com.br",
+    "links": [
+      {
+        "rel": "groups",
+        "href": "https://api.sienge.com.br/dinamicaempreendimentos/public/api/v1/users/moab/groups"
+      }
+    ],
+    "name": "ANTONIO MOAB LIMA MAGALHAES"
+  },
+  {
+    "active": false,
+    "id": "MICHAEL",
+    "email": "tecnica2@dinamicaempreendimentos.com.br",
+    "links": [
+      {
+        "rel": "groups",
+        "href": "https://api.sienge.com.br/dinamicaempreendimentos/public/api/v1/users/michael/groups"
+      }
+    ],
+    "name": "MICHAEL RODRIGUES"
+  },
+  {
+    "active": false,
+    "id": "MAYARA.",
+    "email": "naoresponder@focoinfo.com.br",
+    "links": [
+      {
+        "rel": "groups",
+        "href": "https://api.sienge.com.br/dinamicaempreendimentos/public/api/v1/users/mayara./groups"
+      }
+    ],
+    "name": "SAIENILY MAYARA DE LIMA PORTO"
+  },
+  {
+    "active": false,
+    "id": "MAYARA",
+    "email": "valentemayara98@gmail.com",
+    "links": [
+      {
+        "rel": "groups",
+        "href": "https://api.sienge.com.br/dinamicaempreendimentos/public/api/v1/users/mayara/groups"
+      }
+    ],
+    "name": "MAYARA DA SILVA VALENTE"
+  },
+  {
+    "active": false,
+    "id": "MAURICIO",
+    "email": "naoresponder@focoinfo.com.br",
+    "links": [
+      {
+        "rel": "groups",
+        "href": "https://api.sienge.com.br/dinamicaempreendimentos/public/api/v1/users/mauricio/groups"
+      }
+    ],
+    "name": "MAURICIO LIMA PONTES ALEXANDRE"
+  },
+  {
+    "active": false,
+    "id": "MATHEUS",
+    "email": "naoresponder@focoinfo.com.br",
+    "links": [
+      {
+        "rel": "groups",
+        "href": "https://api.sienge.com.br/dinamicaempreendimentos/public/api/v1/users/matheus/groups"
+      }
+    ],
+    "name": "MATHEUS MARTINS PALMELA BASTOS DE OLIVEIRA"
+  },
+  {
+    "active": false,
+    "id": "MATEUS",
+    "email": "naoresponder@focoinfo.com.br",
+    "links": [
+      {
+        "rel": "groups",
+        "href": "https://api.sienge.com.br/dinamicaempreendimentos/public/api/v1/users/mateus/groups"
+      }
+    ],
+    "name": "MATEUS DUARTE VASCONCELOS"
+  },
+  {
+    "active": true,
+    "id": "MARLON.PINTO",
+    "email": "naoresponder@focoinfo.com.br",
+    "links": [
+      {
+        "rel": "groups",
+        "href": "https://api.sienge.com.br/dinamicaempreendimentos/public/api/v1/users/marlon.pinto/groups"
+      }
+    ],
+    "name": "MARLON PINTO"
+  },
+  {
+    "active": true,
+    "id": "MARCIAEDUARDA",
+    "email": "engcivil.meduarda@gmail.com",
+    "links": [
+      {
+        "rel": "groups",
+        "href": "https://api.sienge.com.br/dinamicaempreendimentos/public/api/v1/users/marciaeduarda/groups"
+      }
+    ],
+    "name": "MARCIA EDUARDA SANTOS RODRIGUES"
+  },
+  {
+    "active": false,
+    "id": "MARCELO",
+    "email": "naoenviar@naoenviar.com",
+    "links": [
+      {
+        "rel": "groups",
+        "href": "https://api.sienge.com.br/dinamicaempreendimentos/public/api/v1/users/marcelo/groups"
+      }
+    ],
+    "name": "MARCELO"
+  },
+  {
+    "active": false,
+    "id": "MARCELA",
+    "email": "naoresponder@focoinfo.com.br",
+    "links": [
+      {
+        "rel": "groups",
+        "href": "https://api.sienge.com.br/dinamicaempreendimentos/public/api/v1/users/marcela/groups"
+      }
+    ],
+    "name": "MARIA MARCELA MONTEIRO TOME"
+  },
+  {
+    "active": true,
+    "id": "LUIZMEDINA",
+    "email": "naoresponder@focoinfo.com.br",
+    "links": [
+      {
+        "rel": "groups",
+        "href": "https://api.sienge.com.br/dinamicaempreendimentos/public/api/v1/users/luizmedina/groups"
+      }
+    ],
+    "name": "LUIZ MEDINA"
+  },
+  {
+    "active": true,
+    "id": "LUISPAULO",
+    "email": "naoresponder@focoinfo.com.br",
+    "links": [
+      {
+        "rel": "groups",
+        "href": "https://api.sienge.com.br/dinamicaempreendimentos/public/api/v1/users/luispaulo/groups"
+      }
+    ],
+    "name": "LUIS PAULO BRAZ DA SILVA"
+  },
+  {
+    "active": true,
+    "id": "LUISGUSTAVO",
+    "email": "naoresponder@focoinfo.com.br",
+    "links": [
+      {
+        "rel": "groups",
+        "href": "https://api.sienge.com.br/dinamicaempreendimentos/public/api/v1/users/luisgustavo/groups"
+      }
+    ],
+    "name": "LUIS GUSTAVO"
+  },
+  {
+    "active": false,
+    "id": "LUISFELIPE",
+    "email": "naoresponder@focoinfo.com.br",
+    "links": [
+      {
+        "rel": "groups",
+        "href": "https://api.sienge.com.br/dinamicaempreendimentos/public/api/v1/users/luisfelipe/groups"
+      }
+    ],
+    "name": "LUIS FELIPE SALES DA SILVA"
+  },
+  {
+    "active": false,
+    "id": "LUDIMILLA",
+    "email": "naoresponder@focoinfo.com.br",
+    "links": [
+      {
+        "rel": "groups",
+        "href": "https://api.sienge.com.br/dinamicaempreendimentos/public/api/v1/users/ludimilla/groups"
+      }
+    ],
+    "name": "LUDIMILLA AZEVEDO DE FREITAS"
+  },
+  {
+    "active": false,
+    "id": "LUCASREIS",
+    "email": "lucas.machado.reis1@gmail.com",
+    "links": [
+      {
+        "rel": "groups",
+        "href": "https://api.sienge.com.br/dinamicaempreendimentos/public/api/v1/users/lucasreis/groups"
+      }
+    ],
+    "name": "LUCAS DOS REIS MACHADO"
+  },
+  {
+    "active": false,
+    "id": "LUCASARCANJO",
+    "email": "naoresponder@focoinfo.com.br",
+    "links": [
+      {
+        "rel": "groups",
+        "href": "https://api.sienge.com.br/dinamicaempreendimentos/public/api/v1/users/lucasarcanjo/groups"
+      }
+    ],
+    "name": "JOSE LUCAS DE ARAUJO ARCANJO"
+  },
+  {
+    "active": false,
+    "id": "LUCAS",
+    "email": "naoresponder@focoinfo.com.br",
+    "links": [
+      {
+        "rel": "groups",
+        "href": "https://api.sienge.com.br/dinamicaempreendimentos/public/api/v1/users/lucas/groups"
+      }
+    ],
+    "name": "LUCAS NUNES MAPURUNGA"
+  },
+  {
+    "active": false,
+    "id": "LIRANEI",
+    "email": "liraneiramalho@gmail.com",
+    "links": [
+      {
+        "rel": "groups",
+        "href": "https://api.sienge.com.br/dinamicaempreendimentos/public/api/v1/users/liranei/groups"
+      }
+    ],
+    "name": "LIRANEI RODRIGUES RAMALHO"
+  },
+  {
+    "active": true,
+    "id": "LIDIAPAIVA",
+    "email": "rh@dinamicaempreendimentos.com.br",
+    "links": [
+      {
+        "rel": "groups",
+        "href": "https://api.sienge.com.br/dinamicaempreendimentos/public/api/v1/users/lidiapaiva/groups"
+      }
+    ],
+    "name": "ANA LIDIA PAIVA DE ALMEIDA"
+  },
+  {
+    "active": true,
+    "id": "LIA",
+    "email": "naoresponder@focoinfo.com.br",
+    "links": [
+      {
+        "rel": "groups",
+        "href": "https://api.sienge.com.br/dinamicaempreendimentos/public/api/v1/users/lia/groups"
+      }
+    ],
+    "name": "LIA GINO DE OLIVEIRA"
+  },
+  {
+    "active": false,
+    "id": "LEVI",
+    "email": "naoresponder@focoinfo.com.br",
+    "links": [
+      {
+        "rel": "groups",
+        "href": "https://api.sienge.com.br/dinamicaempreendimentos/public/api/v1/users/levi/groups"
+      }
+    ],
+    "name": "LEVI AKYM CARDOSO AIRES"
+  },
+  {
+    "active": false,
+    "id": "LEONYS",
+    "email": "naoresponder@focoinfo.com.br",
+    "links": [
+      {
+        "rel": "groups",
+        "href": "https://api.sienge.com.br/dinamicaempreendimentos/public/api/v1/users/leonys/groups"
+      }
+    ],
+    "name": "ANTONIO LEONYS SARAIVA DE FIGUEIREDO LIMA"
+  },
+  {
+    "active": false,
+    "id": "LEONARDO",
+    "email": "naoresponder@focoinfo.com.br",
+    "links": [
+      {
+        "rel": "groups",
+        "href": "https://api.sienge.com.br/dinamicaempreendimentos/public/api/v1/users/leonardo/groups"
+      }
+    ],
+    "name": "LEONARDO DAVI ARAUJO MOURA"
+  },
+  {
+    "active": false,
+    "id": "LEO",
+    "email": "naoresponder@focoinfo.com.br",
+    "links": [
+      {
+        "rel": "groups",
+        "href": "https://api.sienge.com.br/dinamicaempreendimentos/public/api/v1/users/leo/groups"
+      }
+    ],
+    "name": "FRANCISCO LEANDRO P. DA SILVA"
+  },
+  {
+    "active": true,
+    "id": "LEANDRO",
+    "email": "naoresponder@focoinfo.com.br",
+    "links": [
+      {
+        "rel": "groups",
+        "href": "https://api.sienge.com.br/dinamicaempreendimentos/public/api/v1/users/leandro/groups"
+      }
+    ],
+    "name": "LEANDRO NORONHA ALMEIDA"
+  },
+  {
+    "active": false,
+    "id": "LARISSA",
+    "email": "naoresponder@sistema.com",
+    "links": [
+      {
+        "rel": "groups",
+        "href": "https://api.sienge.com.br/dinamicaempreendimentos/public/api/v1/users/larissa/groups"
+      }
+    ],
+    "name": "LARISSA"
+  },
+  {
+    "active": false,
+    "id": "KEYLA",
+    "email": "tecnica3@dinamicaempreendimentos.com.br",
+    "links": [
+      {
+        "rel": "groups",
+        "href": "https://api.sienge.com.br/dinamicaempreendimentos/public/api/v1/users/keyla/groups"
+      }
+    ],
+    "name": "KEYLA KATARINA GONÇALVES GRANGEIRO"
+  },
+  {
+    "active": false,
+    "id": "KECIA",
+    "email": "contato@dinamicaempreendimentos.com.br",
+    "links": [
+      {
+        "rel": "groups",
+        "href": "https://api.sienge.com.br/dinamicaempreendimentos/public/api/v1/users/kecia/groups"
+      }
+    ],
+    "name": "ANA KECIA"
+  },
+  {
+    "active": false,
+    "id": "KARAM",
+    "email": "naoresponder@focoinfo.com.br",
+    "links": [
+      {
+        "rel": "groups",
+        "href": "https://api.sienge.com.br/dinamicaempreendimentos/public/api/v1/users/karam/groups"
+      }
+    ],
+    "name": "MARCOS KARAM BARBOSA CORDEIRO"
+  },
+  {
+    "active": false,
+    "id": "JUNIOR",
+    "email": "juniorcb29@yahoo.com.br",
+    "links": [
+      {
+        "rel": "groups",
+        "href": "https://api.sienge.com.br/dinamicaempreendimentos/public/api/v1/users/junior/groups"
+      }
+    ],
+    "name": "RUI CIRINO CASTELO BRANCO JUNIOR"
+  },
+  {
+    "active": false,
+    "id": "JONE",
+    "email": "naoresponder@focoinfo.com.br",
+    "links": [
+      {
+        "rel": "groups",
+        "href": "https://api.sienge.com.br/dinamicaempreendimentos/public/api/v1/users/jone/groups"
+      }
+    ],
+    "name": "JONE FRANCISCO OLIVEIRA DE PAULA"
+  },
+  {
+    "active": false,
+    "id": "JOHHANESCOSTA",
+    "email": "nr@focoinfo.com.br",
+    "links": [
+      {
+        "rel": "groups",
+        "href": "https://api.sienge.com.br/dinamicaempreendimentos/public/api/v1/users/johhanescosta/groups"
+      }
+    ],
+    "name": "JOHHANES COSTA | SIENGE"
+  },
+  {
+    "active": false,
+    "id": "JOAORAFAEL",
+    "email": "naoresponder@focoinfo.com.br",
+    "links": [
+      {
+        "rel": "groups",
+        "href": "https://api.sienge.com.br/dinamicaempreendimentos/public/api/v1/users/joaorafael/groups"
+      }
+    ],
+    "name": "JOÃO RAFAEL MARTINS TAUMATURGO LEMOS"
+  },
+  {
+    "active": false,
+    "id": "JOAOGABRIEL",
+    "email": "tecnica7@dinamicaempreendimentos.com.br",
+    "links": [
+      {
+        "rel": "groups",
+        "href": "https://api.sienge.com.br/dinamicaempreendimentos/public/api/v1/users/joaogabriel/groups"
+      }
+    ],
+    "name": "JOAO GABRIEL FERREIRA DA SILVA"
+  },
+  {
+    "active": true,
+    "id": "JOAO",
+    "email": "naoresponder@focoinfo.com.br",
+    "links": [
+      {
+        "rel": "groups",
+        "href": "https://api.sienge.com.br/dinamicaempreendimentos/public/api/v1/users/joao/groups"
+      }
+    ],
+    "name": "JOÃO BENEDITO SELESTINO"
+  },
+  {
+    "active": false,
+    "id": "JESSICA",
+    "email": "jessicasantos01830@gmail.com",
+    "links": [
+      {
+        "rel": "groups",
+        "href": "https://api.sienge.com.br/dinamicaempreendimentos/public/api/v1/users/jessica/groups"
+      }
+    ],
+    "name": "JESSICA FERNANDES MARTINS DOS SANTOS"
+  },
+  {
+    "active": true,
+    "id": "JANNEIZA",
+    "email": "naoresponder@focoinfo.com.br",
+    "links": [
+      {
+        "rel": "groups",
+        "href": "https://api.sienge.com.br/dinamicaempreendimentos/public/api/v1/users/janneiza/groups"
+      }
+    ],
+    "name": "JANNEIZA BATISTA DE FRANÇA"
+  },
+  {
+    "active": false,
+    "id": "JANECELY",
+    "email": "naoresponder@focoinfo.com.br",
+    "links": [
+      {
+        "rel": "groups",
+        "href": "https://api.sienge.com.br/dinamicaempreendimentos/public/api/v1/users/janecely/groups"
+      }
+    ],
+    "name": "JANECELY SILVA CASTRO"
   }
 ]

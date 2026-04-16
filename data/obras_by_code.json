@@ -1,0 +1,1102 @@
+{
+  "9": {
+    "id": 9,
+    "name": "IFCE MANUTENÇÃO PREDIAL - FORTALEZA",
+    "address": "AV 13 DE MAIO - 2081 - BENFICA - Fortaleza - CE - 60040-250"
+  },
+  "10": {
+    "id": 10,
+    "name": "IFCE MANUTENÇÃO PREDIAL - REITORIA",
+    "address": "RUA JORGE DUMAR - JARDIM AMÉRICA - Fortaleza - CE - 60410-426"
+  },
+  "12": {
+    "id": 12,
+    "name": "IFCE MANUTENÇÃO PREDIAL - TABULEIRO DO NORTE",
+    "address": "SÍTIO TAPERINHA - S/N - Tabuleiro do Norte - CE"
+  },
+  "18": {
+    "id": 18,
+    "name": "IFCE MANUTENÇÃO PREDIAL - JAGUARUANA",
+    "address": "AV. DR. ANTÔNIO DA ROCHA FREITAS, Jaguaruana - CE, 62823-000 - 1548-1604 - Jaguaruana - CE - 62823-000"
+  },
+  "21": {
+    "id": 21,
+    "name": "HOSPITAL MUNICIPAL EDVAR SILVEIRA - MORRINHOS ",
+    "address": "AV. CORAÇÃO DE MARIA - S/N - SÃO LUIS - Morrinhos - CE - 62550-000"
+  },
+  "22": {
+    "id": 22,
+    "name": "IFCE MANUTENÇÃO PREDIAL - BOA VIAGEM ",
+    "address": "RODOVIA PRESIDENTE JUSCELINO KUBITSCHEK - S/N - KM 020 - ANAFUÊ - Boa Viagem - CE - 63780-000"
+  },
+  "23": {
+    "id": 23,
+    "name": "IFCE MANUTENÇÃO PREDIAL - MORADA NOVA",
+    "address": "AV. PREFEITO RAIMUNDO JOSÉ RABELO - 2717 - JÚLIA SANTIAGO - Morada Nova - CE - 62940-000"
+  },
+  "24": {
+    "id": 24,
+    "name": "\tIFCE MANUTENÇÃO PREDIAL - LIMOEIRO DO NORTE",
+    "address": "RUA ESTEVÃO REMÍGIO DE FREITAS - 1145 - MONSENHOR OTÁVIO - Limoeiro do Norte - CE - 62930-000"
+  },
+  "25": {
+    "id": 25,
+    "name": "PREFEITURA - MORRINHOS - ESCOLA FNDE",
+    "address": "BOM JARDIM - Morrinhos - CE"
+  },
+  "26": {
+    "id": 26,
+    "name": "PREFEITURA MUNICIPAL DE CAUCAIA - CRECHES",
+    "address": "Rua Alfredo Bezerra - s/n - Em frente ao numero 1427 - Conj. Metropolitado - Caucaia - CE - 61604-250"
+  },
+  "28": {
+    "id": 28,
+    "name": "ALMOXARIFADO DINÂMICA",
+    "address": "RUA CAPITÃO GUTEMBERG - 967 - A - CIDADE DOS FUNCIONÁRIOS - Fortaleza - CE - 60823-050"
+  },
+  "29": {
+    "id": 29,
+    "name": "IFCE MANUTENÇÃO PREDIAL - JAGUARIBE",
+    "address": "Jaguaribe - CE"
+  },
+  "31": {
+    "id": 31,
+    "name": "PMC- REFORMA QUADRA COBERTA ESCOLA NELY CAULA DE CARVALHO",
+    "address": "RUA VALDERIZA P. DA SILVA - 514 - JUREMA - Caucaia - CE - 61623-048"
+  },
+  "32": {
+    "id": 32,
+    "name": "PMC- REFORMA DA QUADRA COBERTA DA ESCOLA ANTONIO ALMEIDA LUSTOSA",
+    "address": "RUA PERY - 951 - PARQUE ALBANO - Caucaia - CE - 61645-270"
+  },
+  "33": {
+    "id": 33,
+    "name": "PMC - REFORMA DE UMA QUADRA COBERTA DA ESCOLA DOMINGOS DE ABREU BRASILEIRO",
+    "address": "BR 222 - KM 30 - PRIMAVERA - Caucaia - CE - 61690-990"
+  },
+  "35": {
+    "id": 35,
+    "name": "ITAITINGA - PAV. PEDRA TOSCA EM RUAS GERERAÚ",
+    "address": "RUA CJ, CJ RES ATLANTA - 145 - GERERAÚ - Itaitinga - CE - 61880-000"
+  },
+  "36": {
+    "id": 36,
+    "name": "ESCRITÓRIO NOVO",
+    "address": "RUA CAPITAO GUTEMBERG - 850 - CIDADE DOS FUNCIONARIOS - Fortaleza - CE - 60823-050"
+  },
+  "38": {
+    "id": 38,
+    "name": "IFCE MANUTENÇÃO PREDIAL - CANINDÉ",
+    "address": "RODOVIA BR 020 - KM 303 - S/N - JUBAIA - Canindé - CE - 62700-000"
+  },
+  "39": {
+    "id": 39,
+    "name": "PRAÇA MUNICIPAL EDWAR SILVEIRA - MORRINHOS",
+    "address": "PRAÇA EDWARD SILVEIRA - CENTRO - Morrinhos - CE - 62550-000"
+  },
+  "41": {
+    "id": 41,
+    "name": "ESCRITÓRIO",
+    "address": "RUA CAPITÃO GUTEMBERG - 967 - CIDADE DOS FUNCIONÁRIOS - Fortaleza - CE - 60823-050"
+  },
+  "43": {
+    "id": 43,
+    "name": "IFCE MANUTENÇÃO PREDIAL - CAUCAIA",
+    "address": "RUA FRANCISCO DA ROCHA MARTINS - S/N - PABUSSU - Caucaia - CE - 61609-090"
+  },
+  "45": {
+    "id": 45,
+    "name": "IFCE MANUTENÇAO SUBESTAÇAO - CAMPUS FORTALEZA",
+    "address": "Av. Treze de Maio - 2081 - Benfica - Fortaleza - CE - 60040-531"
+  },
+  "46": {
+    "id": 46,
+    "name": "IFCE MANUTENÇAO SUBESTAÇAO - CAMPUS MARACANAU",
+    "address": "AVENIDA PARQUE CENTRAL - SN - DISTRITO INDUSTRIAL I - Maracanaú - CE - 61939-140"
+  },
+  "48": {
+    "id": 48,
+    "name": "IFCE MANUTENÇAO SUBESTAÇAO - CAMPUS PARACURU",
+    "address": "RUA DEZ - S/N - CENTRO - Paracuru - CE - 62680-000"
+  },
+  "49": {
+    "id": 49,
+    "name": "IFCE MANUTENÇAO SUBESTAÇAO - CAMPUS REITORIA",
+    "address": "R. Jorge Dumar - 1703 - jardim América - Fortaleza - CE - 60410-426"
+  },
+  "50": {
+    "id": 50,
+    "name": "IFCE MANUTENÇAO SUBESTAÇAO - CAMPUS UMIRIM",
+    "address": "FAZENDA FLORESTA - S/N - Umirim - CE - 62660-000"
+  },
+  "51": {
+    "id": 51,
+    "name": "IFCE MANUTENÇAO SUBESTAÇAO - CAMPUS BOA VIAGEM",
+    "address": "Rod. Pres. Juscelino Kubitschek, BR 020 Km 209 - S/N - IFCE - Bairro Anafuê - Boa Viagem - CE"
+  },
+  "52": {
+    "id": 52,
+    "name": "IFCE MANUTENÇAO SUBESTAÇAO - CAMPUS CAMOCIM",
+    "address": "RUA RAIMUNDO CALS - 2041 - CIDADE COM DEUS - Camocim - CE - 62400-000"
+  },
+  "54": {
+    "id": 54,
+    "name": "IFCE MANUTENÇAO SUBESTAÇAO - CAMPUS TAUA",
+    "address": "Tauá - CE"
+  },
+  "55": {
+    "id": 55,
+    "name": "IFCE MANUTENÇAO SUBESTAÇAO - CAMPUS UBAJARA",
+    "address": "RUA LUIS CUNHA - 178 - MONTE CASTELO - Ubajara - CE - 62350-000"
+  },
+  "56": {
+    "id": 56,
+    "name": "IFCE MANUTENÇAO SUBESTAÇAO - CAMPUS ARACATI",
+    "address": "Aracati - CE"
+  },
+  "57": {
+    "id": 57,
+    "name": "IFCE MANUTENÇAO SUBESTAÇAO - CAMPUS CEDRO",
+    "address": "Cedro - CE"
+  },
+  "58": {
+    "id": 58,
+    "name": "IFCE MANUTENÇAO SUBESTAÇAO - CAMPUS JAGUARIBE",
+    "address": "RUA PEDRO BEZERRA DE MENEZES - MANOEL COSTA MORAIS - Jaguaribe - CE - 63475-000"
+  },
+  "59": {
+    "id": 59,
+    "name": "IFCE MANUTENÇAO SUBESTAÇAO - CAMPUS JUAZEIRO DO NORTE",
+    "address": "AV PLACIDO ADERALDO PLACIDO CASTELO - 1646 - PLANALTO - Juazeiro do Norte - CE - 63040-540"
+  },
+  "62": {
+    "id": 62,
+    "name": "IFCE MANUTENÇAO SUBESTAÇAO - CAMPUS CRATEUS",
+    "address": "AV DR. GERALDO BARBOSA MARQUES - 567 - VENANCIO - Crateús - CE - 63708-260"
+  },
+  "63": {
+    "id": 63,
+    "name": "IFCE MANUTENÇÃO PREDIAL - UMIRIM",
+    "address": "ROD CE 040 - S/N - KM 137 - AEROPORTO - Aracati - CE - 62800-000"
+  },
+  "64": {
+    "id": 64,
+    "name": "IFCE MANUTENÇAO SUBESTAÇAO - CAMPUS QUIXADA",
+    "address": "Quixadá - CE"
+  },
+  "65": {
+    "id": 65,
+    "name": "IFCE MANUTENÇÃO PREDIAL - TIANGUA",
+    "address": "CE-187 - S/N - ESTÁDIO - Tianguá - CE - 62320-000"
+  },
+  "66": {
+    "id": 66,
+    "name": "IFCE MANUTENÇAO SUBESTAÇAO - CAMPUS PECEM",
+    "address": "Complexo Industrial e Portuário do Pecém Highway CE - 422 - PECEM - Caucaia - CE - 62670-000"
+  },
+  "67": {
+    "id": 67,
+    "name": "IFCE MANUTENÇAO SUBESTAÇAO - CAMPUS ACARAU",
+    "address": "Acaraú - CE"
+  },
+  "68": {
+    "id": 68,
+    "name": "IFCE MANUTENÇAO SUBESTAÇAO - CAMPUS TIANGUA",
+    "address": "Tianguá - CE"
+  },
+  "69": {
+    "id": 69,
+    "name": "IFCE MANUTENÇAO SUBESTAÇAO - CAMPUS SOBRAL",
+    "address": "Av. Dr. Guarani - 317 - Derby Clube - Sobral - CE - 62042-030"
+  },
+  "70": {
+    "id": 70,
+    "name": "PREFEITURA MUNICIPAL DE CAMOCIM - CONCLUSAO CRECHE",
+    "address": "Rua Dr Raimundo Veras - s/n - OLINDA - Camocim - CE - 62400-000"
+  },
+  "71": {
+    "id": 71,
+    "name": "IFCE MANUTENÇAO SUBESTAÇAO - CAMPUS BATURITE",
+    "address": "Av. Ouvidor Vitóriano Soares Barbosa - 160 - Sanharão - Baturité - CE"
+  },
+  "72": {
+    "id": 72,
+    "name": "IFCE MANUTENÇAO SUBESTAÇAO - CAMPUS TABULEIRO DO NORTE",
+    "address": "Tabuleiro do Norte - CE"
+  },
+  "73": {
+    "id": 73,
+    "name": "VT 03 - CAMINHÃO OKR 8293",
+    "address": "RUA CAPITAO GUTEMBER - 967 - CIDADE DOS FUNCIONARIOS - Fortaleza - CE - 60823-050"
+  },
+  "74": {
+    "id": 74,
+    "name": "MONTANA PRETA 0RR-5194",
+    "address": "Fortaleza - CE"
+  },
+  "75": {
+    "id": 75,
+    "name": "VT 02 - MONTANA POP-3760",
+    "address": "RUA CAPITÃO GUTEMBERG - 967 - A - CIDADE DOS FUNCIONÁRIOS - Fortaleza - CE - 60823-050"
+  },
+  "76": {
+    "id": 76,
+    "name": "VT 01 - SAVEIRO PVZ-5019",
+    "address": "RUA CAPITAO GUTEMBERG - 967 - A - CIDADE DOS FUNCIONARIOS - Fortaleza - CE - 60823-050"
+  },
+  "77": {
+    "id": 77,
+    "name": "VT 04 SAVEIRO GGA4519",
+    "address": "RUA CAPITAO GUTEMBERG - 967 - A - CIDADE DOS FUNCIONARIOS - Fortaleza - CE - 60823-050"
+  },
+  "78": {
+    "id": 78,
+    "name": "VT 05 - SAVEIRO FWX1895",
+    "address": "RUA CAPITAO GUTEMBERG - 967 - A - CIDADE DOS FUNCIONARIOS - Fortaleza - CE - 60823-050"
+  },
+  "79": {
+    "id": 79,
+    "name": "VT 06 L200 JVA-2907",
+    "address": "RUA CAPITAO GUTEMBERG - 967 - A - CIDADE DPS FUNCIONARIOS - Fortaleza - CE - 60823-050"
+  },
+  "80": {
+    "id": 80,
+    "name": "VT 07 MOTO PME-7113",
+    "address": "RUA CAPITAO GUTEMBERG - 967 - A - CIDADE DOS FUNCIONARIOS - Fortaleza - CE - 60823-050"
+  },
+  "81": {
+    "id": 81,
+    "name": "HILUX PNR 1985",
+    "address": "RUA CAPITAO GUTEMBERG - 967 - A - CIDADE DOS FUNCIONARIOS - Fortaleza - CE - 60823-050"
+  },
+  "83": {
+    "id": 83,
+    "name": "AMPLIAÇÃO DO HOSPITAL E MATERNIDADE LUZIA TEODORO DA COSTA NO MUNICÍPIO DE ORÓS",
+    "address": "RUA ANTONIO AMARO COSTA - 2 - CENTRO - Orós - CE - 63520-000"
+  },
+  "87": {
+    "id": 87,
+    "name": "UNIDADE BASICA DE SAUDE (UBS) - CAUCAIA",
+    "address": "Caucaia - CE"
+  },
+  "88": {
+    "id": 88,
+    "name": "IFCE MANUTENÇAO SUBESTAÇAO - CAMPUS GUARAMIRANGA",
+    "address": "Guaramiranga - CE"
+  },
+  "91": {
+    "id": 91,
+    "name": "REFORMA DE FÓRUM VELHO - ADEQUAÇÃO DE GABINETE - MARACANAÚ",
+    "address": "AVENIDA II - 150 - CENTRO ADMINISTRATIVO - CONJUNTO JEREISSATI I - Maracanaú - CE - 61900-370"
+  },
+  "92": {
+    "id": 92,
+    "name": "IFCE MANUTENÇÃO PREDIAL - CRATEUS",
+    "address": "AV. DR. GERALDO BARBOSA MARQUES - 567 - VENANCIO - Crateús - CE - 63708-260"
+  },
+  "94": {
+    "id": 94,
+    "name": "IFCE MANUTENÇAO SUBESTAÇAO - CAMPUS CRATO",
+    "address": "Crato - CE"
+  },
+  "96": {
+    "id": 96,
+    "name": "IFCE MANUTENÇÃO PREDIAL - ACARAU",
+    "address": "AVENIDA DESEMBARGADOR ARMANDO DE SOUZA LOUZADA - S/N - SITIO BURITI - Acaraú - CE - 62580-000"
+  },
+  "97": {
+    "id": 97,
+    "name": "IFCE MANUTENÇÃO PREDIAL - SOBRAL",
+    "address": "AVENIDA. Dr. GUARANI, - 317 - DERBY CLUB - Sobral - CE - 62042-030"
+  },
+  "101": {
+    "id": 101,
+    "name": "CONSTRUÇÃO DA ESTRUTURA DOS 12 LEITOS DE UTI - COVID19 - CAUCAIA",
+    "address": "R. Paulo Gomes da Silva - S/N - Parque Soledade, Caucaia - CE, - Caucaia - CE - 61600-000"
+  },
+  "102": {
+    "id": 102,
+    "name": "REFORMA DO HOSPITAL MUNICIPAL DR. JOÃO ELISIO DE HOLANDA",
+    "address": "RUA JOÃO ALENCAR - S/N - CENTRO - Maracanaú - CE - 61900-010"
+  },
+  "104": {
+    "id": 104,
+    "name": "SUBESTAÇÃO DE ESCOLAS EM SÃO GONÇALO DO AMARANTE",
+    "address": "AV. CORONEL NECO MARTINS - 622 - CENTRO - São Gonçalo do Amarante - CE - 62670-000"
+  },
+  "108": {
+    "id": 108,
+    "name": "ENROCAMENTO EMERGENCIAL - CAUCAIA",
+    "address": "Av Litoranea - Caucaia - CE"
+  },
+  "110": {
+    "id": 110,
+    "name": " SERVIÇOS REMANESCENTES DA CRECHE TIPO 01 - PROINFÂNCIA - TABULEIRO DO NORTE",
+    "address": "RUA ZILTAMIR CHAVES - 3255 - MACENA - Tabuleiro do Norte - CE - 62960-000"
+  },
+  "111": {
+    "id": 111,
+    "name": "REFORMA DOS CEMITÉRIOS PÚBLICOS EM CAUCAIA - CE",
+    "address": "RODOVIA CE 090 - 1076 - ITAMBÉ - Caucaia - CE"
+  },
+  "112": {
+    "id": 112,
+    "name": "DUPLICAÇÃO DA ENTRADA DA CIDADE - TABULEIRO DO NORTE",
+    "address": "RUA CAPITÃO JOSÉ RODRIGUES - S/N - CENTRO - Tabuleiro do Norte - CE - 62960-000"
+  },
+  "113": {
+    "id": 113,
+    "name": "PAVIMENTAÇÃO E URBANIZAÇÃO DA AV. BEIRA RIO - MORRINHOS ",
+    "address": "AV. BEIRA RIO - S/N - CENTRO - Morrinhos - CE"
+  },
+  "114": {
+    "id": 114,
+    "name": "RAFAEL DE SÁ CRUZ",
+    "address": "S/N - Fortaleza - CE"
+  },
+  "115": {
+    "id": 115,
+    "name": "ESCOLAS - CAUCAIA ",
+    "address": "rua capitão gutemberg - 967 - CIDADE DOS FUNCIONÁRIOS - Fortaleza - CE"
+  },
+  "116": {
+    "id": 116,
+    "name": "RETRABALHO",
+    "address": "Caucaia - CE"
+  },
+  "117": {
+    "id": 117,
+    "name": "REQUALIFICAÇÃO DO MERCADO DA JUREMA - CAUCAIA",
+    "address": "AV DOM ALMEIDA LUSTOSA - 2454 - JUREMA - Caucaia - CE"
+  },
+  "119": {
+    "id": 119,
+    "name": "CONTRUÇÃO DE 04 PRAÇAS - MORRINHOS",
+    "address": "CENTRO - Morrinhos - CE"
+  },
+  "120": {
+    "id": 120,
+    "name": "CONSTRUÇÃO ESTÁDIO MUNICIPAL - PREFEITURA DE MORRINHOS ",
+    "address": "CE, 161 - S/N - ZONA URBANA DA SEDE - Morrinhos - CE"
+  },
+  "121": {
+    "id": 121,
+    "name": "PAVIMENTAÇÃO - CNT MORRINHOS",
+    "address": "AV. BEIRA RIO - S/N - CENTRO - Morrinhos - CE"
+  },
+  "122": {
+    "id": 122,
+    "name": "CONSTRUÇÃO DE QUADRAS - TABULEIRO DO NORTE",
+    "address": "Distrito de São Bento - Tabuleiro do Norte - CE"
+  },
+  "123": {
+    "id": 123,
+    "name": "IFCE MANUTENÇÃO PREDIAL - MARANGUAPE",
+    "address": "CE-065 - 803-941 - Novo Parque Iracema - Maranguape - CE"
+  },
+  "124": {
+    "id": 124,
+    "name": "OBRA PARCERIA - IFCE",
+    "address": "RUA TIPOGRAFO SALES - 1131 - AMADEU FURTADO - Fortaleza - CE - 60455-682"
+  },
+  "125": {
+    "id": 125,
+    "name": "COMERCIAL / VENDAS",
+    "address": "Rua Capitão Gutemberg - 967 - CIDADE DOS FUNCIONÁRIOS - Fortaleza - CE - 60823-050"
+  },
+  "126": {
+    "id": 126,
+    "name": "REFORMA DA PRAÇA DA MATRIZ DO MUNICÍPIO DE GRANJEIRO ",
+    "address": "R. David Granjeiro - 49 - PRAÇA MATRIZ - Centro - Granjeiro - CE - 63230-000"
+  },
+  "127": {
+    "id": 127,
+    "name": "REFORMA DE ESCRITÓRIO",
+    "address": "AV. DOUTOR JOÃO PAULINO - CENTRO - Baturité - CE - 62760-000"
+  },
+  "129": {
+    "id": 129,
+    "name": "MANUTENÇÃO NO MUNICÍPIO DE PARACURU - CE",
+    "address": "RUA CAPITÃO GUTEMBERG - 967 - A - CIDADE DOS FUNCIONÁRIOS - Paracuru - CE - 60823-050"
+  },
+  "130": {
+    "id": 130,
+    "name": "OBRAS AREA CAUCAIA",
+    "address": "RUA JOSÉ DO PATROCINIO - 425A - SÃO MIGUEL - Caucaia - CE"
+  },
+  "132": {
+    "id": 132,
+    "name": "REFORMA DE POSTO",
+    "address": "Praça Valdemar Falcão - CENTRO - Baturité - CE - 62760-000"
+  },
+  "135": {
+    "id": 135,
+    "name": "3 - SOP - CONSTRUÇÃO DE CEI - MARACANAÚ ",
+    "address": "RUA UM (LOT SERRA AZUL) - 1100 - PAU-SERRADO - Maracanaú - CE - 61912-150"
+  },
+  "136": {
+    "id": 136,
+    "name": "4 - SOP - CONSTRUÇÃO DE CEI - ICAPUÍ",
+    "address": "Icapuí - CE"
+  },
+  "141": {
+    "id": 141,
+    "name": "SETOR METALÚRGICO",
+    "address": "RUA BELOS PORTOS - SN - PASSARÉ - Fortaleza - CE - 60862-280"
+  },
+  "142": {
+    "id": 142,
+    "name": "SERVIÇOS REMANESCENTES DA CRECHE TIPO 01 - PROINFÂNCIA - ASSARÉ",
+    "address": "MOEDA - Assaré - CE"
+  },
+  "143": {
+    "id": 143,
+    "name": "CONSTRUÇÃO DE ESPAÇO EDUCATIVO 06 SALAS - CAMPOS SALES",
+    "address": "RUA LO-03 S/N - LOTEAMENTO PORTAL DA CIDADE - CENTRO - Campos Sales - CE - 63150-000"
+  },
+  "144": {
+    "id": 144,
+    "name": "URBANIZAÇÃO DO AÇUDE DO JUNCO - CONSTRUÇÃO DE FONTE GRANJEIRO",
+    "address": "AVENIDA FRANCISCO MONTEIRO GRANJEIRO - SN - CENTRO - Granjeiro - CE - 63230-000"
+  },
+  "145": {
+    "id": 145,
+    "name": "CONSTRUÇÃO DA QUADRA SÃO PEDRO - PARACURU",
+    "address": "RUA DESEMBARGADOR PONTES VIEIRA - 575 - CENTRO - Paracuru - CE - 62680-000"
+  },
+  "146": {
+    "id": 146,
+    "name": "CENTRO DE EDUCAÇÃO INFANTIL - CEI IV - CASCAVEL",
+    "address": "Rua Encanto da paz - SN - Loteamento Vila Jardim - Distrito de Guanacés - Cascavel - CE - 62850-000"
+  },
+  "147": {
+    "id": 147,
+    "name": "QUADRA POLIESPORTIVA COM COBERTURA E VESTIÁRIOS MODELO 02 - CAMPOS SALES",
+    "address": "RUA JUSTINO ROCHA - SN - DISTRITO DE BARÃO DE AQUIRAZ - Campos Sales - CE - 63150-000"
+  },
+  "148": {
+    "id": 148,
+    "name": "CONSTRUÇÃO DE ESCOLA 12 SALAS - SENADOR POMPEU",
+    "address": "RUA SDO 01 - SN - AO LADO DA ESCOLA PROFISSIONALIZANTE - CARACARA - Senador Pompeu - CE - 63600-000"
+  },
+  "149": {
+    "id": 149,
+    "name": "REFORMA UBS JARDIM - PARACURU",
+    "address": "DISTRITO DE JARDIM - SN - JARDIM DE CIMA - JARDIM - Paracuru - CE - 62680-000"
+  },
+  "150": {
+    "id": 150,
+    "name": "CENTRO DE EDUCAÇÃO INFANTIL FRANCISCA DOS SANTOS BARROSO - PARACURU",
+    "address": "Rua Sabino Pio - SN - CENTRO - Paracuru - CE - 62680-000"
+  },
+  "151": {
+    "id": 151,
+    "name": "REFORMA E AMPLIAÇÃO DA ESCOLA EDMUNDO PEREIRA BARBOSA EMEIF - PARAIPABA",
+    "address": "RUA PRESIDENTE GETULIO VARGAS - SN - PROJETO DE IRRIGAÇÃO - SETOR C2 - Paraipaba - CE - 62685-000"
+  },
+  "152": {
+    "id": 152,
+    "name": "TJCE - REFORMA TOTAL DO FÓRUM DA COMARCA DE AURORA - TRIBUNAL DE JUSTIÇA",
+    "address": "RUA CORONEL JOSÉ LEITE - SN - ARAÇA - Aurora - CE - 63360-000"
+  },
+  "154": {
+    "id": 154,
+    "name": "ESCOLA MUNICIPAL ALDENOR PEREIRA DOS SANTOS EMEIF - PARAIPABA",
+    "address": "RODOVIA TURISTICA COSTA SOL POENTE, SN - SETOR D2 - Paraipaba - CE - 62685-000"
+  },
+  "155": {
+    "id": 155,
+    "name": "COMPLEXO ESCOLAR SETOR C1 EMEIF - PARAIPABA",
+    "address": "RUA TREZE DE MAIO, S/N PROJETO DE IRRIGACAO. SETOR C-1 - Paraipaba - CE - 62685-000"
+  },
+  "156": {
+    "id": 156,
+    "name": "REFORMA DE EDIFICAÇÃO PARA IMPLANTAÇÃO DA SEDE DO RAIO - DE PENTECOSTE",
+    "address": "AV. DR. JOSÉ DE BORBA - SN - ANTIGA SECRETARIA DE EDUCAÇÃO - PRÓXIMO À PRAÇA PRINCIPAL - CENTRO - Pentecoste - CE - 62640-000"
+  },
+  "157": {
+    "id": 157,
+    "name": "CONSTRUÇÃO DE ESPAÇO EDUCATIVO 12 SALAS - CAMPOS SALES",
+    "address": "ESTRADA VELHA - ATUAL RUA CORONEL ENÉAS ARRAIS - S/N - BAIRRO PORTAL DA CIDADE - Campos Sales - CE - 63150-000"
+  },
+  "158": {
+    "id": 158,
+    "name": "REFORMA DA CRECHE SONHOS DE CRIANÇA - POÇO DOCE - PARACURU",
+    "address": "DISTRITO DE POÇO DOCE - SN - Paracuru - CE - 62680-000"
+  },
+  "159": {
+    "id": 159,
+    "name": "REFORMA CALÇADÃO DA ORLA - PARACURU",
+    "address": "RUA BEIRA MAR - SN - CENTRO - Paracuru - CE - 62680-000"
+  },
+  "160": {
+    "id": 160,
+    "name": "QUADRA POLIESPORTIVA HENRIQUE DOMINGOS BRAGA SANDERS - PARACURU",
+    "address": "Av. João Lopes Meireles - SN - CENTRO - Paracuru - CE - 62680-000"
+  },
+  "161": {
+    "id": 161,
+    "name": "REFORMA DO TERMINAL RODOVIÁRIO - PARACURU",
+    "address": "RUA SÃO FRANCISCO, - SN - CENTRO - Paracuru - CE - 62680-000"
+  },
+  "162": {
+    "id": 162,
+    "name": "4 - REFORMA DA ESCOLA FREI TITO DE ALENCAR LIMA - FORTALEZA",
+    "address": "AVENIDA DIOGUINHO - 5925 - PRAIA DO FUTURO II - Fortaleza - CE - 60183-692"
+  },
+  "165": {
+    "id": 165,
+    "name": "URBANIZAÇÃO ENTRADA DA CIDADE - GRANJEIRO",
+    "address": "RUA JOAQUIM FERREIRA, - SN - ENTRADA DA CIDADE SENTIDO VÁRZEA ALEGRE - GRANJEIRO - Granjeiro - CE - 63230-000"
+  },
+  "166": {
+    "id": 166,
+    "name": "CONSTRUÇÃO DE UNIDADE BASICA DE SAUDE - UBS INDIGENA - CRATEUS",
+    "address": "ALDEIA VILA VITORIA - Crateús - CE - 63700-000"
+  },
+  "168": {
+    "id": 168,
+    "name": "4 - REFORMA E AMPLIAÇÃO DE HOSPITAL - ASSARE",
+    "address": "Av. Perimetral - S/N - PEDRA DE FOGO - Assaré - CE - 63140-000"
+  },
+  "169": {
+    "id": 169,
+    "name": "REFORMA E ADEQUAÇÃO DO SHOWROOM DA  LOJA CLUB COSMÉTICOS",
+    "address": "SILAS MUNGUBA - 643 - LOJA 24 - PARANGABA - Fortaleza - CE - 60740-005"
+  },
+  "170": {
+    "id": 170,
+    "name": "CONSTRUÇÃO DE UM ESPAÇO EDUCATIVO 12 SALAS DE AULA - JUCAS",
+    "address": "RUA JOSÉ MARTINS NETO - SN - DISTRITO DE SÃO PEDRO - ZONA RUAL - Jucás - CE - 63580-000"
+  },
+  "171": {
+    "id": 171,
+    "name": "CONSTRUÇÃO DE PASSAGEM MOLHADA - SÍTIO SÃO LORENZO - ASSARE",
+    "address": "SÍTIO SÃO LORENZO - S/N - Assaré - CE - 63140-000"
+  },
+  "172": {
+    "id": 172,
+    "name": "CONSTRUÇÃO DE PASSAGEM MOLHADA - SÍTIO MARTINS - ASSARÉ",
+    "address": "SÍTIO MARTINS - S/N - Assaré - CE"
+  },
+  "173": {
+    "id": 173,
+    "name": "CONSTRUÇÃO DE PASSAGEM MOLHADA - SÍTIO MAMOEIRO 01 - ASSARÉ",
+    "address": "SÍTIO MAMOEIRO 01 - S/N - Assaré - CE"
+  },
+  "174": {
+    "id": 174,
+    "name": "CONSTRUÇÃO DE PASSAGEM MOLHADA - SÍTIO LAGOA (RIACHO DO DIOGO) - ASSARE",
+    "address": "SÍTIO LAGOA (RIACHO DO DIOGO) - S/N - Assaré - CE - 63140-000"
+  },
+  "175": {
+    "id": 175,
+    "name": "CONSTRUÇÃO DE PASSAGEM MOLHADA - SÍTIO PEDRA PETRA- ASSARE",
+    "address": "SÍTIO PEDRA PETRA - S/N - Assaré - CE - 63140-000"
+  },
+  "176": {
+    "id": 176,
+    "name": "CONSTRUÇÃO DE PASSAGEM MOLHADA - SÍTIO MAMOEIRO 02- ASSARE",
+    "address": "SÍTIO MAMOEIRO 02 - S/N - Assaré - CE - 63140-000"
+  },
+  "177": {
+    "id": 177,
+    "name": "CONSTRUÇÃO DE ESPAÇO EDUCATIVO RURAL COM 06 SALAS DE AULA - SENADOR POMPEU",
+    "address": "DISTRITO DE SÃO JOAQUIM - SN - Senador Pompeu - CE - 63600-000"
+  },
+  "178": {
+    "id": 178,
+    "name": "SBS3J50 - CAMINHÃO PEQUENO",
+    "address": "Rua Capitão Gutemberg - 967 - Fortaleza - CE - 60823-050"
+  },
+  "179": {
+    "id": 179,
+    "name": "SBM1B40 - CAMINHÃO GRANDE",
+    "address": "Fortaleza - CE"
+  },
+  "181": {
+    "id": 181,
+    "name": "FIAT MOB (06) - SBB0E60",
+    "address": "Rua Capitão Gutemberg - 967 - Cidade dos Funcionarios - Fortaleza - CE - 60823-050"
+  },
+  "183": {
+    "id": 183,
+    "name": "4 - SOP - CONSTRUÇÃO DE CEI - CANINDE",
+    "address": "RUA SANTO ANTONIO - SN - NOSSA SENHORA DE FÁTIMA - Canindé - CE - 62700-000"
+  },
+  "184": {
+    "id": 184,
+    "name": "REF E AMP DA EDIFICAÇÃO DA ESCOLA SUPERIOR DA MAGISTRAT DO EST DO CEARA - ESMEC",
+    "address": "RUA VEREADOR JOSE BATISTA BARBOSA - PONTO DE REFERENCIA: ESMEC - ESCOLA SUPERIOR DA MAGISTRAT DO EST DO CEARA - EDSON QUEIROZ - Fortaleza - CE - 60811-670"
+  },
+  "185": {
+    "id": 185,
+    "name": "4 - REFORMA ESCOLA MUNICIPAL JOSEFA BARROS DE ALENCAR - FORTALEZA",
+    "address": "Doutor Joaquim Bento - 590 - MESSEJANA - Fortaleza - CE - 60840-200"
+  },
+  "186": {
+    "id": 186,
+    "name": "5 - CONSTRUÇÃO DE GALPÃO INDUSTRIAL - TABULEIRO DO NORTE/CE",
+    "address": "RUA PADRE CÍCERO - 465 - SÃO FRANCISCO - Tabuleiro do Norte - CE"
+  },
+  "187": {
+    "id": 187,
+    "name": "4 - CONSTRUÇÃO DE ESCOLA VERTICAL 12 SALAS NO BAIRRO ALTO DA BRASILIA - SOBRAL",
+    "address": "Av José Figueiredo de Paula Pessoa - SN - Próximo à Estação VLT - ALTO DA BRASILIA - Sobral - CE - 62041-320"
+  },
+  "188": {
+    "id": 188,
+    "name": "OBRAS PARCERIAS TABULEIRO CRECHE",
+    "address": "RUA ZILTAMIR CHAVES - 3255 - MACENA - Tabuleiro do Norte - CE - 62960-000"
+  },
+  "189": {
+    "id": 189,
+    "name": "OBRAS PARCERIAS TABULEIRO - ENTRADA DA CIDADE",
+    "address": "RUA CAPITÃO JOSÉ RODRIGUES - S/N - CENTRO - Tabuleiro do Norte - CE - 62960-000"
+  },
+  "190": {
+    "id": 190,
+    "name": "OBRAS PARCERIAS TABULEIRO - QUADRAS",
+    "address": "Distrito de São Bento - Tabuleiro do Norte - CE"
+  },
+  "193": {
+    "id": 193,
+    "name": "CONSTRUÇÃO DE PASSAGEM MOLHADA - SÍTIO LAGOA (AÇUDE DE WALTIM) - ASSARE",
+    "address": "LOCALIDADE DE SÍTIO LAGOA (AÇUDE WALTIM - SN - Assaré - CE"
+  },
+  "194": {
+    "id": 194,
+    "name": "4 - REFORMA E AMPLIAÇÃO DA ESCOLA MUNICIPAL DIOGO VITAL DE SIQUERA - FORTALEZA",
+    "address": "AV. L - S/N - JOSE WALTER - Fortaleza - CE - 60750-110"
+  },
+  "195": {
+    "id": 195,
+    "name": "CONSTRUÇAO DE UMA ESCOLA NO DISTRITO DE MONTE ALVERNE - CRATO",
+    "address": "Distrito Mont´Alverne - S/N - Crato - CE - 63100-000"
+  },
+  "196": {
+    "id": 196,
+    "name": "CENTRO DE GESTÃO INTEGRADA - CGI MUNICIPIO DE TAUA",
+    "address": "RUA ABIGAIL CIDRÃO DE OLIVEIRA - SN - CENTRO - Tauá - CE - 63660-000"
+  },
+  "197": {
+    "id": 197,
+    "name": "CONSTRUÇÃO DE 01 CRECHE TIPO II - DISTRITO CURUPIRA - OCARA CE",
+    "address": "DISTRITO DE CURUPIRA - SN - Ocara - CE - 62755-000"
+  },
+  "198": {
+    "id": 198,
+    "name": "CONSTRUÇÃO DE GALPÃO INDUSTRIAL - SENADOR POMPEU",
+    "address": "DISTRITO BONFIM, KM 20 - AO LADO DA FÁBRICA DE CALÇADOS - Senador Pompeu - CE"
+  },
+  "199": {
+    "id": 199,
+    "name": "CONSTRUÇÃO DE 01 CRECHE TIPO II - DISTRITO SÃO MARCOS - OCARA CE",
+    "address": "RUA JOÃO CORREIA DODO - SN - SÃO MARCOS - Ocara - CE - 62755-000"
+  },
+  "200": {
+    "id": 200,
+    "name": "4 - URBANIZAÇÃO CAMPUS UNILAB",
+    "address": "AV. DA ABOLIÇÃO - 03 - CAMPUS UNILAB - CENTRO - Redenção - CE - 62790-000"
+  },
+  "201": {
+    "id": 201,
+    "name": "4 - CONSTRUÇÃO DE CEI - BAIRRO MONDUBIM - FORTALEZA",
+    "address": "MODUBIM - Fortaleza - CE"
+  },
+  "204": {
+    "id": 204,
+    "name": "CONSTRUÇÃO DE 01 CRECHE TIPO II - DISTRITO DE SERENO - OCARA CE",
+    "address": "DISTRITO DE SERENO - SN - CROATÁ - Ocara - CE - 62755-000"
+  },
+  "205": {
+    "id": 205,
+    "name": "CONSTRUÇÃO DE BLOCO DE 04 (QUATRO) SALAS DE AULA NA REITORIA - STEEL FRAME ",
+    "address": "RUA JOGER DUMAR - 1703 - AUDITORIO DA REITORIA DO IFCE - JARDIM AMERICA - Fortaleza - CE - 60410-426"
+  },
+  "207": {
+    "id": 207,
+    "name": "CONSTRUÇÃO DE 01 CRECHE TIPO II - DISTRITO SÃO PEDRO - OCARA CE",
+    "address": "RUA MARIA CORREIA SANTIAGO - SN - SÃO PEDRO - Ocara - CE - 62755-000"
+  },
+  "209": {
+    "id": 209,
+    "name": "IFCE - CAMOCIM - SUBESTAÇÃO - GRUPO 02",
+    "address": "RUA RAIMUNDO CALS - 2041 - CIDADE COM DEUS - Camocim - CE - 60870-775"
+  },
+  "210": {
+    "id": 210,
+    "name": "IFCE - CAMPUS ACARAÚ - SUBESTAÇÃO - GRUPO 02",
+    "address": "AV. DES. ARMANDO DE SOUZA LOUZADA - SITIO BURITI - Acaraú - CE - 62580-000"
+  },
+  "211": {
+    "id": 211,
+    "name": "IFCE - CAMPUS BOA VIAGEM - SUBESTAÇÃO - GRUPO 02",
+    "address": "ROD. PRES. JUSCELINO KUBITSCHEK - Boa Viagem - CE - 63870-000"
+  },
+  "212": {
+    "id": 212,
+    "name": "IFCE - CAMPUS CANINDE - SUBESTAÇÃO - GRUPO 02 ",
+    "address": "RODOVIA BR 020, KM 303 - JUBAIA - Canindé - CE - 62700-000"
+  },
+  "213": {
+    "id": 213,
+    "name": "IFCE - CAMPUS CRATEÚS - SUBESTAÇÃO - GRUPO 02",
+    "address": "AV. DR. GERALDO BARBOSA MARQUES - 567 - VENANCIO - Crateús - CE - 63708-260"
+  },
+  "214": {
+    "id": 214,
+    "name": "IFCE - CAMPUS ITAPIPOCA - SUBESTAÇÃO - GRUPO 02",
+    "address": "RUA DA UNIVERSIDADE - 102 - MADALENAS - Itapipoca - CE - 62505-090"
+  },
+  "215": {
+    "id": 215,
+    "name": "IFCE - CAMPUS SOBRAL - SUBESTAÇÃO - GRUPO 02",
+    "address": "AV. DR. GUARANI - 317 - DERBY CLUBE - Sobral - CE - 62042-030"
+  },
+  "216": {
+    "id": 216,
+    "name": "IFCE - CAMPUS TAUÁ - SUBESTAÇÃO - GRUPO 02",
+    "address": "R. ANTÔNIO TEIXEIRA BENEVIDES - 1 - PLANALTO DOS COLIBRIS - Tauá - CE - 63660-000"
+  },
+  "217": {
+    "id": 217,
+    "name": "IFCE - CAMPUS TIANGUÁ - SUBESTAÇÃO - GRUPO 02",
+    "address": "CE - 187 - ESTADIO - Tianguá - CE - 62320-000"
+  },
+  "218": {
+    "id": 218,
+    "name": "IFCE - CAMPUS UBAJARA - SUBESTAÇÃO - GRUPO 02",
+    "address": "R. LUIZ CUNHA - MONTE CASTELO - Ubajara - CE - 62350-000"
+  },
+  "219": {
+    "id": 219,
+    "name": "IFCE - CAMPUS ARACATI - SUBESTAÇÃO - GRUPO 03",
+    "address": "RODOVIA CE-040, KM 137,1 - CONJ. HAB. DR. ABELARDO FILHO - AEROPORTO - Aracati - CE - 62800-000"
+  },
+  "220": {
+    "id": 220,
+    "name": "IFCE - CAMPUS JAGUARIBE - SUBESTAÇÃO - GRUPO 03",
+    "address": "RUA PEDRO BEZERRA DE MENEZES - BAIRRO MANOEL COSTA MORAES - Jaguaribe - CE - 63475-000"
+  },
+  "221": {
+    "id": 221,
+    "name": "IFCE - CAMPUS JAGUARUANA - SUBESTAÇÃO - GRUPO 03",
+    "address": "AV. DR. ANTÔNIO DA ROCHA FREITAS - 1548-1604 - Jaguaruana - CE - 62823-000"
+  },
+  "222": {
+    "id": 222,
+    "name": "IFCE - CAMPUS LIMOEIRO DO NORTE - SUBESTAÇÃO - GRUPO 03",
+    "address": "RUA ESTEVÃO REMÍGIO DE FREITAS - 1145 - MONSENHOR OTÁVIO - Limoeiro do Norte - CE - 62930-000"
+  },
+  "223": {
+    "id": 223,
+    "name": "IFCE - CAMPUS MORADA NOVA - SUBESTAÇÃO - GRUPO 03",
+    "address": "R. PREF. RAIMUNDO JOSE RABELO - 2717 - Morada Nova - CE - 62940-000"
+  },
+  "224": {
+    "id": 224,
+    "name": "IFCE - CAMPUS QUIXADA - SUBESTAÇÃO - GRUPO 03",
+    "address": "AV. JOSÉ DE FREITAS QUEIROZ - 5000 - Quixadá - CE - 63902-580"
+  },
+  "225": {
+    "id": 225,
+    "name": "IFCE - CAMPUS TABULEIRO DO NORTE - SUBESTAÇÃO - GRUPO 03",
+    "address": "RUA ESTEVÃO REMÍGIO DE FREITAS - 1145 - MONSENHOR OTÁVIO - Limoeiro do Norte - CE - 62960-000"
+  },
+  "226": {
+    "id": 226,
+    "name": "IFCE - CAMPUS BATURITE - SUBESTAÇÃO - GRUPO 01",
+    "address": "AV. OUVIDOR VITÓRIANO SOARES BARBOSA - 160 - SANHARÃO - Baturité - CE - 62760-000"
+  },
+  "227": {
+    "id": 227,
+    "name": "IFCE - CAMPUS CAUCAIA - SUBESTAÇÃO - GRUPO 01",
+    "address": "R. FRANCISCO DA ROCHA MARTINS - PABUSSU - Caucaia - CE"
+  },
+  "228": {
+    "id": 228,
+    "name": "IFCE - CAMPUS FORTALEZA - SUBESTAÇÃO - GRUPO 01",
+    "address": "AV. TREZE DE MAIO - 2081 - BENFICA - Fortaleza - CE - 60040-531"
+  },
+  "229": {
+    "id": 229,
+    "name": "IFCE - CAMPUS GUARAMIRANGA - SUBESTAÇÃO - GRUPO 01",
+    "address": "FRANCISCO MATOS BRITO - 203 - Guaramiranga - CE - 62766-000"
+  },
+  "230": {
+    "id": 230,
+    "name": "IFCE - CAMPUS HORIZONTE - SUBESTAÇÃO - GRUPO 01",
+    "address": "RUA FRANCISCA CECÍLIA - PLANALTO HORIZONTE - Horizonte - CE"
+  },
+  "231": {
+    "id": 231,
+    "name": "IFCE - CAMPUS MARACANAU - SUBESTAÇÃO - GRUPO 01",
+    "address": "AV. PARQUE CENTRAL - 1315 - DISTRITO INDUSTRIAL I - Maracanaú - CE - 61939-140"
+  },
+  "232": {
+    "id": 232,
+    "name": "IFCE - CAMPUS MARANGUAPE - SUBESTAÇÃO - GRUPO 01",
+    "address": "CE-065 - 803-941 - NOVO PARQUE IRACEMA - Maranguape - CE - 61940-750"
+  },
+  "233": {
+    "id": 233,
+    "name": "IFCE - CAMPUS PARACURU - SUBESTAÇÃO - GRUPO 01",
+    "address": "R. DEZ - Paracuru - CE - 62680-000"
+  },
+  "234": {
+    "id": 234,
+    "name": "IFCE - CAMPUS PECEM - SUBESTAÇÃO - GRUPO 01",
+    "address": "COMPLEXO INDUSTRIAL E PORTUÁRIO DO PECÉM HIGHWAY - 422 - Caucaia - CE - 62670-000"
+  },
+  "235": {
+    "id": 235,
+    "name": "IFCE - CAMPUS POLO DE INOVAÇÃO - SUBESTAÇÃO - GRUPO 01",
+    "address": "R. NOGUEIRA ACIOLI - 621 - ALDEOTA - Fortaleza - CE - 60110-140"
+  },
+  "236": {
+    "id": 236,
+    "name": "IFCE - CAMPUS UMIRIM - SUBESTAÇÃO - GRUPO 01",
+    "address": "R. CARLOS ANTÔNIO SÁLES - FLORESTA - Umirim - CE - 62660-000"
+  },
+  "237": {
+    "id": 237,
+    "name": "IFCE - CAMPUS REITORIA - SUBESTAÇÃO",
+    "address": "RUA JORGER DUMAR - 1703 - JARDIM AMERICA - Fortaleza - CE - 60410-426"
+  },
+  "238": {
+    "id": 238,
+    "name": "IFCE - CAMPUS IGUATU - SUBESTAÇÃO - GRUPO 04",
+    "address": "RODOVIA CE-060 - SN - KM 05 - CAJAZEIRAS - Iguatu - CE - 63503-790"
+  },
+  "239": {
+    "id": 239,
+    "name": "IFCE - CAMPUS ACOPIARA - SUBESTAÇÃO - GRUPO 04",
+    "address": "Rodovia CE 060 - SN - KM 332 - VILA MARTINS - Acopiara - CE - 63560-000"
+  },
+  "241": {
+    "id": 241,
+    "name": "IFCE - CAMPUS CRATO - SUBESTAÇÃO - GRUPO 04",
+    "address": "CE-292 - SN - Gisélia Pinheiro - Crato - CE - 63115-500"
+  },
+  "242": {
+    "id": 242,
+    "name": "IFCE - CAMPUS JUAZEIRO DO NORTE - SUBESTAÇÃO - GRUPO 04",
+    "address": "Av. Plácido Aderaldo Castelo - 1646 - Planalto - Juazeiro do Norte - CE - 63047-040"
+  },
+  "243": {
+    "id": 243,
+    "name": "IFCE - CAMPUS MOMBAÇA - SUBESTAÇÃO - GRUPO 04",
+    "address": "Sítio São Francisco - SN - CE 363 - Recreação - Mombaça - CE - 63610-000"
+  },
+  "248": {
+    "id": 248,
+    "name": "CONDOMINIO RESIDENCIAL EM AQUIRAZ DE 152 UNIDADES CASAS - GENESIS",
+    "address": "Av. Noé leite de Freitas - 1166 - Tapuio - Aquiraz - CE - 61700-000"
+  },
+  "249": {
+    "id": 249,
+    "name": "EXPANSÃO IV DO IFCE - CAMPUS CASCAVEL - CIDADE CASCAVEL",
+    "address": "Rodovia CE 040 - SN - Mata Quiri em zona urbana do distrito Sede - Zona Urbana - Cascavel - CE"
+  },
+  "255": {
+    "id": 255,
+    "name": "1 - SOP - CONSTRUÇÃO DE CEI - CANINDE",
+    "address": "RUA SANTO ANTONIO - SN - NOSSA SENHORA DE FÁTIMA - Canindé - CE - 62700-000"
+  },
+  "256": {
+    "id": 256,
+    "name": "1 - CONSTRUÇÃO DE ESCOLA VERTICAL 12 SALAS NO BAIRRO ALTO DA BRASILIA - SOBRAL",
+    "address": "Av José Figueiredo de Paula Pessoa - SN - Próximo à Estação VLT - ALTO DA BRASILIA - Sobral - CE - 62041-320"
+  },
+  "257": {
+    "id": 257,
+    "name": "1 - CONSTRUÇÃO DE CEI - BAIRRO MONDUBIM - FORTALEZA",
+    "address": "MONDUBIM - Fortaleza - CE"
+  },
+  "258": {
+    "id": 258,
+    "name": "1 - SOP - CONSTRUÇÃO DE CEI - ICAPUÍ",
+    "address": "Icapuí - CE"
+  },
+  "259": {
+    "id": 259,
+    "name": "1 - REFORMA ESCOLA MUNICIPAL JOSEFA BARROS DE ALENCAR - FORTALEZA",
+    "address": "Doutor Joaquim Bento - 590 - MESSEJANA - Fortaleza - CE - 60840-200"
+  },
+  "260": {
+    "id": 260,
+    "name": "1 - REFORMA DA ESCOLA FREI TITO DE ALENCAR LIMA - FORTALEZA",
+    "address": "AVENIDA DIOGUINHO - 5925 - PRAIA DO FUTURO II - Fortaleza - CE - 60183-692"
+  },
+  "261": {
+    "id": 261,
+    "name": "1 - URBANIZAÇÃO CAMPUS UNILAB",
+    "address": "AV. DA ABOLIÇÃO - 03 - CAMPUS UNILAB - CENTRO - Redenção - CE - 62790-000"
+  },
+  "262": {
+    "id": 262,
+    "name": "1 - UNILAB - CONSTRUÇÃO DOS BLOCOS ANEXOS DO CAMPUS DOS MALÊS",
+    "address": "Av. Juvenal Eugênio Queiroz - SN - São Francisco do Conde - BA - CENTRO - São Francisco do Conde - BA - 43900-000"
+  },
+  "263": {
+    "id": 263,
+    "name": "2 - CONSTRUÇÃO TIPOS ALVENARIA E/OU LIGHT STEEL FRAME - CAMPUS CAMOCIM",
+    "address": "RUA RAIMUNDO CALS - 2041 - Camocim - CE - 62400-000"
+  },
+  "264": {
+    "id": 264,
+    "name": "2 - CONSTRUÇÃO DO TIPOS ALVENARIA E/OU LIGHT STEEL FRAME - CAMPUS CRATEUS",
+    "address": "Av. Dr. Geraldo Barbosa Marques - 567 - VENANCIO - Crateús - CE - 63708-260"
+  },
+  "265": {
+    "id": 265,
+    "name": "2 - CONSTRUÇÃO DO TIPOS ALVENARIA E/OU LIGHT STEEL FRAME - CAMPUS MARACANAU",
+    "address": "Av. Parque Central - 1315 - Distrito Industrial I - Maracanaú - CE - 61939-140"
+  },
+  "266": {
+    "id": 266,
+    "name": "2 - CONSTRUÇÃO DO TIPOS ALVENARIA E/OU LIGHT STEEL FRAME - CAMPUS MORADA NOVA",
+    "address": "R. Pref. Raimundo Jose Rabelo - 2717 - Morada Nova - CE - 62940-000"
+  },
+  "267": {
+    "id": 267,
+    "name": "2 - CONSTRUÇÃO DO TIPOS ALVENARIA E/OU LIGHT STEEL FRAME - TABULEIRO DO NORTE",
+    "address": "José Rosendo - Rua Raimundo Noronha Chaves, R. Deoclécio Florêncio Freire - 85 - JOSE ROSENDO - Tabuleiro do Norte - CE - 62960-000"
+  },
+  "268": {
+    "id": 268,
+    "name": "2 - CONSTRUÇÃO DO TIPOS ALVENARIA E/OU LIGHT STEEL FRAME - CAMPUS UBAJARA",
+    "address": "R. Luiz Cunha - 178 - MONTE CASTELO - Ubajara - CE - 62350-000"
+  },
+  "269": {
+    "id": 269,
+    "name": "1 - CONSTRUÇÃO SEDE OPERACIONAL PRF - POCINHOS/PB",
+    "address": "BR 230 - S/N - POCINHOS/PB - Pocinhos - PB - 60750-110"
+  },
+  "271": {
+    "id": 271,
+    "name": "1 - UNIDADE DE ALIMENTAÇÃO NUTRICIONAL DO CAMPUS ACARAÚ DO IFCE",
+    "address": "Av. Des. Armando de Souza Louzada - SN - Sítio - Buriti, Acaraú - CE, - Acaraú - CE - 62580-000"
+  },
+  "275": {
+    "id": 275,
+    "name": "CONSTRUÇÃO DE CENTRO COMERCIAL HARMONY - LIGHT STEEL FRAME ",
+    "address": "Rodovia Estruturante - 1288 - CE-085 - Padre Romualdo - Caucaia - CE - 61601-145"
+  },
+  "276": {
+    "id": 276,
+    "name": "ALMOXARIFADO PROVISORIO DO GENESIS",
+    "address": "Av. Noé Leite de Freitas - 967 - Tapuio - Fortaleza - CE - 61700-000"
+  },
+  "279": {
+    "id": 279,
+    "name": "UNIDADE NUTRICIONAL DO CAMPUS CAMOCIM - IFCE",
+    "address": "R. Raimundo Cals - 2041 - Camocim - CE - 62400-000"
+  },
+  "280": {
+    "id": 280,
+    "name": "UNIDADE NUTRICIONAL DO CAMPUS CAUCAIA - IFCE",
+    "address": "R. Francisco da Rocha Martins - Pabussu - Caucaia - CE - 61609-090"
+  },
+  "281": {
+    "id": 281,
+    "name": "UNIDADE NUTRICIONAL DO CAMPUS PARACURU - IFCE",
+    "address": "R. Dez - Paracuru - CE - 62680-000"
+  },
+  "282": {
+    "id": 282,
+    "name": "UNIDADE NUTRICIONAL DO CAMPUS HORIZONTE - IFCE ",
+    "address": "Rua Francisca Cecília - Planalto Horizonte - Horizonte - CE - 62884-105"
+  },
+  "283": {
+    "id": 283,
+    "name": "UNIDADE NUTRICIONAL DO CAMPUS TIANGUÁ - IFCE ",
+    "address": "CE-187 - Estádio - Tianguá - CE - 62320-000"
+  },
+  "284": {
+    "id": 284,
+    "name": "UNIDADE NUTRICIONAL DO CAMPUS UBAJARA - IFCE",
+    "address": "R. Luiz Cunha - 178 - Monte Castelo - Ubajara - CE - 62350-000"
+  },
+  "286": {
+    "id": 286,
+    "name": "UNIDADE NUTRICIONAL DO CAMPUS MORADA NOVA - IFCE",
+    "address": "Av. Prefeito Raimundo José Rabelo, 2717 - Morada Nova - CE - 62940-00"
+  },
+  "287": {
+    "id": 287,
+    "name": "UNIDADE NUTRICIONAL DO CAMPUS BATURITÉ - IFCE",
+    "address": "Av. Ouvidor Vitóriano Soares Barbosa - Sanharão - Baturité - CE - 62760-000"
+  },
+  "288": {
+    "id": 288,
+    "name": "ALMOXARIFADO DINÂMICA - READEQUADO",
+    "address": "RUA CAPITÃO GUTEMBERG - A - CIDADE DOS FUNCIONÁRIOS - Fortaleza - CE - 60823-050"
+  },
+  "20003": {
+    "id": 20003,
+    "name": "REFORMA SALA - IFCE MARACANAÚ",
+    "address": "AVENIDA CONTORNO NORTE - 10 - PARQUE CENTRAL - DISTRITO INDUSTRIAL - Maracanaú - CE - 61925-315"
+  },
+  "20004": {
+    "id": 20004,
+    "name": "CASA BOULEVARD ",
+    "address": "CE - 090 - SN - LOT. JARDINS BOULEVARD / QUADRA 7 - LOTES 7 E 8 - ITAMBÉ 2 - Caucaia - CE - 61602-755"
+  },
+  "30001": {
+    "id": 30001,
+    "name": "ESCRITORIO POLY STEEL",
+    "address": "RUA BELOS PORTOS - S/N - PASSARÉ - Fortaleza - CE"
+  },
+  "30002": {
+    "id": 30002,
+    "name": "OBRAS PARCERIA POLY STEEL",
+    "address": "RUA BELOS PORTOS - 783 - Passaré - Fortaleza - CE"
+  },
+  "30013": {
+    "id": 30013,
+    "name": "MARQUISE - UMIRIM",
+    "address": "BR 222 - S/N - PONTO DE REFERENCIA: ENTRADA DA CIDADE DE UMIRIM - CENTRO - Umirim - CE - 62660-000"
+  },
+  "30014": {
+    "id": 30014,
+    "name": "COBERTA METALICA - MADALENA",
+    "address": "AV: DAU ALBERTO - S/N - BR O20, KM 241 - MADALENA VELHA - Madalena - CE - 63860-000"
+  },
+  "30015": {
+    "id": 30015,
+    "name": "ESTRUTURA METÁLICA - SOLONÓPOLE",
+    "address": "RUA BELOS PORTOS - 783 - PASSARÉ - Fortaleza - CE"
+  },
+  "30016": {
+    "id": 30016,
+    "name": "GALPÃO INDUSTRIAL - NP&P ",
+    "address": "176, R. Pref. Sifredo Pinheiro - 10 - Solonópole - CE - 63620-000"
+  },
+  "30021": {
+    "id": 30021,
+    "name": "ALMOXARIFADO POLYSTEEL ",
+    "address": "Rua Belos Portos - 783 - Passaré - Fortaleza - CE - 60862-280"
+  },
+  "60002": {
+    "id": 60002,
+    "name": "CASACOR - BANGALÔ REFÚGIO ",
+    "address": "Rua dragão do mar 310 - 500 - Praia de Iracema - Fortaleza - CE - 60060-390"
+  },
+  "60003": {
+    "id": 60003,
+    "name": "CASACOR - LOFT",
+    "address": "Av Almirante Barroso - 500 - Praia de Iracema - Fortaleza - CE"
+  },
+  "70002": {
+    "id": 70002,
+    "name": "CONDOMINIO RESIDENCIAL EM AQUIRAZ DE 152 UNIDADES CASAS - GENESIS",
+    "address": "AVENIDA NOE LEITE DE FREITAS - 1166 - TAPUIO - Aquiraz - CE - 61700-000"
+  },
+  "80001": {
+    "id": 80001,
+    "name": "ESCRITÓRIO SMN",
+    "address": "Av. Professor José Arthur de Carvalho - 1599 - Lagoa Redonda - Fortaleza - CE - 60831-370"
+  }
+}

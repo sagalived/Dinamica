@@ -4,9 +4,11 @@ import {
   DollarSign, Package, Calendar as CalendarIcon, RefreshCw, 
   User as UserIcon, Building2, ChevronRight, Search, Map as MapIcon,
   Wifi, WifiOff, CheckCircle2, AlertCircle, FileText, Printer, X,
-  Menu, ChevronDown, SlidersHorizontal
+  Menu, ChevronDown, SlidersHorizontal, Truck
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import { LogisticsTab } from './components/Logistics';
+import { AccessControlTab } from './components/AccessControl';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -16,7 +18,7 @@ import { Label } from '@/components/ui/label';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { format, subDays, addDays, isWithinInterval, startOfYear, endOfYear, parseISO } from 'date-fns';
+import { parseISO, format, addDays } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { 
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, 
@@ -26,7 +28,7 @@ import { api, Building, User, Creditor, PurchaseOrder, PriceAlert } from './lib/
 import { cn } from './lib/utils';
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'alerts' | 'map' | 'finance'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'alerts' | 'map' | 'finance' | 'logistics' | 'access'>('dashboard');
   const [loading, setLoading] = useState(false);
   const [apiStatus, setApiStatus] = useState<'online' | 'offline' | 'checking'>('checking');
   const [lastUpdate, setLastUpdate] = useState<Date>(new Date());
@@ -40,6 +42,23 @@ export default function App() {
 
   type ReportType = 'pagar' | 'receber' | 'abertos' | null;
   const [reportType, setReportType] = useState<ReportType>(null);
+  
+  const [alertSortConfig, setAlertSortConfig] = useState<{ key: 'date' | 'vlrUnit' | 'vlrAtual' | 'valorTotal', direction: 'asc' | 'desc' } | null>(null);
+
+  const toggleSort = (key: 'date' | 'vlrUnit' | 'vlrAtual' | 'valorTotal') => {
+    setAlertSortConfig(prev => {
+      if (prev?.key === key) {
+        if (prev.direction === 'asc') return { key, direction: 'desc' };
+        return null; // Removes sort on third click
+      }
+      return { key, direction: 'asc' };
+    });
+  };
+
+  const renderSortIcon = (key: string) => {
+    if (alertSortConfig?.key !== key) return <span className="opacity-0 group-hover:opacity-40 transition-opacity ml-1">▼</span>;
+    return alertSortConfig.direction === 'asc' ? <span className="text-orange-500 ml-1">▲</span> : <span className="text-orange-500 ml-1">▼</span>;
+  };
 
   useEffect(() => {
     if (newOrderAlert) {
@@ -115,6 +134,12 @@ export default function App() {
   // Selection State for Map
   const [selectedMapBuilding, setSelectedMapBuilding] = useState<number | null>(null);
   const [buildingSearch, setBuildingSearch] = useState('');
+  const [editingEngineer, setEditingEngineer] = useState(false);
+  const [engineerDraft, setEngineerDraft] = useState('');
+  const [savingEngineer, setSavingEngineer] = useState(false);
+
+  // "admin" role - change this to a real auth check once login is implemented
+  const isAdmin = true;
 
   // Filter State
   const [selectedBuilding, setSelectedBuilding] = useState<string>('all');
@@ -370,31 +395,35 @@ export default function App() {
       // ---------------------------------
 
       const allFData = (Array.isArray(fDataRaw) ? fDataRaw : []).map((f: any) => {
-        const dStr = f.dataVencimento || f.issueDate || f.dataVencimentoProjetado || f.dataEmissao || f.dataContabil || "---";
+        const dStr = f.dataVencimento || f.issueDate || f.dueDate || f.dataVencimentoProjetado || f.dataEmissao || f.dataContabil || "---";
         const d = parseISO(dStr);
+        const creditorId = String(f.creditorId || f.debtorId || '');
+        const creditorNameResolved = creditorMap[creditorId] || f.nomeCredor || f.nomeFantasiaCredor || f.fornecedor || f.creditorName || f.credor || (creditorId ? `Credor ${creditorId}` : 'N/A');
         return {
-          id: f.id || f.numero || f.codigoTitulo || 0,
-          buildingId: f.idObra || f.debtorId || f.codigoObra || 0,
-          description: f.descricao || f.historico || f.tipoDocumento || f.observacao || 'Título a Pagar',
-          creditorName: f.nomeCredor || f.nomeFantasiaCredor || f.fornecedor || f.credor || 'S/N',
+          id: f.id || f.numero || f.codigoTitulo || f.documentNumber || 0,
+          buildingId: f.idObra || f.codigoObra || f.enterpriseId || 0,
+          description: f.descricao || f.historico || f.tipoDocumento || f.notes || f.observacao || 'Título a Pagar',
+          creditorName: creditorNameResolved,
+          _rawCreditorId: creditorId,
           dueDate: dStr,
           dueDateNumeric: isNaN(d.getTime()) ? 0 : d.getTime(),
-          amount: parseFloat(f.valor || f.amount || f.valorTotal || f.valorLiquido || f.valorBruto) || 0,
+          amount: parseFloat(f.totalInvoiceAmount || f.valor || f.amount || f.valorTotal || f.valorLiquido || f.valorBruto) || 0,
           status: f.situacao || f.status || 'Pendente',
         };
       });
 
+
       const allRData = (Array.isArray(rDataRaw) ? rDataRaw : []).map((r: any) => {
-        const dStr = r.dataVencimento || r.dataEmissao || r.issueDate || r?.dataVencimentoProjetado || "---";
+        const dStr = r.data || r.date || r.dataVencimento || r.dataEmissao || r.issueDate || r?.dataVencimentoProjetado || "---";
         const d = parseISO(dStr);
         return {
-          id: r.id || r.numero || r.numeroTitulo || r.codigoTitulo || 0,
+          id: r.id || r.numero || r.numeroTitulo || r.codigoTitulo || r.documentNumber || 0,
           buildingId: r.idObra || r.codigoObra || 0,
-          description: r.descricao || r.historico || r.observacao || r.notes || 'Título a Receber',
-          clientName: r.nomeCliente || r.nomeFantasiaCliente || r.cliente || 'S/N',
+          description: r.descricao || r.historico || r.observacao || r.notes || r.description || 'Título a Receber',
+          clientName: r.nomeCliente || r.nomeFantasiaCliente || r.cliente || r.clientName || 'Extrato/Cliente',
           dueDate: dStr,
           dueDateNumeric: isNaN(d.getTime()) ? 0 : d.getTime(),
-          amount: parseFloat(r.valor || r.valorSaldo || r.totalInvoiceAmount || r.valorTotal) || 0,
+          amount: parseFloat(r.value || r.valor || r.valorSaldo || r.totalInvoiceAmount || r.valorTotal || r.amount) || 0,
           status: String(r.situacao || r.status || 'ABERTO').toUpperCase(),
         };
       });
@@ -471,8 +500,44 @@ export default function App() {
     }
   };
 
+  // Memoized lookup maps - rebuilt whenever master lists change
+  const buildingMap = useMemo(() => {
+    const m: Record<string, string> = {};
+    buildings.forEach(b => { m[String(b.id)] = b.name; });
+    return m;
+  }, [buildings]);
+
+  const creditorMap = useMemo(() => {
+    const m: Record<string, string> = {};
+    creditors.forEach(c => { m[String(c.id)] = c.name; });
+    return m;
+  }, [creditors]);
+
+  const resolveBuildingName = (o: any): string => {
+    const id = String(o.buildingId || o.enterpriseId || o.idObra || '');
+    return buildingMap[id] || o.nomeObra || o.enterpriseName || (id ? `Obra ${id}` : 'N/A');
+  };
+
+  const resolveCreditorName = (o: any): string => {
+    const id = String(o.supplierId || o.creditorId || o.idCredor || o.codigoFornecedor || '');
+    return creditorMap[id] || o.nomeFornecedor || o.supplierName || o.creditorName || (id ? `Credor ${id}` : 'N/A');
+  };
+
+  // Re-resolve creditor names whenever the creditor list loads (fixes the race with refreshData)
+  useEffect(() => {
+    if (Object.keys(creditorMap).length === 0) return;
+    const resolve = (list: any[]) => list.map(f => {
+      if (!f._rawCreditorId) return f;
+      const resolved = creditorMap[f._rawCreditorId];
+      return resolved && f.creditorName !== resolved ? { ...f, creditorName: resolved } : f;
+    });
+    setAllFinancialTitles(prev => resolve(prev));
+    setFinancialTitles(prev => resolve(prev));
+  }, [creditorMap]);
+
   useEffect(() => {
     fetchInitialData();
+
     
     // Agora o Client Puxa passivamente o cache em background a cada 20min (o servidor atualiza pesado autonomamente)
     const syncInterval = setInterval(() => {
@@ -507,6 +572,7 @@ export default function App() {
 
     return { total, avg, fTotal, rTotal, balance };
   }, [orders, financialTitles, receivableTitles]);
+
 
   const chartData = useMemo(() => {
     const months = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
@@ -545,29 +611,28 @@ export default function App() {
   }, [orders, financialTitles]);
 
   const supplierData = useMemo(() => {
-    const map: Record<number, number> = {};
+    const map: Record<string, { name: string; value: number }> = {};
     const ordersArray = Array.isArray(orders) ? orders : [];
     ordersArray.forEach(o => {
-      if (o.supplierId) {
-        map[o.supplierId] = (map[o.supplierId] || 0) + (o.totalAmount || 0);
-      }
+      const id = String(o.supplierId || o.creditorId || o.idCredor || '');
+      if (!id || id === 'undefined') return;
+      const name = creditorMap[id] || o.nomeFornecedor || o.supplierName || `Credor ${id}`;
+      if (!map[id]) map[id] = { name, value: 0 };
+      map[id].value += (o.totalAmount || o.valorTotal || o.amount || 0);
     });
-    return Object.entries(map)
-      .map(([id, val]) => ({ 
-        name: creditors.find(c => c.id === Number(id))?.name || `Fornecedor ${id}`, 
-        value: val 
-      }))
+
+    return Object.values(map)
       .sort((a, b) => b.value - a.value)
       .slice(0, 5);
-  }, [orders, creditors]);
+  }, [orders, creditorMap]);
 
   const paymentMethodData = useMemo(() => {
     const map: Record<string, number> = {};
     const ordersArray = Array.isArray(orders) ? orders : [];
     
     ordersArray.forEach(order => {
-      const method = order.paymentCondition || 'Não Informado';
-      map[method] = (map[method] || 0) + (order.totalAmount || 0);
+      const method = order.paymentConditionDescription || order.condicaoPagamentoDescricao || order.paymentCondition || 'Não Informado';
+      map[method] = (map[method] || 0) + (order.totalAmount || order.valorTotal || order.amount || 0);
     });
 
     const result = Object.entries(map)
@@ -578,7 +643,7 @@ export default function App() {
       { name: 'Boleto', value: 45000 },
       { name: 'PIX', value: 30000 },
       { name: 'Cartão', value: 15000 },
-      { name: 'Transferência', value: 10000 },
+      { name: 'Dinheiro', value: 10000 },
     ];
   }, [orders]);
 
@@ -675,6 +740,8 @@ export default function App() {
               { id: 'finance', label: 'Financeiro', icon: DollarSign },
               { id: 'alerts', label: 'Alertas', icon: Bell },
               { id: 'map', label: 'Mapa de Obras', icon: MapIcon },
+              { id: 'logistics', label: 'Logística', icon: Truck },
+              { id: 'access', label: 'Acessos', icon: UserIcon },
             ].map((tab) => (
               <button
                 key={tab.id}
@@ -732,12 +799,14 @@ export default function App() {
       </header>
 
       {/* Mobile Bottom Navigation */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-[#161618]/95 backdrop-blur-xl border-t border-white/5 flex print:hidden">
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-[#161618]/95 backdrop-blur-xl border-t border-white/5 flex flex-wrap print:hidden">
         {[
           { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-          { id: 'finance', label: 'Financeiro', icon: DollarSign },
+          { id: 'finance', label: 'Finance', icon: DollarSign },
           { id: 'alerts', label: 'Alertas', icon: Bell },
           { id: 'map', label: 'Mapa', icon: MapIcon },
+          { id: 'logistics', label: 'Logística', icon: Truck },
+          { id: 'access', label: 'Acessos', icon: UserIcon },
         ].map((tab) => (
           <button
             key={tab.id}
@@ -755,8 +824,9 @@ export default function App() {
 
       <main className="w-full max-w-[98%] 2xl:max-w-[1800px] mx-auto px-4 sm:px-6 py-6 sm:py-10 pb-24 md:pb-10">
         {/* Global Date Filter - Mobile Collapsible */}
-        <div className="mb-6 sm:mb-10 bg-[#161618] rounded-2xl border border-white/5 shadow-xl print:hidden overflow-hidden">
-          {/* Filter Header - Mobile Toggle */}
+        {activeTab !== 'logistics' && activeTab !== 'access' && (
+          <div className="mb-6 sm:mb-10 bg-[#161618] rounded-2xl border border-white/5 shadow-xl print:hidden overflow-hidden">
+            {/* Filter Header - Mobile Toggle */}
           <button
             onClick={() => setMobileFiltersOpen(!mobileFiltersOpen)}
             className="w-full flex items-center justify-between p-4 sm:p-6 md:cursor-default"
@@ -867,6 +937,7 @@ export default function App() {
             </div>
           </div>
         </div>
+        )}
 
         <AnimatePresence mode="wait">
           {activeTab === 'dashboard' && (
@@ -969,6 +1040,7 @@ export default function App() {
                         <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#666', fontSize: 12}} />
                         <YAxis axisLine={false} tickLine={false} tick={{fill: '#666', fontSize: 12}} tickFormatter={(v) => `R$${v/1000}k`} />
                         <Tooltip 
+                          formatter={(value: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value)}
                           contentStyle={{ backgroundColor: '#161618', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px' }}
                           itemStyle={{ fontWeight: 'bold' }}
                         />
@@ -1001,7 +1073,7 @@ export default function App() {
                             <Cell key={`cell-${index}`} fill={['#f97316', '#3b82f6', '#10b981', '#f59e0b', '#6366f1'][index % 5]} />
                           ))}
                         </Pie>
-                        <Tooltip contentStyle={{ backgroundColor: '#161618', border: 'none', borderRadius: '8px' }} />
+                        <Tooltip formatter={(value: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value)} contentStyle={{ backgroundColor: '#161618', border: 'none', borderRadius: '8px' }} />
                         <Legend />
                       </PieChart>
                     </ResponsiveContainer>
@@ -1020,7 +1092,7 @@ export default function App() {
                       <BarChart data={supplierData} layout="vertical">
                         <XAxis type="number" hide />
                         <YAxis dataKey="name" type="category" axisLine={false} tickLine={false} tick={{fill: '#fff', fontSize: 10}} width={120} />
-                        <Tooltip cursor={{fill: '#ffffff05'}} contentStyle={{ backgroundColor: '#161618', border: 'none' }} />
+                        <Tooltip formatter={(value: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value)} cursor={{fill: '#ffffff05'}} contentStyle={{ backgroundColor: '#161618', border: 'none' }} />
                         <Bar dataKey="value" fill="#f97316" radius={[0, 4, 4, 0]} barSize={20} />
                       </BarChart>
                     </ResponsiveContainer>
@@ -1054,11 +1126,11 @@ export default function App() {
                             ) : (
                               orders.slice(0, 6).map((order, idx) => (
                                 <TableRow key={order.id || `order-${idx}`} className="border-white/5 hover:bg-white/5 transition-colors">
-                                  <TableCell className="font-bold text-sm text-gray-300">
-                                    {buildings.find(b => b.id === order.buildingId)?.name || order.buildingId}
+                                <TableCell className="font-bold text-sm text-gray-300">
+                                    {resolveBuildingName(order)}
                                   </TableCell>
                                   <TableCell className="text-xs text-gray-400">
-                                    {creditors.find(c => c.id === order.supplierId)?.name || order.supplierId}
+                                    {resolveCreditorName(order)}
                                   </TableCell>
                                   <TableCell className="text-xs text-gray-500">
                                     {safeFormat(order.date, 'dd/MM/yy')}
@@ -1104,49 +1176,55 @@ export default function App() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-                {priceAlerts.slice(0, 8).map((alert, i) => (
-                  <Card key={i} className="bg-[#161618] border-white/5 shadow-lg overflow-hidden relative">
-                    <div className="absolute top-0 left-0 w-1.5 h-full bg-orange-600" />
-                    <CardContent className="p-5 flex flex-col justify-between">
-                      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                        <div className="space-y-1">
-                          <h4 className="text-sm font-black text-white leading-tight max-w-[250px] line-clamp-2" title={alert.item}>{alert.item}</h4>
-                          <div className="flex items-center gap-2 text-[10px] text-gray-500">
-                            <span>{safeFormat(alert.oldDate)}</span>
-                            <ChevronRight size={10} />
-                            <span className="font-bold text-orange-500/80">{safeFormat(alert.newDate)}</span>
-                          </div>
-                        </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-4">
+                {priceAlerts.slice(0, 8).map((alert, idx) => (
+                  <Card key={idx} className="bg-gradient-to-br from-orange-600/20 to-transparent border-orange-500/20 shadow-none overflow-hidden">
+                    <CardContent className="p-4 sm:p-5 pb-0 relative">
+                      <div className="flex flex-col mb-4">
+                        <h4 className="text-white font-black uppercase text-xs sm:text-[13px] leading-tight w-full mb-3 pb-2 border-b border-white/5" title={alert.item}>
+                          {alert.item}
+                        </h4>
                         
-                        <div className="flex items-center gap-3 bg-black/40 p-3 rounded-xl border border-white/5 shrink-0">
-                          <div className="text-center">
-                            <p className="text-[9px] font-black uppercase text-gray-500 mb-0.5">Anterior</p>
-                            <p className="text-xs font-bold text-gray-400">R$ {alert.oldPrice.toFixed(2)}</p>
+                        <div className="flex items-start gap-2 w-full justify-between">
+                          <div className="flex flex-1 items-center gap-3 sm:gap-6">
+                            <div className="flex flex-col flex-1">
+                              <p className="text-gray-500 text-[9px] font-bold tracking-widest uppercase mb-1">Anterior</p>
+                              <h3 className="text-xs sm:text-sm font-bold text-gray-400 decoration-red-500/30">
+                                {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(alert.oldPrice)}
+                              </h3>
+                              <p className="text-[#666] text-[8px] font-bold mt-0.5">{safeFormat(alert.oldDate)}</p>
+                            </div>
+
+                            <div className="w-px h-8 bg-white/5 mx-1" />
+
+                            <div className="flex flex-col flex-1">
+                              <p className="text-orange-500 text-[9px] font-bold tracking-widest uppercase mb-1">Atual</p>
+                              <h3 className="text-sm sm:text-base font-black text-white">
+                                {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(alert.newPrice)}
+                              </h3>
+                              <p className="text-orange-600/50 text-[8px] font-bold mt-0.5">{safeFormat(alert.newDate)}</p>
+                            </div>
                           </div>
-                          <div className="w-px h-6 bg-white/10" />
-                          <div className="text-center">
-                            <p className="text-[9px] font-black uppercase text-orange-500 mb-0.5">Atual</p>
-                            <p className="text-base font-black text-white pr-1">R$ {alert.newPrice.toFixed(2)}</p>
-                          </div>
-                          <div className="flex flex-col items-center bg-orange-600/10 px-3 py-1 rounded-lg border border-orange-600/20 min-w-[55px]">
-                            <span className="text-[11px] font-black text-orange-500 whitespace-nowrap">
-                              {alert.diff > 0 ? '+' : ''}{((alert.diff/alert.oldPrice)*100).toFixed(1)}%
+                          
+                          <div className="shrink-0 flex items-center justify-center bg-orange-500/10 border border-orange-500/20 rounded-lg px-2 sm:px-3 py-1 sm:py-1.5 h-fit mt-3">
+                            <span className="text-orange-500 font-black text-[10px] sm:text-xs tracking-tighter">
+                              +{alert.diff > 1000 ? '>1000' : alert.diff}%
                             </span>
                           </div>
                         </div>
-                      </div>
-                      {alert.history && alert.history.length > 0 && (
-                        <div className="mt-4 h-16 w-full opacity-60 hover:opacity-100 transition-opacity">
-                          <ResponsiveContainer width="100%" height="100%">
-                            <LineChart data={alert.history}>
-                              <Line type="monotone" dataKey="price" stroke="#f97316" strokeWidth={2} dot={{ fill: '#f97316', strokeWidth: 1, r: 2 }} activeDot={{ r: 4 }} />
-                            </LineChart>
-                          </ResponsiveContainer>
                         </div>
-                      )}
-                    </CardContent>
-                  </Card>
+
+                        {alert.history && alert.history.length > 0 && (
+                          <div className="mt-4 h-[50px] sm:h-16 w-full opacity-60 hover:opacity-100 transition-opacity">
+                            <ResponsiveContainer width="100%" height="100%">
+                              <LineChart data={alert.history}>
+                                <Line type="monotone" dataKey="price" stroke="#f97316" strokeWidth={2} dot={{ fill: '#f97316', strokeWidth: 1, r: 2 }} activeDot={{ r: 4 }} />
+                              </LineChart>
+                            </ResponsiveContainer>
+                          </div>
+                        )}
+                      </CardContent>
+                    </Card>
                 ))}
               </div>
 
@@ -1159,15 +1237,23 @@ export default function App() {
                     <TableHeader className="bg-black/80 sticky top-0 z-10 backdrop-blur-md print:bg-gray-100 print:relative border-b border-white/10">
                       <TableRow className="border-none print:border-gray-200">
                         <TableHead className="text-[10px] font-black uppercase text-gray-500 print:text-black">Item e Código</TableHead>
-                        <TableHead className="text-[10px] font-black uppercase text-gray-500 print:text-black">Data</TableHead>
+                        <TableHead className="text-[10px] font-black uppercase text-gray-500 print:text-black cursor-pointer group hover:text-white transition-colors" onClick={() => toggleSort('date')}>
+                          <div className="flex items-center">Data {renderSortIcon('date')}</div>
+                        </TableHead>
                         <TableHead className="text-[10px] font-black uppercase text-gray-500 print:text-black">Status</TableHead>
                         <TableHead className="text-[10px] font-black uppercase text-gray-500 print:text-black">Solicitante</TableHead>
                         <TableHead className="text-[10px] font-black uppercase text-gray-500 print:text-black">Comprador</TableHead>
                         <TableHead className="text-[10px] font-black uppercase text-gray-500 print:text-black">Prazos</TableHead>
                         <TableHead className="text-[10px] font-black uppercase text-gray-500 text-center print:text-black">Qtd</TableHead>
-                        <TableHead className="text-[10px] font-black uppercase text-gray-500 text-right print:text-black">Vlr Unit</TableHead>
-                        <TableHead className="text-[10px] font-black uppercase text-gray-500 text-right print:text-black">Vlr Atual</TableHead>
-                        <TableHead className="text-[10px] font-black uppercase text-gray-500 text-right print:text-black">Valor Total</TableHead>
+                        <TableHead className="text-[10px] font-black uppercase text-gray-500 text-right print:text-black cursor-pointer group hover:text-white transition-colors" onClick={() => toggleSort('vlrUnit')}>
+                          <div className="flex items-center justify-end">Vlr Unit {renderSortIcon('vlrUnit')}</div>
+                        </TableHead>
+                        <TableHead className="text-[10px] font-black uppercase text-gray-500 text-right print:text-black cursor-pointer group hover:text-white transition-colors" onClick={() => toggleSort('vlrAtual')}>
+                          <div className="flex items-center justify-end">Vlr Atual {renderSortIcon('vlrAtual')}</div>
+                        </TableHead>
+                        <TableHead className="text-[10px] font-black uppercase text-gray-500 text-right print:text-black cursor-pointer group hover:text-white transition-colors" onClick={() => toggleSort('valorTotal')}>
+                          <div className="flex items-center justify-end">Valor Total {renderSortIcon('valorTotal')}</div>
+                        </TableHead>
                       </TableRow>
                     </TableHeader>
                       <TableBody>
@@ -1178,19 +1264,56 @@ export default function App() {
                             </TableCell>
                           </TableRow>
                         ) : (() => {
-                          return [...orders].sort((a,b) => (b.dateNumeric || 0) - (a.dateNumeric || 0))
-                          .slice(0, isPrinting ? 999999 : 100).map((o, i) => {
-                            // buyerId pode ser código numérico ou username — exibe direto
-                            const comprador = o.buyerId || "N/A";
-                            // requesterId agora é o requesterUser real da Solicitação (ex: "GEAN", "RAFAEL")
-                            // Se não houver solicitação vinculada, mostra o createdBy (comprador direto)
-                            const solicitante = o.requesterId && o.requesterId !== "0" ? o.requesterId : (o.createdBy || "N/A");
+                          let flatItems: any[] = [];
+                          orders.forEach(o => {
                             const itemsList = itemsDetailsMap[o.id];
+                            const comprador = o.buyerId || "N/A";
+                            const solicitante = o.requesterId && o.requesterId !== "0" ? o.requesterId : (o.createdBy || "N/A");
                             
                             if (!itemsList || itemsList.length === 0) {
+                              flatItems.push({
+                                o, idx: 0, isFallback: true, desc: `Cod. ${o.id} (Carregando...)`,
+                                comprador, solicitante, qty: 0, vlrBase: 0, vlrAtual: 0, totalAmount: o.totalAmount, dateNumeric: o.dateNumeric || 0
+                              });
+                              return;
+                            }
+                            
+                            itemsList.forEach((item: any, idx: number) => {
+                              if (!item) return;
+                              const qty = Number(item.quantity || item.quantidade || 1);
+                              const realUnitValue = Number(item.netPrice || item.unitPrice || item.valorUnitario || 0);
+                              const totalAmount = qty * realUnitValue;
+                              const desc = item.resourceDescription || item.descricao || `Item ${idx+1}`;
+                              const vlrAtual = Number(latestPricesMap[desc]) || 0;
+                              const vlrBase = Number(baselinePricesMap[desc]) || realUnitValue;
+                              
+                              flatItems.push({
+                                o, idx, isFallback: false, desc, comprador, solicitante,
+                                qty, vlrBase, vlrAtual, totalAmount, dateNumeric: o.dateNumeric || 0
+                              });
+                            });
+                          });
+                          
+                          if (alertSortConfig) {
+                            flatItems.sort((a,b) => {
+                              let valA = 0, valB = 0;
+                              if (alertSortConfig.key === 'date') { valA = a.dateNumeric; valB = b.dateNumeric; }
+                              if (alertSortConfig.key === 'vlrUnit') { valA = a.vlrBase; valB = b.vlrBase; }
+                              if (alertSortConfig.key === 'vlrAtual') { valA = a.vlrAtual; valB = b.vlrAtual; }
+                              if (alertSortConfig.key === 'valorTotal') { valA = a.totalAmount; valB = b.totalAmount; }
+                              
+                              return alertSortConfig.direction === 'asc' ? valA - valB : valB - valA;
+                            });
+                          } else {
+                            flatItems.sort((a,b) => b.dateNumeric - a.dateNumeric);
+                          }
+                          
+                          return flatItems.slice(0, isPrinting ? 999999 : 100).map((flat, i) => {
+                            const { o, isFallback, desc, comprador, solicitante, qty, vlrBase, vlrAtual, totalAmount } = flat;
+                            if (isFallback) {
                               return (
-                                <TableRow key={`alert-${o.id}-fallback`} className="border-white/5 hover:bg-white/5 transition-colors">
-                                  <TableCell className="font-bold text-orange-500 whitespace-nowrap">Cod. {o.id} {(!itemsList) ? "(Carregando...)" : ""}</TableCell>
+                                <TableRow key={`alert-${o.id}-fallback-${i}`} className="border-white/5 hover:bg-white/5 transition-colors">
+                                  <TableCell className="font-bold text-orange-500 whitespace-nowrap">{desc}</TableCell>
                                   <TableCell className="text-xs text-gray-500">{safeFormat(o.date)}</TableCell>
                                   <TableCell><Badge variant="outline" className="bg-white/5 text-gray-400 border-white/10 uppercase text-[9px]">{o.status}</Badge></TableCell>
                                   <TableCell className="text-xs text-gray-400 max-w-[120px] truncate">{solicitante}</TableCell>
@@ -1199,50 +1322,38 @@ export default function App() {
                                   <TableCell className="text-xs font-mono text-gray-500 text-center">-</TableCell>
                                   <TableCell className="text-xs text-gray-400 font-mono text-right">-</TableCell>
                                   <TableCell className="text-xs text-gray-400 font-mono text-right">-</TableCell>
-                                  <TableCell className="text-right font-black text-white whitespace-nowrap">R$ {o.totalAmount.toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2})}</TableCell>
+                                  <TableCell className="text-right font-black text-white whitespace-nowrap">R$ {totalAmount.toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2})}</TableCell>
                                 </TableRow>
                               );
                             }
-
+                            
+                            const isCheaper = vlrAtual > 0 && vlrAtual < vlrBase;
+                            const isExpensive = vlrAtual > vlrBase;
+                            const colorClass = isCheaper ? "text-green-500 font-black drop-shadow-[0_0_5px_rgba(34,197,94,0.5)]" : isExpensive ? "text-orange-500 font-black drop-shadow-[0_0_5px_rgba(249,115,22,0.5)]" : "text-gray-400";
+                            
                             return (
-                              <Fragment key={`frag-${o.id}`}>
-                                {itemsList.map((item: any, idx: number) => {
-                                  if (!item) return null;
-                                  const qty = Number(item.quantity || item.quantidade || 1);
-                                  const realUnitValue = Number(item.netPrice || item.unitPrice || item.valorUnitario || 0);
-                                  const totalAmount = qty * realUnitValue;
-                                  
-                                  const desc = item.resourceDescription || item.descricao;
-                                  const vlrAtual = Number(latestPricesMap[desc]) || 0;
-                                  const vlrBase = Number(baselinePricesMap[desc]) || realUnitValue;
-                                  // Na tabela, só coramos de alerta se o valor subiu no novo orçamento!
-                                  const isDiff = vlrAtual > vlrBase;
-                                  
-                                  return (
-                                  <TableRow key={`alert-${o.id}-${idx}`} className="border-white/5 hover:bg-white/5 transition-colors">
-                                    <TableCell className="font-bold text-orange-500" title={desc}>
-                                      <div className="max-w-[200px] truncate">{desc || `Item ${idx+1}`}</div>
-                                    </TableCell>
-                                    <TableCell className="text-xs text-gray-500">{safeFormat(o.date)}</TableCell>
-                                    <TableCell>
-                                      <Badge variant="outline" className="bg-white/5 text-gray-400 border-white/10 uppercase text-[9px]">{o.status}</Badge>
-                                    </TableCell>
-                                    <TableCell className="text-xs text-gray-400 max-w-[120px] truncate">{solicitante}</TableCell>
-                                    <TableCell className="text-xs text-gray-400 max-w-[120px] truncate">{comprador}</TableCell>
-                                    <TableCell className="text-xs text-gray-400">{o.paymentCondition || "N/A"}</TableCell>
-                                    <TableCell className="text-xs font-mono text-gray-500 text-center">{qty}</TableCell>
-                                    <TableCell className="text-xs text-gray-400 font-mono text-right" title="Valor Anterior da Data Inicial">
-                                      R$ {vlrBase.toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2})}
-                                    </TableCell>
-                                    <TableCell className={`text-xs font-mono text-right ${isDiff ? "text-orange-500 font-black" : "text-gray-400"}`}>
-                                      {vlrAtual > 0 ? `R$ ${vlrAtual.toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2})}` : '-'}
-                                    </TableCell>
-                                    <TableCell className="text-right font-black text-white whitespace-nowrap">
-                                      R$ {totalAmount.toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2})}
-                                    </TableCell>
-                                  </TableRow>
-                                )})}
-                              </Fragment>
+                              <TableRow key={`alert-${o.id}-${flat.idx}-${i}`} className="border-white/5 hover:bg-white/5 transition-colors">
+                                <TableCell className="font-bold text-orange-500" title={desc}>
+                                  <div className="max-w-[200px] truncate">{desc}</div>
+                                </TableCell>
+                                <TableCell className="text-xs text-gray-500">{safeFormat(o.date)}</TableCell>
+                                <TableCell>
+                                  <Badge variant="outline" className="bg-white/5 text-gray-400 border-white/10 uppercase text-[9px]">{o.status}</Badge>
+                                </TableCell>
+                                <TableCell className="text-xs text-gray-400 max-w-[120px] truncate">{solicitante}</TableCell>
+                                <TableCell className="text-xs text-gray-400 max-w-[120px] truncate">{comprador}</TableCell>
+                                <TableCell className="text-xs text-gray-400">{o.paymentCondition || "N/A"}</TableCell>
+                                <TableCell className="text-xs font-mono text-gray-500 text-center">{qty}</TableCell>
+                                <TableCell className="text-xs text-gray-400 font-mono text-right" title="Valor Anterior da Data Inicial">
+                                  R$ {vlrBase.toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2})}
+                                </TableCell>
+                                <TableCell className={`text-xs font-mono text-right ${colorClass}`}>
+                                  {vlrAtual > 0 ? `R$ ${vlrAtual.toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2})}` : '-'}
+                                </TableCell>
+                                <TableCell className="text-right font-black text-white whitespace-nowrap">
+                                  R$ {totalAmount.toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2})}
+                                </TableCell>
+                              </TableRow>
                             );
                           });
                         })()}
@@ -1433,23 +1544,47 @@ export default function App() {
                   </div>
                 </CardHeader>
                 <CardContent className="flex-1 overflow-y-auto px-2 pb-4 space-y-1 custom-scrollbar">
-                  {buildings.filter(b => b.name.toLowerCase().includes(buildingSearch.toLowerCase()) || String(b.id).includes(buildingSearch)).map(b => (
-                    <button
-                      key={b.id}
-                      onClick={() => setSelectedMapBuilding(b.id)}
-                      className={cn(
-                        "w-full text-left p-3 rounded-xl transition-all border text-xs font-bold",
-                        selectedMapBuilding === b.id 
-                          ? "bg-orange-600/20 border-orange-500/50 text-orange-500" 
-                          : "bg-black/20 border-white/5 text-gray-400 hover:bg-white/5 hover:text-white"
-                      )}
-                    >
-                      <div className="truncate mb-1">{b.name}</div>
-                      <div className="text-[9px] text-gray-500 uppercase flex items-center gap-1">
-                        <MapIcon size={10} /> ID: {b.id}
-                      </div>
-                    </button>
-                  ))}
+                  {(() => {
+                    const filtered = buildings.filter(b =>
+                      b.name.toLowerCase().includes(buildingSearch.toLowerCase()) ||
+                      String(b.id).includes(buildingSearch)
+                    );
+                    // Compute volume per building from allOrders for sorting
+                    const buildingVolume: Record<string, number> = {};
+                    allOrders.forEach(o => {
+                      const key = String(o.buildingId);
+                      buildingVolume[key] = (buildingVolume[key] || 0) + (o.totalAmount || 0);
+                    });
+                    return filtered
+                      .sort((a, b) => (buildingVolume[String(b.id)] || 0) - (buildingVolume[String(a.id)] || 0))
+                      .map(b => {
+                        const vol = buildingVolume[String(b.id)] || 0;
+                        return (
+                          <button
+                            key={b.id}
+                            onClick={() => { setSelectedMapBuilding(b.id); setEditingEngineer(false); }}
+                            className={cn(
+                              "w-full text-left p-3 rounded-xl transition-all border text-xs font-bold",
+                              selectedMapBuilding === b.id
+                                ? "bg-orange-600/20 border-orange-500/50 text-orange-500"
+                                : "bg-black/20 border-white/5 text-gray-400 hover:bg-white/5 hover:text-white"
+                            )}
+                          >
+                            <div className="truncate mb-1 text-sm">{b.name}</div>
+                            <div className="flex items-center justify-between">
+                              <div className="text-[9px] text-gray-500 uppercase flex items-center gap-1">
+                                <MapIcon size={10} /> ID: {b.id}
+                              </div>
+                              {vol > 0 && (
+                                <div className="text-[9px] font-black text-orange-500/70">
+                                  R$&nbsp;{vol.toLocaleString('pt-BR', { maximumFractionDigits: 0 })}
+                                </div>
+                              )}
+                            </div>
+                          </button>
+                        );
+                    });
+                  })()}
                 </CardContent>
               </Card>
 
@@ -1488,44 +1623,115 @@ export default function App() {
               <Card className="lg:col-span-1 bg-[#161618] border-white/5 shadow-2xl h-full overflow-y-auto">
                 <CardHeader className="pb-4">
                   <CardTitle className="text-white font-black uppercase text-sm tracking-tight leading-tight">
-                    {selectedMapBuilding 
-                      ? buildings.find(b => b.id === selectedMapBuilding)?.name 
+                    {selectedMapBuilding
+                      ? buildings.find(b => b.id === selectedMapBuilding)?.name
                       : "Resumo da Obra"}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   {selectedMapBuilding ? (
-                    <div className="space-y-6">
+                    <div className="space-y-5">
                       {(() => {
                         const currentBuilding = buildings.find(b => b.id === selectedMapBuilding);
+                        // Use ALL orders (no date filter) for accurate building totals
                         const buildingOrders = allOrders.filter(o => String(o.buildingId) === String(selectedMapBuilding));
-                        const buildingPayable = allFinancialTitles.filter(f => String(f.buildingId) === String(selectedMapBuilding));
-                        
+                        // financial titles may not have buildingId — sum ALL if 0-based
+                        const buildingPayable = allFinancialTitles.filter(f => {
+                          if (String(f.buildingId) === String(selectedMapBuilding)) return true;
+                          return false;
+                        });
+                        const openPayableBuilding = buildingPayable.filter(
+                          f => f.status !== 'BAIXADO' && f.status !== 'PAGO' && f.status !== 'LIQUIDADO'
+                        );
+
                         const totalOrders = buildingOrders.reduce((acc, curr) => acc + (curr.totalAmount || 0), 0);
-                        const totalPayable = buildingPayable.reduce((acc, curr) => acc + (curr.amount || 0), 0);
-                        
+                        const totalPayable = openPayableBuilding.reduce((acc, curr) => acc + (curr.amount || 0), 0);
+
+                        const saveEngineer = async () => {
+                          if (!currentBuilding) return;
+                          setSavingEngineer(true);
+                          try {
+                            await api.post('/obras/meta', { id: currentBuilding.id, engineer: engineerDraft });
+                            // Update local state
+                            setBuildings(prev => prev.map(b =>
+                              b.id === currentBuilding.id ? { ...b, engineer: engineerDraft } : b
+                            ));
+                            setEditingEngineer(false);
+                          } catch (e) {
+                            console.error('Erro ao salvar engenheiro', e);
+                          } finally {
+                            setSavingEngineer(false);
+                          }
+                        };
+
                         return (
                           <>
-                            <div className="flex items-center gap-3">
-                              <div className="w-10 h-10 rounded-full bg-orange-500/20 flex items-center justify-center shrink-0">
-                                <UserIcon size={20} className="text-orange-500" />
-                              </div>
-                              <div className="min-w-0">
-                                <p className="text-[10px] font-black uppercase text-gray-500 text-left">Responsável Técnico</p>
-                                <p className="text-sm font-bold text-white leading-tight text-left truncate">{currentBuilding?.engineer || "N/A"}</p>
+                            {/* Responsável Técnico */}
+                            <div className="bg-black/20 p-4 rounded-xl border border-white/5">
+                              <div className="flex items-start gap-3">
+                                <div className="w-9 h-9 rounded-full bg-orange-500/20 flex items-center justify-center shrink-0 mt-0.5">
+                                  <UserIcon size={16} className="text-orange-500" />
+                                </div>
+                                <div className="min-w-0 flex-1">
+                                  <p className="text-[10px] font-black uppercase text-gray-500 mb-1">Responsável Técnico</p>
+                                  {editingEngineer ? (
+                                    <div className="flex flex-col gap-2">
+                                      <input
+                                        autoFocus
+                                        value={engineerDraft}
+                                        onChange={e => setEngineerDraft(e.target.value)}
+                                        onKeyDown={e => { if(e.key === 'Enter') saveEngineer(); if(e.key === 'Escape') setEditingEngineer(false); }}
+                                        className="bg-black/60 border border-orange-500/40 rounded-lg px-3 py-1.5 text-sm text-white w-full focus:outline-none focus:border-orange-500"
+                                        placeholder="Nome do responsável"
+                                      />
+                                      <div className="flex gap-2">
+                                        <button
+                                          onClick={saveEngineer}
+                                          disabled={savingEngineer}
+                                          className="flex-1 bg-orange-600 hover:bg-orange-700 text-white text-xs font-black py-1.5 rounded-lg transition-colors disabled:opacity-50"
+                                        >
+                                          {savingEngineer ? 'Salvando...' : 'Salvar'}
+                                        </button>
+                                        <button
+                                          onClick={() => setEditingEngineer(false)}
+                                          className="flex-1 bg-white/5 hover:bg-white/10 text-gray-400 text-xs font-bold py-1.5 rounded-lg transition-colors"
+                                        >
+                                          Cancelar
+                                        </button>
+                                      </div>
+                                    </div>
+                                  ) : (
+                                    <div className="flex items-center justify-between gap-2">
+                                      <p className="text-sm font-bold text-white leading-tight truncate">
+                                        {currentBuilding?.engineer || 'Não definido'}
+                                      </p>
+                                      {isAdmin && (
+                                        <button
+                                          onClick={() => { setEngineerDraft(currentBuilding?.engineer || ''); setEditingEngineer(true); }}
+                                          className="shrink-0 text-[9px] font-black uppercase text-orange-500/70 hover:text-orange-500 border border-orange-500/20 hover:border-orange-500/50 px-2 py-1 rounded-md transition-colors"
+                                        >
+                                          ✏️ Editar
+                                        </button>
+                                      )}
+                                    </div>
+                                  )}
+                                </div>
                               </div>
                             </div>
 
-                            <div className="space-y-4">
+                            <div className="space-y-3">
                               <div className="bg-black/20 p-4 rounded-xl border border-white/5">
                                 <p className="text-[10px] font-black text-gray-500 uppercase mb-1">Volume de Compras</p>
                                 <p className="text-2xl font-black text-orange-500 leading-tight">R$ {totalOrders.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
-                                <p className="text-[10px] text-gray-600 mt-2">{buildingOrders.length} pedidos em todo o histórico</p>
+                                <p className="text-[10px] text-gray-600 mt-1">{buildingOrders.length} pedidos em todo o histórico</p>
                               </div>
-                              
+
                               <div className="bg-black/20 p-4 rounded-xl border border-white/5">
                                 <p className="text-[10px] font-black text-gray-500 uppercase mb-1">Pendente a Pagar</p>
                                 <p className="text-2xl font-black text-red-500 leading-tight">R$ {totalPayable.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
+                                {buildingPayable.length === 0 && (
+                                  <p className="text-[9px] text-gray-600 mt-1">⚠️ Títulos financeiros sem vínculo de obra</p>
+                                )}
                               </div>
                             </div>
                           </>
@@ -1533,14 +1739,39 @@ export default function App() {
                       })()}
                     </div>
                   ) : (
-                      <div className="flex items-center justify-center h-full text-gray-600 text-xs py-10">
-                        Nenhuma obra selecionada
-                      </div>
+                    <div className="flex items-center justify-center h-full text-gray-600 text-xs py-10">
+                      Nenhuma obra selecionada
+                    </div>
                   )}
                 </CardContent>
               </Card>
             </motion.div>
           )}
+
+          {activeTab === 'logistics' && (
+            <motion.div
+              key="logistics"
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="w-full"
+            >
+              <LogisticsTab />
+            </motion.div>
+          )}
+
+          {activeTab === 'access' && (
+            <motion.div
+              key="access"
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="w-full"
+            >
+              <AccessControlTab />
+            </motion.div>
+          )}
+
         </AnimatePresence>
       </main>
 

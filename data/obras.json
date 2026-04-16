@@ -1,682 +1,1902 @@
 [
   {
-    "id": 25,
-    "nome": "PREFEITURA - MORRINHOS - ESCOLA FNDE"
+    "id": 1,
+    "name": "IFCE CONSTRUÇÃO SALAS DE AULA - MORADA NOVA",
+    "commercialName": null,
+    "cnpj": "10.744.098/0017-02",
+    "type": "1",
+    "adress": "AV PREFEITO RAIMUNDO JOSÉ RABELO - 271 - JÚLIA SANTIAGO - Morada Nova - CE - 62940-000",
+    "creationDate": "2019-01-10",
+    "modificationDate": "2023-06-23",
+    "createdBy": "BARBARA",
+    "modifiedBy": "JACKSON",
+    "companyId": 1,
+    "companyName": "DINAMICA EMPREENDIMENTOS E SOLUCOES LTDA",
+    "costDatabaseId": 1,
+    "costDatabaseDescription": "Tabela geral",
+    "buildingTypeId": 1,
+    "buildingTypeDescription": "CONSTRUÇÃO CIVIL",
+    "enterpriseObservation": null
   },
   {
-    "id": 26,
-    "nome": "PREFEITURA MUNICIPAL DE CAUCAIA - CRECHES"
+    "id": 2,
+    "name": "IFCE CONSTRUÇÃO ESPAÇO DE VIVÊNCIA - CAMOCIM",
+    "commercialName": null,
+    "cnpj": "10.744.098/0001-45",
+    "type": "1",
+    "adress": "R. Dr. Raimundo Cals - 2041 - Tv. Cidade Com Deus II - Camocim - CE - 62400-000",
+    "creationDate": "2019-01-10",
+    "modificationDate": "2025-11-27",
+    "createdBy": "BARBARA",
+    "modifiedBy": "JACKSON",
+    "companyId": 1,
+    "companyName": "DINAMICA EMPREENDIMENTOS E SOLUCOES LTDA",
+    "costDatabaseId": 5,
+    "costDatabaseDescription": "SINAPI - 2018/07 - CE - Não Desonerado",
+    "buildingTypeId": 1,
+    "buildingTypeDescription": "CONSTRUÇÃO CIVIL",
+    "enterpriseObservation": null
   },
   {
-    "id": 21,
-    "nome": "HOSPITAL MUNICIPAL EDVAR SILVEIRA - MORRINHOS "
+    "id": 3,
+    "name": "IFCE CONSTRUÇÃO ESPAÇO DE VIVÊNCIA - TAUÁ",
+    "commercialName": null,
+    "cnpj": "10.744.098/0001-45",
+    "type": "1",
+    "adress": "RUA ANTÔNIO TEIXEIRA BENEVIDES - 1 - PLANALTO DOS COLIBRIS - Tauá - CE - 63660-000",
+    "creationDate": "2019-01-10",
+    "modificationDate": "2023-02-16",
+    "createdBy": "BARBARA",
+    "modifiedBy": "BARBARA",
+    "companyId": 1,
+    "companyName": "DINAMICA EMPREENDIMENTOS E SOLUCOES LTDA",
+    "costDatabaseId": 5,
+    "costDatabaseDescription": "SINAPI - 2018/07 - CE - Não Desonerado",
+    "buildingTypeId": 1,
+    "buildingTypeDescription": "CONSTRUÇÃO CIVIL",
+    "enterpriseObservation": null
+  },
+  {
+    "id": 4,
+    "name": "IFCE CONSTRUÇÃO ESPAÇO DE VIVÊNCIA - TIANGUÁ",
+    "commercialName": null,
+    "cnpj": "10.744.098/0001-45",
+    "type": "1",
+    "adress": "CE-187 - S/N - ESTÁDIO - Tianguá - CE - 62320-000",
+    "creationDate": "2019-01-10",
+    "modificationDate": "2019-10-16",
+    "createdBy": "BARBARA",
+    "modifiedBy": "JACKSON",
+    "companyId": 1,
+    "companyName": "DINAMICA EMPREENDIMENTOS E SOLUCOES LTDA",
+    "costDatabaseId": 5,
+    "costDatabaseDescription": "SINAPI - 2018/07 - CE - Não Desonerado",
+    "buildingTypeId": 1,
+    "buildingTypeDescription": "CONSTRUÇÃO CIVIL",
+    "enterpriseObservation": null
+  },
+  {
+    "id": 5,
+    "name": "IFCE CONSTRUÇÃO ESPAÇO DE VIVÊNCIA - UBAJARA",
+    "commercialName": null,
+    "cnpj": "10.744.098/0001-45",
+    "type": "1",
+    "adress": "R. Luís Cunha - S/N - Monte Castelo - Ubajara - CE - 62350-000",
+    "creationDate": "2019-01-10",
+    "modificationDate": "2021-01-15",
+    "createdBy": "BARBARA",
+    "modifiedBy": "BARBARA",
+    "companyId": 1,
+    "companyName": "DINAMICA EMPREENDIMENTOS E SOLUCOES LTDA",
+    "costDatabaseId": 5,
+    "costDatabaseDescription": "SINAPI - 2018/07 - CE - Não Desonerado",
+    "buildingTypeId": 1,
+    "buildingTypeDescription": "CONSTRUÇÃO CIVIL",
+    "enterpriseObservation": null
+  },
+  {
+    "id": 6,
+    "name": "IFCE CONSTRUÇÃO ESPAÇO DE VIVÊNCIA - CAUCAIA",
+    "commercialName": null,
+    "cnpj": "10.744.098/0001-45",
+    "type": "1",
+    "adress": "R. Francisco da Rocha Martins - Pabussu - Caucaia - CE - 61609-090",
+    "creationDate": "2019-01-10",
+    "modificationDate": "2019-10-16",
+    "createdBy": "BARBARA",
+    "modifiedBy": "JACKSON",
+    "companyId": 1,
+    "companyName": "DINAMICA EMPREENDIMENTOS E SOLUCOES LTDA",
+    "costDatabaseId": 5,
+    "costDatabaseDescription": "SINAPI - 2018/07 - CE - Não Desonerado",
+    "buildingTypeId": 1,
+    "buildingTypeDescription": "CONSTRUÇÃO CIVIL",
+    "enterpriseObservation": null
+  },
+  {
+    "id": 7,
+    "name": "IFCE CONSTRUÇÃO ESPAÇO DE VIVÊNCIA - MORADA NOVA ",
+    "commercialName": null,
+    "cnpj": "10.744.098/0001-45",
+    "type": "1",
+    "adress": "AV PREFEITO RAIMUNDO JOSÉ RABELO - 2717 - JÚLIA SANTIAGO - Morada Nova - CE - 62940-000",
+    "creationDate": "2019-01-10",
+    "modificationDate": "2020-11-18",
+    "createdBy": "BARBARA",
+    "modifiedBy": "BARBARA",
+    "companyId": 1,
+    "companyName": "DINAMICA EMPREENDIMENTOS E SOLUCOES LTDA",
+    "costDatabaseId": 5,
+    "costDatabaseDescription": "SINAPI - 2018/07 - CE - Não Desonerado",
+    "buildingTypeId": 1,
+    "buildingTypeDescription": "CONSTRUÇÃO CIVIL",
+    "enterpriseObservation": null
+  },
+  {
+    "id": 8,
+    "name": "IFCE CONSTRUÇÃO ESPAÇO DE VIVÊNCIA - TABULEIRO DO NORTE",
+    "commercialName": null,
+    "cnpj": "10.744.098/0001-45",
+    "type": "1",
+    "adress": "SÍTIO TAPERINHA - S/N - Tabuleiro do Norte - CE",
+    "creationDate": "2019-01-10",
+    "modificationDate": "2019-12-02",
+    "createdBy": "BARBARA",
+    "modifiedBy": "EMILSON",
+    "companyId": 1,
+    "companyName": "DINAMICA EMPREENDIMENTOS E SOLUCOES LTDA",
+    "costDatabaseId": 5,
+    "costDatabaseDescription": "SINAPI - 2018/07 - CE - Não Desonerado",
+    "buildingTypeId": 1,
+    "buildingTypeDescription": "CONSTRUÇÃO CIVIL",
+    "enterpriseObservation": null
+  },
+  {
+    "id": 9,
+    "name": "IFCE MANUTENÇÃO PREDIAL - FORTALEZA",
+    "commercialName": null,
+    "cnpj": "10.744.098/0002-26",
+    "type": "1",
+    "adress": "AV 13 DE MAIO - 2081 - BENFICA - Fortaleza - CE - 60040-250",
+    "creationDate": "2019-01-10",
+    "modificationDate": "2026-03-04",
+    "createdBy": "BARBARA",
+    "modifiedBy": "FARID",
+    "companyId": 1,
+    "companyName": "DINAMICA EMPREENDIMENTOS E SOLUCOES LTDA",
+    "costDatabaseId": 9,
+    "costDatabaseDescription": "MISTA",
+    "buildingTypeId": 1,
+    "buildingTypeDescription": "CONSTRUÇÃO CIVIL",
+    "enterpriseObservation": null
   },
   {
     "id": 10,
-    "nome": "IFCE MANUTENÇÃO PREDIAL - REITORIA"
+    "name": "IFCE MANUTENÇÃO PREDIAL - REITORIA",
+    "commercialName": null,
+    "cnpj": "10.744.098/0001-45",
+    "type": "1",
+    "adress": "RUA JORGE DUMAR - JARDIM AMÉRICA - Fortaleza - CE - 60410-426",
+    "creationDate": "2019-01-11",
+    "modificationDate": "2020-04-27",
+    "createdBy": "BARBARA",
+    "modifiedBy": "EMILSON",
+    "companyId": 1,
+    "companyName": "DINAMICA EMPREENDIMENTOS E SOLUCOES LTDA",
+    "costDatabaseId": 9,
+    "costDatabaseDescription": "MISTA",
+    "buildingTypeId": 1,
+    "buildingTypeDescription": "CONSTRUÇÃO CIVIL",
+    "enterpriseObservation": null
   },
   {
-    "id": 43,
-    "nome": "IFCE MANUTENÇÃO PREDIAL - CAUCAIA"
+    "id": 11,
+    "name": "IFCE MANUTENÇÃO PREDIAL - ARACATI",
+    "commercialName": null,
+    "cnpj": "10.744.098/0021-99",
+    "type": "1",
+    "adress": "RODOVIA CE-040 - S/N - KM137,1 - Aracati - CE",
+    "creationDate": "2019-01-11",
+    "modificationDate": "2026-03-11",
+    "createdBy": "BARBARA",
+    "modifiedBy": "FARID",
+    "companyId": 1,
+    "companyName": "DINAMICA EMPREENDIMENTOS E SOLUCOES LTDA",
+    "costDatabaseId": 1,
+    "costDatabaseDescription": "Tabela geral",
+    "buildingTypeId": 1,
+    "buildingTypeDescription": "CONSTRUÇÃO CIVIL",
+    "enterpriseObservation": null
   },
   {
-    "id": 32,
-    "nome": "PMC- REFORMA DA QUADRA COBERTA DA ESCOLA ANTONIO ALMEIDA LUSTOSA"
+    "id": 12,
+    "name": "IFCE MANUTENÇÃO PREDIAL - TABULEIRO DO NORTE",
+    "commercialName": null,
+    "cnpj": "10.744.098/0016-21",
+    "type": "1",
+    "adress": "SÍTIO TAPERINHA - S/N - Tabuleiro do Norte - CE",
+    "creationDate": "2019-01-11",
+    "modificationDate": "2026-03-11",
+    "createdBy": "BARBARA",
+    "modifiedBy": "FARID",
+    "companyId": 1,
+    "companyName": "DINAMICA EMPREENDIMENTOS E SOLUCOES LTDA",
+    "costDatabaseId": 9,
+    "costDatabaseDescription": "MISTA",
+    "buildingTypeId": 1,
+    "buildingTypeDescription": "CONSTRUÇÃO CIVIL",
+    "enterpriseObservation": null
   },
   {
-    "id": 24,
-    "nome": "\tIFCE MANUTENÇÃO PREDIAL - LIMOEIRO DO NORTE"
+    "id": 13,
+    "name": "IFCE MANUTENÇÃO PREDIAL - PARACURU",
+    "commercialName": null,
+    "cnpj": "",
+    "type": "1",
+    "adress": "RUA DEZ - S/N - ZONA RURAL - Paracuru - CE - 62680-000",
+    "creationDate": "2019-01-11",
+    "modificationDate": "2026-03-11",
+    "createdBy": "BARBARA",
+    "modifiedBy": "FARID",
+    "companyId": 1,
+    "companyName": "DINAMICA EMPREENDIMENTOS E SOLUCOES LTDA",
+    "costDatabaseId": 1,
+    "costDatabaseDescription": "Tabela geral",
+    "buildingTypeId": 1,
+    "buildingTypeDescription": "CONSTRUÇÃO CIVIL",
+    "enterpriseObservation": null
   },
   {
-    "id": 63,
-    "nome": "IFCE MANUTENÇÃO PREDIAL - UMIRIM"
+    "id": 14,
+    "name": "IFCE MANUTENÇÃO PREDIAL - HORIZONTE",
+    "commercialName": null,
+    "cnpj": "10.744.098/0023-50",
+    "type": "1",
+    "adress": "Rua Francisca Cecília - Planalto Horizonte - Horizonte - CE - 62880-000",
+    "creationDate": "2019-01-11",
+    "modificationDate": "2026-03-11",
+    "createdBy": "BARBARA",
+    "modifiedBy": "FARID",
+    "companyId": 1,
+    "companyName": "DINAMICA EMPREENDIMENTOS E SOLUCOES LTDA",
+    "costDatabaseId": 1,
+    "costDatabaseDescription": "Tabela geral",
+    "buildingTypeId": 1,
+    "buildingTypeDescription": "CONSTRUÇÃO CIVIL",
+    "enterpriseObservation": null
   },
   {
-    "id": 28,
-    "nome": "ALMOXARIFADO DINÂMICA"
+    "id": 15,
+    "name": "IFCE MANUTENÇÃO PREDIAL - QUIXADÁ",
+    "commercialName": null,
+    "cnpj": "10.744.098/0004-98",
+    "type": "1",
+    "adress": "Avenida José de Freitas Queiroz - 500 - CEDRO - Quixadá - CE",
+    "creationDate": "2019-01-16",
+    "modificationDate": "2026-03-11",
+    "createdBy": "BARBARA",
+    "modifiedBy": "FARID",
+    "companyId": 1,
+    "companyName": "DINAMICA EMPREENDIMENTOS E SOLUCOES LTDA",
+    "costDatabaseId": 6,
+    "costDatabaseDescription": "SEINFRA 26 DES",
+    "buildingTypeId": 1,
+    "buildingTypeDescription": "CONSTRUÇÃO CIVIL",
+    "enterpriseObservation": null
   },
   {
-    "id": 33,
-    "nome": "PMC - REFORMA DE UMA QUADRA COBERTA DA ESCOLA DOMINGOS DE ABREU BRASILEIRO"
+    "id": 16,
+    "name": "IFCE CONSTRUÇÃO SALAS DE AULA E ESP. VIVÊNCIA - JAGUARIBE",
+    "commercialName": null,
+    "cnpj": "10.744.098/0018-93",
+    "type": "1",
+    "adress": "PEDRO BEZERRA DE MENEZES - 387 - MANOEL COSTA MORAIS - Jaguaribe - CE - 63475-000",
+    "creationDate": "2019-02-01",
+    "modificationDate": "2026-03-11",
+    "createdBy": "BARBARA",
+    "modifiedBy": "FARID",
+    "companyId": 1,
+    "companyName": "DINAMICA EMPREENDIMENTOS E SOLUCOES LTDA",
+    "costDatabaseId": 2,
+    "costDatabaseDescription": "SINAPI - 2018/10 - CE - Não Desonerado",
+    "buildingTypeId": 1,
+    "buildingTypeDescription": "CONSTRUÇÃO CIVIL",
+    "enterpriseObservation": null
   },
   {
-    "id": 39,
-    "nome": "PRAÇA MUNICIPAL EDWAR SILVEIRA - MORRINHOS"
+    "id": 17,
+    "name": "SEDUC REFORMA DO CEJAQUI - AQUIRAZ",
+    "commercialName": null,
+    "cnpj": "",
+    "type": "1",
+    "adress": "Aquiraz - CE",
+    "creationDate": "2019-03-12",
+    "modificationDate": "2019-10-16",
+    "createdBy": "FERNANDO",
+    "modifiedBy": "JACKSON",
+    "companyId": 1,
+    "companyName": "DINAMICA EMPREENDIMENTOS E SOLUCOES LTDA",
+    "costDatabaseId": 3,
+    "costDatabaseDescription": "SEINFRA TABELA 26",
+    "buildingTypeId": 1,
+    "buildingTypeDescription": "CONSTRUÇÃO CIVIL",
+    "enterpriseObservation": null
+  },
+  {
+    "id": 18,
+    "name": "IFCE MANUTENÇÃO PREDIAL - JAGUARUANA",
+    "commercialName": null,
+    "cnpj": "10.744.098/0001-45",
+    "type": "1",
+    "adress": "AV. DR. ANTÔNIO DA ROCHA FREITAS, Jaguaruana - CE, 62823-000 - 1548-1604 - Jaguaruana - CE - 62823-000",
+    "creationDate": "2019-03-29",
+    "modificationDate": "2026-03-11",
+    "createdBy": "BARBARA",
+    "modifiedBy": "FARID",
+    "companyId": 1,
+    "companyName": "DINAMICA EMPREENDIMENTOS E SOLUCOES LTDA",
+    "costDatabaseId": 3,
+    "costDatabaseDescription": "SEINFRA TABELA 26",
+    "buildingTypeId": 1,
+    "buildingTypeDescription": "CONSTRUÇÃO CIVIL",
+    "enterpriseObservation": null
+  },
+  {
+    "id": 19,
+    "name": "TESTE",
+    "commercialName": "",
+    "cnpj": "",
+    "type": "1",
+    "adress": "Fortaleza - CE",
+    "creationDate": "2019-04-01",
+    "modificationDate": "2026-03-11",
+    "createdBy": "FERNANDO",
+    "modifiedBy": "FARID",
+    "companyId": 1,
+    "companyName": "DINAMICA EMPREENDIMENTOS E SOLUCOES LTDA",
+    "costDatabaseId": 9,
+    "costDatabaseDescription": "MISTA",
+    "buildingTypeId": 1,
+    "buildingTypeDescription": "CONSTRUÇÃO CIVIL",
+    "enterpriseObservation": null
+  },
+  {
+    "id": 20,
+    "name": "PSJ ETE HORIZONTE ",
+    "commercialName": null,
+    "cnpj": "20.126.518/0001-83",
+    "type": "1",
+    "adress": "AV. PRESIDENTE CASTELO BRANCO - 484 - B SALA 4 - CENTRO - Horizonte - CE - 62880-060",
+    "creationDate": "2019-04-08",
+    "modificationDate": "2019-10-16",
+    "createdBy": "BARBARA",
+    "modifiedBy": "JACKSON",
+    "companyId": 1,
+    "companyName": "DINAMICA EMPREENDIMENTOS E SOLUCOES LTDA",
+    "costDatabaseId": 3,
+    "costDatabaseDescription": "SEINFRA TABELA 26",
+    "buildingTypeId": 1,
+    "buildingTypeDescription": "CONSTRUÇÃO CIVIL",
+    "enterpriseObservation": null
+  },
+  {
+    "id": 21,
+    "name": "HOSPITAL MUNICIPAL EDVAR SILVEIRA - MORRINHOS ",
+    "commercialName": null,
+    "cnpj": "11.407.938/0001-47",
+    "type": "1",
+    "adress": "AV. CORAÇÃO DE MARIA - S/N - SÃO LUIS - Morrinhos - CE - 62550-000",
+    "creationDate": "2019-05-06",
+    "modificationDate": "2020-01-23",
+    "createdBy": "BARBARA",
+    "modifiedBy": "EMILSON",
+    "companyId": 1,
+    "companyName": "DINAMICA EMPREENDIMENTOS E SOLUCOES LTDA",
+    "costDatabaseId": 8,
+    "costDatabaseDescription": "SINAPI - 2018/07 - CE - Desonerado",
+    "buildingTypeId": 1,
+    "buildingTypeDescription": "CONSTRUÇÃO CIVIL",
+    "enterpriseObservation": null
+  },
+  {
+    "id": 22,
+    "name": "IFCE MANUTENÇÃO PREDIAL - BOA VIAGEM ",
+    "commercialName": null,
+    "cnpj": "10.744.098/0031-60",
+    "type": "1",
+    "adress": "RODOVIA PRESIDENTE JUSCELINO KUBITSCHEK - S/N - KM 020 - ANAFUÊ - Boa Viagem - CE - 63780-000",
+    "creationDate": "2019-05-22",
+    "modificationDate": "2026-03-11",
+    "createdBy": "BARBARA",
+    "modifiedBy": "FARID",
+    "companyId": 1,
+    "companyName": "DINAMICA EMPREENDIMENTOS E SOLUCOES LTDA",
+    "costDatabaseId": 9,
+    "costDatabaseDescription": "MISTA",
+    "buildingTypeId": 1,
+    "buildingTypeDescription": "CONSTRUÇÃO CIVIL",
+    "enterpriseObservation": null
   },
   {
     "id": 23,
-    "nome": "IFCE MANUTENÇÃO PREDIAL - MORADA NOVA"
+    "name": "IFCE MANUTENÇÃO PREDIAL - MORADA NOVA",
+    "commercialName": null,
+    "cnpj": "10.744.098/0017-02",
+    "type": "1",
+    "adress": "AV. PREFEITO RAIMUNDO JOSÉ RABELO - 2717 - JÚLIA SANTIAGO - Morada Nova - CE - 62940-000",
+    "creationDate": "2019-06-03",
+    "modificationDate": "2020-07-17",
+    "createdBy": "BARBARA",
+    "modifiedBy": "SADJA",
+    "companyId": 1,
+    "companyName": "DINAMICA EMPREENDIMENTOS E SOLUCOES LTDA",
+    "costDatabaseId": 9,
+    "costDatabaseDescription": "MISTA",
+    "buildingTypeId": 1,
+    "buildingTypeDescription": "CONSTRUÇÃO CIVIL",
+    "enterpriseObservation": null
   },
   {
-    "id": 36,
-    "nome": "ESCRITÓRIO NOVO"
+    "id": 24,
+    "name": "\tIFCE MANUTENÇÃO PREDIAL - LIMOEIRO DO NORTE",
+    "commercialName": null,
+    "cnpj": "10.744.098/0003-07",
+    "type": "1",
+    "adress": "RUA ESTEVÃO REMÍGIO DE FREITAS - 1145 - MONSENHOR OTÁVIO - Limoeiro do Norte - CE - 62930-000",
+    "creationDate": "2019-06-17",
+    "modificationDate": "2020-01-14",
+    "createdBy": "BARBARA",
+    "modifiedBy": "EMILSON",
+    "companyId": 1,
+    "companyName": "DINAMICA EMPREENDIMENTOS E SOLUCOES LTDA",
+    "costDatabaseId": 9,
+    "costDatabaseDescription": "MISTA",
+    "buildingTypeId": 1,
+    "buildingTypeDescription": "CONSTRUÇÃO CIVIL",
+    "enterpriseObservation": null
   },
   {
-    "id": 73,
-    "nome": "VT 03 - CAMINHÃO OKR 8293"
+    "id": 25,
+    "name": "PREFEITURA - MORRINHOS - ESCOLA FNDE",
+    "commercialName": null,
+    "cnpj": "07.566.920/0001-10",
+    "type": "1",
+    "adress": "BOM JARDIM - Morrinhos - CE",
+    "creationDate": "2019-07-01",
+    "modificationDate": "2019-09-16",
+    "createdBy": "BARBARA",
+    "modifiedBy": "EMILSON",
+    "companyId": 1,
+    "companyName": "DINAMICA EMPREENDIMENTOS E SOLUCOES LTDA",
+    "costDatabaseId": 9,
+    "costDatabaseDescription": "MISTA",
+    "buildingTypeId": 1,
+    "buildingTypeDescription": "CONSTRUÇÃO CIVIL",
+    "enterpriseObservation": null
   },
   {
-    "id": 70,
-    "nome": "PREFEITURA MUNICIPAL DE CAMOCIM - CONCLUSAO CRECHE"
+    "id": 26,
+    "name": "PREFEITURA MUNICIPAL DE CAUCAIA - CRECHES",
+    "commercialName": null,
+    "cnpj": "",
+    "type": "1",
+    "adress": "Rua Alfredo Bezerra - s/n - Em frente ao numero 1427 - Conj. Metropolitado - Caucaia - CE - 61604-250",
+    "creationDate": "2019-07-21",
+    "modificationDate": "2020-03-11",
+    "createdBy": "FERNANDO",
+    "modifiedBy": "EMILSON",
+    "companyId": 1,
+    "companyName": "DINAMICA EMPREENDIMENTOS E SOLUCOES LTDA",
+    "costDatabaseId": 9,
+    "costDatabaseDescription": "MISTA",
+    "buildingTypeId": 1,
+    "buildingTypeDescription": "CONSTRUÇÃO CIVIL",
+    "enterpriseObservation": null
   },
   {
-    "id": 76,
-    "nome": "VT 01 - SAVEIRO PVZ-5019"
+    "id": 27,
+    "name": "PREFEITURA MUNICIPAL DE CAUCAIA - CONCLUSÃO ",
+    "commercialName": null,
+    "cnpj": "07.616.162/0001-06",
+    "type": "1",
+    "adress": "RODOVIA CE 090 KM 1 - 1076 - ITAMBÉ - Caucaia - CE",
+    "creationDate": "2019-08-19",
+    "modificationDate": "2019-11-01",
+    "createdBy": "BARBARA",
+    "modifiedBy": "EMILSON",
+    "companyId": 1,
+    "companyName": "DINAMICA EMPREENDIMENTOS E SOLUCOES LTDA",
+    "costDatabaseId": 3,
+    "costDatabaseDescription": "SEINFRA TABELA 26",
+    "buildingTypeId": 1,
+    "buildingTypeDescription": "CONSTRUÇÃO CIVIL",
+    "enterpriseObservation": null
   },
   {
-    "id": 78,
-    "nome": "VT 05 - SAVEIRO FWX1895"
+    "id": 28,
+    "name": "ALMOXARIFADO DINÂMICA",
+    "commercialName": null,
+    "cnpj": "",
+    "type": "1",
+    "adress": "RUA CAPITÃO GUTEMBERG - 967 - A - CIDADE DOS FUNCIONÁRIOS - Fortaleza - CE - 60823-050",
+    "creationDate": "2019-08-23",
+    "modificationDate": "2026-03-05",
+    "createdBy": "EMILSON",
+    "modifiedBy": "SARAH",
+    "companyId": 1,
+    "companyName": "DINAMICA EMPREENDIMENTOS E SOLUCOES LTDA",
+    "costDatabaseId": 9,
+    "costDatabaseDescription": "MISTA",
+    "buildingTypeId": 1,
+    "buildingTypeDescription": "CONSTRUÇÃO CIVIL",
+    "enterpriseObservation": null
   },
   {
-    "id": 79,
-    "nome": "VT 06 L200 JVA-2907"
+    "id": 29,
+    "name": "IFCE MANUTENÇÃO PREDIAL - JAGUARIBE",
+    "commercialName": null,
+    "cnpj": "",
+    "type": "1",
+    "adress": "Jaguaribe - CE",
+    "creationDate": "2019-08-26",
+    "modificationDate": "2026-03-11",
+    "createdBy": "FERNANDO",
+    "modifiedBy": "FARID",
+    "companyId": 1,
+    "companyName": "DINAMICA EMPREENDIMENTOS E SOLUCOES LTDA",
+    "costDatabaseId": 9,
+    "costDatabaseDescription": "MISTA",
+    "buildingTypeId": 1,
+    "buildingTypeDescription": "CONSTRUÇÃO CIVIL",
+    "enterpriseObservation": null
   },
   {
-    "id": 83,
-    "nome": "AMPLIAÇÃO DO HOSPITAL E MATERNIDADE LUZIA TEODORO DA COSTA NO MUNICÍPIO DE ORÓS"
+    "id": 30,
+    "name": "ITAITINGA - CONST. QUADRA COBERTA COM VESTIÁRIO",
+    "commercialName": null,
+    "cnpj": "",
+    "type": "1",
+    "adress": "Itaitinga - CE",
+    "creationDate": "2019-09-26",
+    "modificationDate": "2026-03-11",
+    "createdBy": "FERNANDO",
+    "modifiedBy": "FARID",
+    "companyId": 1,
+    "companyName": "DINAMICA EMPREENDIMENTOS E SOLUCOES LTDA",
+    "costDatabaseId": 9,
+    "costDatabaseDescription": "MISTA",
+    "buildingTypeId": 1,
+    "buildingTypeDescription": "CONSTRUÇÃO CIVIL",
+    "enterpriseObservation": null
   },
   {
-    "id": 49,
-    "nome": "IFCE MANUTENÇAO SUBESTAÇAO - CAMPUS REITORIA"
+    "id": 31,
+    "name": "PMC- REFORMA QUADRA COBERTA ESCOLA NELY CAULA DE CARVALHO",
+    "commercialName": null,
+    "cnpj": "",
+    "type": "1",
+    "adress": "RUA VALDERIZA P. DA SILVA - 514 - JUREMA - Caucaia - CE - 61623-048",
+    "creationDate": "2019-10-01",
+    "modificationDate": "2026-03-12",
+    "createdBy": "EMILSON",
+    "modifiedBy": "JACKSON",
+    "companyId": 1,
+    "companyName": "DINAMICA EMPREENDIMENTOS E SOLUCOES LTDA",
+    "costDatabaseId": 9,
+    "costDatabaseDescription": "MISTA",
+    "buildingTypeId": 1,
+    "buildingTypeDescription": "CONSTRUÇÃO CIVIL",
+    "enterpriseObservation": null
   },
   {
-    "id": 55,
-    "nome": "IFCE MANUTENÇAO SUBESTAÇAO - CAMPUS UBAJARA"
+    "id": 32,
+    "name": "PMC- REFORMA DA QUADRA COBERTA DA ESCOLA ANTONIO ALMEIDA LUSTOSA",
+    "commercialName": null,
+    "cnpj": "",
+    "type": "1",
+    "adress": "RUA PERY - 951 - PARQUE ALBANO - Caucaia - CE - 61645-270",
+    "creationDate": "2019-10-01",
+    "modificationDate": "2020-03-27",
+    "createdBy": "EMILSON",
+    "modifiedBy": "SADJA",
+    "companyId": 1,
+    "companyName": "DINAMICA EMPREENDIMENTOS E SOLUCOES LTDA",
+    "costDatabaseId": 9,
+    "costDatabaseDescription": "MISTA",
+    "buildingTypeId": 1,
+    "buildingTypeDescription": "CONSTRUÇÃO CIVIL",
+    "enterpriseObservation": null
   },
   {
-    "id": 75,
-    "nome": "VT 02 - MONTANA POP-3760"
+    "id": 33,
+    "name": "PMC - REFORMA DE UMA QUADRA COBERTA DA ESCOLA DOMINGOS DE ABREU BRASILEIRO",
+    "commercialName": null,
+    "cnpj": "",
+    "type": "1",
+    "adress": "BR 222 - KM 30 - PRIMAVERA - Caucaia - CE - 61690-990",
+    "creationDate": "2019-10-03",
+    "modificationDate": "2020-01-23",
+    "createdBy": "EMILSON",
+    "modifiedBy": "EMILSON",
+    "companyId": 1,
+    "companyName": "DINAMICA EMPREENDIMENTOS E SOLUCOES LTDA",
+    "costDatabaseId": 9,
+    "costDatabaseDescription": "MISTA",
+    "buildingTypeId": 1,
+    "buildingTypeDescription": "CONSTRUÇÃO CIVIL",
+    "enterpriseObservation": null
   },
   {
-    "id": 77,
-    "nome": "VT 04 SAVEIRO GGA4519"
-  },
-  {
-    "id": 41,
-    "nome": "ESCRITÓRIO"
-  },
-  {
-    "id": 91,
-    "nome": "REFORMA DE FÓRUM VELHO - ADEQUAÇÃO DE GABINETE - MARACANAÚ"
-  },
-  {
-    "id": 45,
-    "nome": "IFCE MANUTENÇAO SUBESTAÇAO - CAMPUS FORTALEZA"
-  },
-  {
-    "id": 92,
-    "nome": "IFCE MANUTENÇÃO PREDIAL - CRATEUS"
-  },
-  {
-    "id": 38,
-    "nome": "IFCE MANUTENÇÃO PREDIAL - CANINDÉ"
-  },
-  {
-    "id": 97,
-    "nome": "IFCE MANUTENÇÃO PREDIAL - SOBRAL"
-  },
-  {
-    "id": 96,
-    "nome": "IFCE MANUTENÇÃO PREDIAL - ACARAU"
-  },
-  {
-    "id": 101,
-    "nome": "CONSTRUÇÃO DA ESTRUTURA DOS 12 LEITOS DE UTI - COVID19 - CAUCAIA"
-  },
-  {
-    "id": 102,
-    "nome": "REFORMA DO HOSPITAL MUNICIPAL DR. JOÃO ELISIO DE HOLANDA"
+    "id": 34,
+    "name": "IFCE MANUTENÇÃO PREDIAL - QUIXADÁ 2",
+    "commercialName": null,
+    "cnpj": "",
+    "type": "1",
+    "adress": "Quixadá - CE",
+    "creationDate": "2019-10-04",
+    "modificationDate": "2026-03-11",
+    "createdBy": "FERNANDO",
+    "modifiedBy": "FARID",
+    "companyId": 1,
+    "companyName": "DINAMICA EMPREENDIMENTOS E SOLUCOES LTDA",
+    "costDatabaseId": 9,
+    "costDatabaseDescription": "MISTA",
+    "buildingTypeId": 1,
+    "buildingTypeDescription": "CONSTRUÇÃO CIVIL",
+    "enterpriseObservation": null
   },
   {
     "id": 35,
-    "nome": "ITAITINGA - PAV. PEDRA TOSCA EM RUAS GERERAÚ"
-  },
-  {
-    "id": 108,
-    "nome": "ENROCAMENTO EMERGENCIAL - CAUCAIA"
-  },
-  {
-    "id": 130,
-    "nome": "OBRAS AREA CAUCAIA"
-  },
-  {
-    "id": 111,
-    "nome": "REFORMA DOS CEMITÉRIOS PÚBLICOS EM CAUCAIA - CE"
-  },
-  {
-    "id": 110,
-    "nome": " SERVIÇOS REMANESCENTES DA CRECHE TIPO 01 - PROINFÂNCIA - TABULEIRO DO NORTE"
-  },
-  {
-    "id": 112,
-    "nome": "DUPLICAÇÃO DA ENTRADA DA CIDADE - TABULEIRO DO NORTE"
-  },
-  {
-    "id": 113,
-    "nome": "PAVIMENTAÇÃO E URBANIZAÇÃO DA AV. BEIRA RIO - MORRINHOS "
-  },
-  {
-    "id": 122,
-    "nome": "CONSTRUÇÃO DE QUADRAS - TABULEIRO DO NORTE"
-  },
-  {
-    "id": 121,
-    "nome": "PAVIMENTAÇÃO - CNT MORRINHOS"
-  },
-  {
-    "id": 123,
-    "nome": "IFCE MANUTENÇÃO PREDIAL - MARANGUAPE"
-  },
-  {
-    "id": 127,
-    "nome": "REFORMA DE ESCRITÓRIO"
-  },
-  {
-    "id": 126,
-    "nome": "REFORMA DA PRAÇA DA MATRIZ DO MUNICÍPIO DE GRANJEIRO "
-  },
-  {
-    "id": 119,
-    "nome": "CONTRUÇÃO DE 04 PRAÇAS - MORRINHOS"
-  },
-  {
-    "id": 135,
-    "nome": "3 - SOP - CONSTRUÇÃO DE CEI - MARACANAÚ "
-  },
-  {
-    "id": 129,
-    "nome": "MANUTENÇÃO NO MUNICÍPIO DE PARACURU - CE"
-  },
-  {
-    "id": 142,
-    "nome": "SERVIÇOS REMANESCENTES DA CRECHE TIPO 01 - PROINFÂNCIA - ASSARÉ"
-  },
-  {
-    "id": 143,
-    "nome": "CONSTRUÇÃO DE ESPAÇO EDUCATIVO 06 SALAS - CAMPOS SALES"
-  },
-  {
-    "id": 30001,
-    "nome": "ESCRITORIO POLY STEEL"
-  },
-  {
-    "id": 136,
-    "nome": "4 - SOP - CONSTRUÇÃO DE CEI - ICAPUÍ"
-  },
-  {
-    "id": 144,
-    "nome": "URBANIZAÇÃO DO AÇUDE DO JUNCO - CONSTRUÇÃO DE FONTE GRANJEIRO"
-  },
-  {
-    "id": 147,
-    "nome": "QUADRA POLIESPORTIVA COM COBERTURA E VESTIÁRIOS MODELO 02 - CAMPOS SALES"
-  },
-  {
-    "id": 149,
-    "nome": "REFORMA UBS JARDIM - PARACURU"
-  },
-  {
-    "id": 151,
-    "nome": "REFORMA E AMPLIAÇÃO DA ESCOLA EDMUNDO PEREIRA BARBOSA EMEIF - PARAIPABA"
-  },
-  {
-    "id": 148,
-    "nome": "CONSTRUÇÃO DE ESCOLA 12 SALAS - SENADOR POMPEU"
-  },
-  {
-    "id": 152,
-    "nome": "TJCE - REFORMA TOTAL DO FÓRUM DA COMARCA DE AURORA - TRIBUNAL DE JUSTIÇA"
-  },
-  {
-    "id": 154,
-    "nome": "ESCOLA MUNICIPAL ALDENOR PEREIRA DOS SANTOS EMEIF - PARAIPABA"
-  },
-  {
-    "id": 155,
-    "nome": "COMPLEXO ESCOLAR SETOR C1 EMEIF - PARAIPABA"
-  },
-  {
-    "id": 150,
-    "nome": "CENTRO DE EDUCAÇÃO INFANTIL FRANCISCA DOS SANTOS BARROSO - PARACURU"
-  },
-  {
-    "id": 157,
-    "nome": "CONSTRUÇÃO DE ESPAÇO EDUCATIVO 12 SALAS - CAMPOS SALES"
-  },
-  {
-    "id": 114,
-    "nome": "RAFAEL DE SÁ CRUZ"
-  },
-  {
-    "id": 124,
-    "nome": "OBRA PARCERIA - IFCE"
-  },
-  {
-    "id": 156,
-    "nome": "REFORMA DE EDIFICAÇÃO PARA IMPLANTAÇÃO DA SEDE DO RAIO - DE PENTECOSTE"
-  },
-  {
-    "id": 158,
-    "nome": "REFORMA DA CRECHE SONHOS DE CRIANÇA - POÇO DOCE - PARACURU"
-  },
-  {
-    "id": 160,
-    "nome": "QUADRA POLIESPORTIVA HENRIQUE DOMINGOS BRAGA SANDERS - PARACURU"
-  },
-  {
-    "id": 146,
-    "nome": "CENTRO DE EDUCAÇÃO INFANTIL - CEI IV - CASCAVEL"
-  },
-  {
-    "id": 159,
-    "nome": "REFORMA CALÇADÃO DA ORLA - PARACURU"
-  },
-  {
-    "id": 30002,
-    "nome": "OBRAS PARCERIA POLY STEEL"
-  },
-  {
-    "id": 162,
-    "nome": "4 - REFORMA DA ESCOLA FREI TITO DE ALENCAR LIMA - FORTALEZA"
-  },
-  {
-    "id": 165,
-    "nome": "URBANIZAÇÃO ENTRADA DA CIDADE - GRANJEIRO"
-  },
-  {
-    "id": 168,
-    "nome": "4 - REFORMA E AMPLIAÇÃO DE HOSPITAL - ASSARE"
-  },
-  {
-    "id": 169,
-    "nome": "REFORMA E ADEQUAÇÃO DO SHOWROOM DA  LOJA CLUB COSMÉTICOS"
-  },
-  {
-    "id": 170,
-    "nome": "CONSTRUÇÃO DE UM ESPAÇO EDUCATIVO 12 SALAS DE AULA - JUCAS"
-  },
-  {
-    "id": 171,
-    "nome": "CONSTRUÇÃO DE PASSAGEM MOLHADA - SÍTIO SÃO LORENZO - ASSARE"
-  },
-  {
-    "id": 172,
-    "nome": "CONSTRUÇÃO DE PASSAGEM MOLHADA - SÍTIO MARTINS - ASSARÉ"
-  },
-  {
-    "id": 177,
-    "nome": "CONSTRUÇÃO DE ESPAÇO EDUCATIVO RURAL COM 06 SALAS DE AULA - SENADOR POMPEU"
-  },
-  {
-    "id": 184,
-    "nome": "REF E AMP DA EDIFICAÇÃO DA ESCOLA SUPERIOR DA MAGISTRAT DO EST DO CEARA - ESMEC"
-  },
-  {
-    "id": 183,
-    "nome": "4 - SOP - CONSTRUÇÃO DE CEI - CANINDE"
-  },
-  {
-    "id": 187,
-    "nome": "4 - CONSTRUÇÃO DE ESCOLA VERTICAL 12 SALAS NO BAIRRO ALTO DA BRASILIA - SOBRAL"
-  },
-  {
-    "id": 185,
-    "nome": "4 - REFORMA ESCOLA MUNICIPAL JOSEFA BARROS DE ALENCAR - FORTALEZA"
-  },
-  {
-    "id": 188,
-    "nome": "OBRAS PARCERIAS TABULEIRO CRECHE"
-  },
-  {
-    "id": 190,
-    "nome": "OBRAS PARCERIAS TABULEIRO - QUADRAS"
-  },
-  {
-    "id": 194,
-    "nome": "4 - REFORMA E AMPLIAÇÃO DA ESCOLA MUNICIPAL DIOGO VITAL DE SIQUERA - FORTALEZA"
-  },
-  {
-    "id": 195,
-    "nome": "CONSTRUÇAO DE UMA ESCOLA NO DISTRITO DE MONTE ALVERNE - CRATO"
-  },
-  {
-    "id": 189,
-    "nome": "OBRAS PARCERIAS TABULEIRO - ENTRADA DA CIDADE"
-  },
-  {
-    "id": 30013,
-    "nome": "MARQUISE - UMIRIM"
-  },
-  {
-    "id": 30014,
-    "nome": "COBERTA METALICA - MADALENA"
-  },
-  {
-    "id": 174,
-    "nome": "CONSTRUÇÃO DE PASSAGEM MOLHADA - SÍTIO LAGOA (RIACHO DO DIOGO) - ASSARE"
-  },
-  {
-    "id": 198,
-    "nome": "CONSTRUÇÃO DE GALPÃO INDUSTRIAL - SENADOR POMPEU"
-  },
-  {
-    "id": 200,
-    "nome": "4 - URBANIZAÇÃO CAMPUS UNILAB"
-  },
-  {
-    "id": 30015,
-    "nome": "ESTRUTURA METÁLICA - SOLONÓPOLE"
-  },
-  {
-    "id": 201,
-    "nome": "4 - CONSTRUÇÃO DE CEI - BAIRRO MONDUBIM - FORTALEZA"
-  },
-  {
-    "id": 193,
-    "nome": "CONSTRUÇÃO DE PASSAGEM MOLHADA - SÍTIO LAGOA (AÇUDE DE WALTIM) - ASSARE"
-  },
-  {
-    "id": 175,
-    "nome": "CONSTRUÇÃO DE PASSAGEM MOLHADA - SÍTIO PEDRA PETRA- ASSARE"
-  },
-  {
-    "id": 30016,
-    "nome": "GALPÃO INDUSTRIAL - NP&P "
-  },
-  {
-    "id": 205,
-    "nome": "CONSTRUÇÃO DE BLOCO DE 04 (QUATRO) SALAS DE AULA NA REITORIA - STEEL FRAME "
-  },
-  {
-    "id": 209,
-    "nome": "IFCE - CAMOCIM - SUBESTAÇÃO - GRUPO 02"
-  },
-  {
-    "id": 234,
-    "nome": "IFCE - CAMPUS PECEM - SUBESTAÇÃO - GRUPO 01"
-  },
-  {
-    "id": 219,
-    "nome": "IFCE - CAMPUS ARACATI - SUBESTAÇÃO - GRUPO 03"
-  },
-  {
-    "id": 216,
-    "nome": "IFCE - CAMPUS TAUÁ - SUBESTAÇÃO - GRUPO 02"
-  },
-  {
-    "id": 30021,
-    "nome": "ALMOXARIFADO POLYSTEEL "
-  },
-  {
-    "id": 227,
-    "nome": "IFCE - CAMPUS CAUCAIA - SUBESTAÇÃO - GRUPO 01"
-  },
-  {
-    "id": 255,
-    "nome": "1 - SOP - CONSTRUÇÃO DE CEI - CANINDE"
-  },
-  {
-    "id": 256,
-    "nome": "1 - CONSTRUÇÃO DE ESCOLA VERTICAL 12 SALAS NO BAIRRO ALTO DA BRASILIA - SOBRAL"
-  },
-  {
-    "id": 258,
-    "nome": "1 - SOP - CONSTRUÇÃO DE CEI - ICAPUÍ"
-  },
-  {
-    "id": 261,
-    "nome": "1 - URBANIZAÇÃO CAMPUS UNILAB"
-  },
-  {
-    "id": 269,
-    "nome": "1 - CONSTRUÇÃO SEDE OPERACIONAL PRF - POCINHOS/PB"
-  },
-  {
-    "id": 262,
-    "nome": "1 - UNILAB - CONSTRUÇÃO DOS BLOCOS ANEXOS DO CAMPUS DOS MALÊS"
-  },
-  {
-    "id": 271,
-    "nome": "1 - UNIDADE DE ALIMENTAÇÃO NUTRICIONAL DO CAMPUS ACARAÚ DO IFCE"
-  },
-  {
-    "id": 217,
-    "nome": "IFCE - CAMPUS TIANGUÁ - SUBESTAÇÃO - GRUPO 02"
-  },
-  {
-    "id": 220,
-    "nome": "IFCE - CAMPUS JAGUARIBE - SUBESTAÇÃO - GRUPO 03"
-  },
-  {
-    "id": 264,
-    "nome": "2 - CONSTRUÇÃO DO TIPOS ALVENARIA E/OU LIGHT STEEL FRAME - CAMPUS CRATEUS"
-  },
-  {
-    "id": 241,
-    "nome": "IFCE - CAMPUS CRATO - SUBESTAÇÃO - GRUPO 04"
-  },
-  {
-    "id": 267,
-    "nome": "2 - CONSTRUÇÃO DO TIPOS ALVENARIA E/OU LIGHT STEEL FRAME - TABULEIRO DO NORTE"
-  },
-  {
-    "id": 222,
-    "nome": "IFCE - CAMPUS LIMOEIRO DO NORTE - SUBESTAÇÃO - GRUPO 03"
-  },
-  {
-    "id": 266,
-    "nome": "2 - CONSTRUÇÃO DO TIPOS ALVENARIA E/OU LIGHT STEEL FRAME - CAMPUS MORADA NOVA"
-  },
-  {
-    "id": 265,
-    "nome": "2 - CONSTRUÇÃO DO TIPOS ALVENARIA E/OU LIGHT STEEL FRAME - CAMPUS MARACANAU"
-  },
-  {
-    "id": 268,
-    "nome": "2 - CONSTRUÇÃO DO TIPOS ALVENARIA E/OU LIGHT STEEL FRAME - CAMPUS UBAJARA"
-  },
-  {
-    "id": 224,
-    "nome": "IFCE - CAMPUS QUIXADA - SUBESTAÇÃO - GRUPO 03"
-  },
-  {
-    "id": 211,
-    "nome": "IFCE - CAMPUS BOA VIAGEM - SUBESTAÇÃO - GRUPO 02"
-  },
-  {
-    "id": 213,
-    "nome": "IFCE - CAMPUS CRATEÚS - SUBESTAÇÃO - GRUPO 02"
-  },
-  {
-    "id": 236,
-    "nome": "IFCE - CAMPUS UMIRIM - SUBESTAÇÃO - GRUPO 01"
-  },
-  {
-    "id": 228,
-    "nome": "IFCE - CAMPUS FORTALEZA - SUBESTAÇÃO - GRUPO 01"
-  },
-  {
-    "id": 233,
-    "nome": "IFCE - CAMPUS PARACURU - SUBESTAÇÃO - GRUPO 01"
-  },
-  {
-    "id": 60002,
-    "nome": "CASACOR - BANGALÔ REFÚGIO "
-  },
-  {
-    "id": 60003,
-    "nome": "CASACOR - LOFT"
-  },
-  {
-    "id": 225,
-    "nome": "IFCE - CAMPUS TABULEIRO DO NORTE - SUBESTAÇÃO - GRUPO 03"
-  },
-  {
-    "id": 235,
-    "nome": "IFCE - CAMPUS POLO DE INOVAÇÃO - SUBESTAÇÃO - GRUPO 01"
-  },
-  {
-    "id": 237,
-    "nome": "IFCE - CAMPUS REITORIA - SUBESTAÇÃO"
-  },
-  {
-    "id": 239,
-    "nome": "IFCE - CAMPUS ACOPIARA - SUBESTAÇÃO - GRUPO 04"
-  },
-  {
-    "id": 248,
-    "nome": "CONDOMINIO RESIDENCIAL EM AQUIRAZ DE 152 UNIDADES CASAS - GENESIS"
-  },
-  {
-    "id": 212,
-    "nome": "IFCE - CAMPUS CANINDE - SUBESTAÇÃO - GRUPO 02 "
-  },
-  {
-    "id": 215,
-    "nome": "IFCE - CAMPUS SOBRAL - SUBESTAÇÃO - GRUPO 02"
-  },
-  {
-    "id": 243,
-    "nome": "IFCE - CAMPUS MOMBAÇA - SUBESTAÇÃO - GRUPO 04"
-  },
-  {
-    "id": 276,
-    "nome": "ALMOXARIFADO PROVISORIO DO GENESIS"
-  },
-  {
-    "id": 226,
-    "nome": "IFCE - CAMPUS BATURITE - SUBESTAÇÃO - GRUPO 01"
-  },
-  {
-    "id": 231,
-    "nome": "IFCE - CAMPUS MARACANAU - SUBESTAÇÃO - GRUPO 01"
-  },
-  {
-    "id": 229,
-    "nome": "IFCE - CAMPUS GUARAMIRANGA - SUBESTAÇÃO - GRUPO 01"
-  },
-  {
-    "id": 210,
-    "nome": "IFCE - CAMPUS ACARAÚ - SUBESTAÇÃO - GRUPO 02"
-  },
-  {
-    "id": 181,
-    "nome": "FIAT MOB (06) - SBB0E60"
-  },
-  {
-    "id": 218,
-    "nome": "IFCE - CAMPUS UBAJARA - SUBESTAÇÃO - GRUPO 02"
-  },
-  {
-    "id": 232,
-    "nome": "IFCE - CAMPUS MARANGUAPE - SUBESTAÇÃO - GRUPO 01"
-  },
-  {
-    "id": 221,
-    "nome": "IFCE - CAMPUS JAGUARUANA - SUBESTAÇÃO - GRUPO 03"
-  },
-  {
-    "id": 280,
-    "nome": "UNIDADE NUTRICIONAL DO CAMPUS CAUCAIA - IFCE"
-  },
-  {
-    "id": 282,
-    "nome": "UNIDADE NUTRICIONAL DO CAMPUS HORIZONTE - IFCE "
-  },
-  {
-    "id": 281,
-    "nome": "UNIDADE NUTRICIONAL DO CAMPUS PARACURU - IFCE"
-  },
-  {
-    "id": 286,
-    "nome": "UNIDADE NUTRICIONAL DO CAMPUS MORADA NOVA - IFCE"
-  },
-  {
-    "id": 287,
-    "nome": "UNIDADE NUTRICIONAL DO CAMPUS BATURITÉ - IFCE"
-  },
-  {
-    "id": 223,
-    "nome": "IFCE - CAMPUS MORADA NOVA - SUBESTAÇÃO - GRUPO 03"
-  },
-  {
-    "id": 214,
-    "nome": "IFCE - CAMPUS ITAPIPOCA - SUBESTAÇÃO - GRUPO 02"
-  },
-  {
-    "id": 238,
-    "nome": "IFCE - CAMPUS IGUATU - SUBESTAÇÃO - GRUPO 04"
-  },
-  {
-    "id": 80001,
-    "nome": "ESCRITÓRIO SMN"
-  },
-  {
-    "id": 242,
-    "nome": "IFCE - CAMPUS JUAZEIRO DO NORTE - SUBESTAÇÃO - GRUPO 04"
-  },
-  {
-    "id": 288,
-    "nome": "ALMOXARIFADO DINÂMICA - READEQUADO"
-  },
-  {
-    "id": 283,
-    "nome": "UNIDADE NUTRICIONAL DO CAMPUS TIANGUÁ - IFCE "
-  },
-  {
-    "id": 279,
-    "nome": "UNIDADE NUTRICIONAL DO CAMPUS CAMOCIM - IFCE"
-  },
-  {
-    "id": 284,
-    "nome": "UNIDADE NUTRICIONAL DO CAMPUS UBAJARA - IFCE"
-  },
-  {
-    "id": 178,
-    "nome": "SBS3J50 - CAMINHÃO PEQUENO"
-  },
-  {
-    "id": 166,
-    "nome": "CONSTRUÇÃO DE UNIDADE BASICA DE SAUDE - UBS INDIGENA - CRATEUS"
-  },
-  {
-    "id": 70002,
-    "nome": "CONDOMINIO RESIDENCIAL EM AQUIRAZ DE 152 UNIDADES CASAS - GENESIS"
-  },
-  {
-    "id": 230,
-    "nome": "IFCE - CAMPUS HORIZONTE - SUBESTAÇÃO - GRUPO 01"
-  },
-  {
-    "id": 179,
-    "nome": "SBM1B40 - CAMINHÃO GRANDE"
-  },
-  {
-    "id": 196,
-    "nome": "CENTRO DE GESTÃO INTEGRADA - CGI MUNICIPIO DE TAUA"
-  },
-  {
-    "id": 197,
-    "nome": "CONSTRUÇÃO DE 01 CRECHE TIPO II - DISTRITO CURUPIRA - OCARA CE"
-  },
-  {
-    "id": 199,
-    "nome": "CONSTRUÇÃO DE 01 CRECHE TIPO II - DISTRITO SÃO MARCOS - OCARA CE"
-  },
-  {
-    "id": 204,
-    "nome": "CONSTRUÇÃO DE 01 CRECHE TIPO II - DISTRITO DE SERENO - OCARA CE"
-  },
-  {
-    "id": 207,
-    "nome": "CONSTRUÇÃO DE 01 CRECHE TIPO II - DISTRITO SÃO PEDRO - OCARA CE"
-  },
-  {
-    "id": 20003,
-    "nome": "REFORMA SALA - IFCE MARACANAÚ"
-  },
-  {
-    "id": 20004,
-    "nome": "CASA BOULEVARD "
+    "name": "ITAITINGA - PAV. PEDRA TOSCA EM RUAS GERERAÚ",
+    "commercialName": null,
+    "cnpj": "",
+    "type": "1",
+    "adress": "RUA CJ, CJ RES ATLANTA - 145 - GERERAÚ - Itaitinga - CE - 61880-000",
+    "creationDate": "2019-10-06",
+    "modificationDate": "2020-08-31",
+    "createdBy": "FERNANDO",
+    "modifiedBy": "BARBARA",
+    "companyId": 1,
+    "companyName": "DINAMICA EMPREENDIMENTOS E SOLUCOES LTDA",
+    "costDatabaseId": 9,
+    "costDatabaseDescription": "MISTA",
+    "buildingTypeId": 1,
+    "buildingTypeDescription": "CONSTRUÇÃO CIVIL",
+    "enterpriseObservation": null
+  },
+  {
+    "id": 36,
+    "name": "ESCRITÓRIO NOVO",
+    "commercialName": null,
+    "cnpj": "",
+    "type": "1",
+    "adress": "RUA CAPITAO GUTEMBERG - 850 - CIDADE DOS FUNCIONARIOS - Fortaleza - CE - 60823-050",
+    "creationDate": "2019-10-15",
+    "modificationDate": "2026-03-05",
+    "createdBy": "EMILSON",
+    "modifiedBy": "SARAH",
+    "companyId": 1,
+    "companyName": "DINAMICA EMPREENDIMENTOS E SOLUCOES LTDA",
+    "costDatabaseId": 9,
+    "costDatabaseDescription": "MISTA",
+    "buildingTypeId": 1,
+    "buildingTypeDescription": "CONSTRUÇÃO CIVIL",
+    "enterpriseObservation": null
+  },
+  {
+    "id": 37,
+    "name": "LICITAÇÃO",
+    "commercialName": null,
+    "cnpj": "",
+    "type": "1",
+    "adress": "Fortaleza - CE",
+    "creationDate": "2019-10-22",
+    "modificationDate": "2026-03-05",
+    "createdBy": "BARBARA",
+    "modifiedBy": "SARAH",
+    "companyId": 1,
+    "companyName": "DINAMICA EMPREENDIMENTOS E SOLUCOES LTDA",
+    "costDatabaseId": 9,
+    "costDatabaseDescription": "MISTA",
+    "buildingTypeId": 1,
+    "buildingTypeDescription": "CONSTRUÇÃO CIVIL",
+    "enterpriseObservation": null
+  },
+  {
+    "id": 38,
+    "name": "IFCE MANUTENÇÃO PREDIAL - CANINDÉ",
+    "commercialName": null,
+    "cnpj": "",
+    "type": "1",
+    "adress": "RODOVIA BR 020 - KM 303 - S/N - JUBAIA - Canindé - CE - 62700-000",
+    "creationDate": "2019-10-29",
+    "modificationDate": "2020-04-07",
+    "createdBy": "FERNANDO",
+    "modifiedBy": "SANDRONEY",
+    "companyId": 1,
+    "companyName": "DINAMICA EMPREENDIMENTOS E SOLUCOES LTDA",
+    "costDatabaseId": 9,
+    "costDatabaseDescription": "MISTA",
+    "buildingTypeId": 1,
+    "buildingTypeDescription": "CONSTRUÇÃO CIVIL",
+    "enterpriseObservation": null
+  },
+  {
+    "id": 39,
+    "name": "PRAÇA MUNICIPAL EDWAR SILVEIRA - MORRINHOS",
+    "commercialName": null,
+    "cnpj": "",
+    "type": "1",
+    "adress": "PRAÇA EDWARD SILVEIRA - CENTRO - Morrinhos - CE - 62550-000",
+    "creationDate": "2019-10-31",
+    "modificationDate": "2020-11-23",
+    "createdBy": "FERNANDO",
+    "modifiedBy": "BARBARA",
+    "companyId": 1,
+    "companyName": "DINAMICA EMPREENDIMENTOS E SOLUCOES LTDA",
+    "costDatabaseId": 9,
+    "costDatabaseDescription": "MISTA",
+    "buildingTypeId": 1,
+    "buildingTypeDescription": "CONSTRUÇÃO CIVIL",
+    "enterpriseObservation": null
+  },
+  {
+    "id": 40,
+    "name": "PREFEITURA MUNICIPAL DE CAUCAIA - REF 02 QUADRAS (Mª DE LOURDES E PEDRO LAURINDO",
+    "commercialName": null,
+    "cnpj": "",
+    "type": "1",
+    "adress": "RODOVIA CE 090 - 1076 - KM 1 - ITAMBE - Caucaia - CE",
+    "creationDate": "2019-10-31",
+    "modificationDate": "2026-03-11",
+    "createdBy": "SADJA",
+    "modifiedBy": "FARID",
+    "companyId": 1,
+    "companyName": "DINAMICA EMPREENDIMENTOS E SOLUCOES LTDA",
+    "costDatabaseId": 9,
+    "costDatabaseDescription": "MISTA",
+    "buildingTypeId": 1,
+    "buildingTypeDescription": "CONSTRUÇÃO CIVIL",
+    "enterpriseObservation": null
+  },
+  {
+    "id": 41,
+    "name": "ESCRITÓRIO",
+    "commercialName": null,
+    "cnpj": "25.025.604/0001-13",
+    "type": "1",
+    "adress": "RUA CAPITÃO GUTEMBERG - 967 - CIDADE DOS FUNCIONÁRIOS - Fortaleza - CE - 60823-050",
+    "creationDate": "2019-11-04",
+    "modificationDate": "2026-03-05",
+    "createdBy": "JACKSON",
+    "modifiedBy": "SARAH",
+    "companyId": 1,
+    "companyName": "DINAMICA EMPREENDIMENTOS E SOLUCOES LTDA",
+    "costDatabaseId": 9,
+    "costDatabaseDescription": "MISTA",
+    "buildingTypeId": 1,
+    "buildingTypeDescription": "CONSTRUÇÃO CIVIL",
+    "enterpriseObservation": null
+  },
+  {
+    "id": 42,
+    "name": "LOGÍSTICA",
+    "commercialName": "",
+    "cnpj": "25.025.604/0001-13",
+    "type": "1",
+    "adress": "RUA CAPITÃO GUTEMBERG - 967 - CIDADE DOS FUNCIONÁRIOS - Fortaleza - CE - 60823-050",
+    "creationDate": "2019-11-04",
+    "modificationDate": "2026-03-11",
+    "createdBy": "JACKSON",
+    "modifiedBy": "FARID",
+    "companyId": 1,
+    "companyName": "DINAMICA EMPREENDIMENTOS E SOLUCOES LTDA",
+    "costDatabaseId": 9,
+    "costDatabaseDescription": "MISTA",
+    "buildingTypeId": 1,
+    "buildingTypeDescription": "CONSTRUÇÃO CIVIL",
+    "enterpriseObservation": null
+  },
+  {
+    "id": 43,
+    "name": "IFCE MANUTENÇÃO PREDIAL - CAUCAIA",
+    "commercialName": null,
+    "cnpj": "",
+    "type": "1",
+    "adress": "RUA FRANCISCO DA ROCHA MARTINS - S/N - PABUSSU - Caucaia - CE - 61609-090",
+    "creationDate": "2019-11-04",
+    "modificationDate": "2020-04-16",
+    "createdBy": "FERNANDO",
+    "modifiedBy": "EMILSON",
+    "companyId": 1,
+    "companyName": "DINAMICA EMPREENDIMENTOS E SOLUCOES LTDA",
+    "costDatabaseId": 9,
+    "costDatabaseDescription": "MISTA",
+    "buildingTypeId": 1,
+    "buildingTypeDescription": "CONSTRUÇÃO CIVIL",
+    "enterpriseObservation": null
+  },
+  {
+    "id": 44,
+    "name": "IFCE MANUTENÇAO SUBESTAÇAO- CAMPUS CAUCAIA",
+    "commercialName": null,
+    "cnpj": "",
+    "type": "1",
+    "adress": "Caucaia - CE",
+    "creationDate": "2019-11-07",
+    "modificationDate": "2026-03-11",
+    "createdBy": "SADJA",
+    "modifiedBy": "FARID",
+    "companyId": 1,
+    "companyName": "DINAMICA EMPREENDIMENTOS E SOLUCOES LTDA",
+    "costDatabaseId": 9,
+    "costDatabaseDescription": "MISTA",
+    "buildingTypeId": 1,
+    "buildingTypeDescription": "CONSTRUÇÃO CIVIL",
+    "enterpriseObservation": null
+  },
+  {
+    "id": 45,
+    "name": "IFCE MANUTENÇAO SUBESTAÇAO - CAMPUS FORTALEZA",
+    "commercialName": null,
+    "cnpj": "",
+    "type": "1",
+    "adress": "Av. Treze de Maio - 2081 - Benfica - Fortaleza - CE - 60040-531",
+    "creationDate": "2019-11-07",
+    "modificationDate": "2022-10-19",
+    "createdBy": "SADJA",
+    "modifiedBy": "NATALIA",
+    "companyId": 1,
+    "companyName": "DINAMICA EMPREENDIMENTOS E SOLUCOES LTDA",
+    "costDatabaseId": 9,
+    "costDatabaseDescription": "MISTA",
+    "buildingTypeId": 1,
+    "buildingTypeDescription": "CONSTRUÇÃO CIVIL",
+    "enterpriseObservation": null
+  },
+  {
+    "id": 46,
+    "name": "IFCE MANUTENÇAO SUBESTAÇAO - CAMPUS MARACANAU",
+    "commercialName": null,
+    "cnpj": "",
+    "type": "1",
+    "adress": "AVENIDA PARQUE CENTRAL - SN - DISTRITO INDUSTRIAL I - Maracanaú - CE - 61939-140",
+    "creationDate": "2019-11-07",
+    "modificationDate": "2026-03-11",
+    "createdBy": "SADJA",
+    "modifiedBy": "FARID",
+    "companyId": 1,
+    "companyName": "DINAMICA EMPREENDIMENTOS E SOLUCOES LTDA",
+    "costDatabaseId": 9,
+    "costDatabaseDescription": "MISTA",
+    "buildingTypeId": 1,
+    "buildingTypeDescription": "CONSTRUÇÃO CIVIL",
+    "enterpriseObservation": null
+  },
+  {
+    "id": 47,
+    "name": "IFCE MANUTENÇAO SUBESTAÇAO - CAMPUS MARANGUAPE",
+    "commercialName": null,
+    "cnpj": "",
+    "type": "1",
+    "adress": "Maranguape - CE",
+    "creationDate": "2019-11-07",
+    "modificationDate": "2026-03-11",
+    "createdBy": "SADJA",
+    "modifiedBy": "FARID",
+    "companyId": 1,
+    "companyName": "DINAMICA EMPREENDIMENTOS E SOLUCOES LTDA",
+    "costDatabaseId": 9,
+    "costDatabaseDescription": "MISTA",
+    "buildingTypeId": 1,
+    "buildingTypeDescription": "CONSTRUÇÃO CIVIL",
+    "enterpriseObservation": null
+  },
+  {
+    "id": 48,
+    "name": "IFCE MANUTENÇAO SUBESTAÇAO - CAMPUS PARACURU",
+    "commercialName": null,
+    "cnpj": "",
+    "type": "1",
+    "adress": "RUA DEZ - S/N - CENTRO - Paracuru - CE - 62680-000",
+    "creationDate": "2019-11-07",
+    "modificationDate": "2026-03-11",
+    "createdBy": "SADJA",
+    "modifiedBy": "FARID",
+    "companyId": 1,
+    "companyName": "DINAMICA EMPREENDIMENTOS E SOLUCOES LTDA",
+    "costDatabaseId": 9,
+    "costDatabaseDescription": "MISTA",
+    "buildingTypeId": 1,
+    "buildingTypeDescription": "CONSTRUÇÃO CIVIL",
+    "enterpriseObservation": null
+  },
+  {
+    "id": 49,
+    "name": "IFCE MANUTENÇAO SUBESTAÇAO - CAMPUS REITORIA",
+    "commercialName": null,
+    "cnpj": "",
+    "type": "1",
+    "adress": "R. Jorge Dumar - 1703 - jardim América - Fortaleza - CE - 60410-426",
+    "creationDate": "2019-11-07",
+    "modificationDate": "2022-10-19",
+    "createdBy": "SADJA",
+    "modifiedBy": "NATALIA",
+    "companyId": 1,
+    "companyName": "DINAMICA EMPREENDIMENTOS E SOLUCOES LTDA",
+    "costDatabaseId": 9,
+    "costDatabaseDescription": "MISTA",
+    "buildingTypeId": 1,
+    "buildingTypeDescription": "CONSTRUÇÃO CIVIL",
+    "enterpriseObservation": null
+  },
+  {
+    "id": 50,
+    "name": "IFCE MANUTENÇAO SUBESTAÇAO - CAMPUS UMIRIM",
+    "commercialName": null,
+    "cnpj": "",
+    "type": "1",
+    "adress": "FAZENDA FLORESTA - S/N - Umirim - CE - 62660-000",
+    "creationDate": "2019-11-07",
+    "modificationDate": "2026-03-11",
+    "createdBy": "SADJA",
+    "modifiedBy": "FARID",
+    "companyId": 1,
+    "companyName": "DINAMICA EMPREENDIMENTOS E SOLUCOES LTDA",
+    "costDatabaseId": 9,
+    "costDatabaseDescription": "MISTA",
+    "buildingTypeId": 1,
+    "buildingTypeDescription": "CONSTRUÇÃO CIVIL",
+    "enterpriseObservation": null
+  },
+  {
+    "id": 51,
+    "name": "IFCE MANUTENÇAO SUBESTAÇAO - CAMPUS BOA VIAGEM",
+    "commercialName": null,
+    "cnpj": "",
+    "type": "1",
+    "adress": "Rod. Pres. Juscelino Kubitschek, BR 020 Km 209 - S/N - IFCE - Bairro Anafuê - Boa Viagem - CE",
+    "creationDate": "2019-11-07",
+    "modificationDate": "2026-03-11",
+    "createdBy": "SADJA",
+    "modifiedBy": "FARID",
+    "companyId": 1,
+    "companyName": "DINAMICA EMPREENDIMENTOS E SOLUCOES LTDA",
+    "costDatabaseId": 9,
+    "costDatabaseDescription": "MISTA",
+    "buildingTypeId": 1,
+    "buildingTypeDescription": "CONSTRUÇÃO CIVIL",
+    "enterpriseObservation": null
+  },
+  {
+    "id": 52,
+    "name": "IFCE MANUTENÇAO SUBESTAÇAO - CAMPUS CAMOCIM",
+    "commercialName": null,
+    "cnpj": "",
+    "type": "1",
+    "adress": "RUA RAIMUNDO CALS - 2041 - CIDADE COM DEUS - Camocim - CE - 62400-000",
+    "creationDate": "2019-11-07",
+    "modificationDate": "2026-03-11",
+    "createdBy": "SADJA",
+    "modifiedBy": "FARID",
+    "companyId": 1,
+    "companyName": "DINAMICA EMPREENDIMENTOS E SOLUCOES LTDA",
+    "costDatabaseId": 9,
+    "costDatabaseDescription": "MISTA",
+    "buildingTypeId": 1,
+    "buildingTypeDescription": "CONSTRUÇÃO CIVIL",
+    "enterpriseObservation": null
+  },
+  {
+    "id": 53,
+    "name": "IFCE MANUTENÇAO SUBESTAÇAO - CAMPUS ITAPIPOCA",
+    "commercialName": null,
+    "cnpj": "",
+    "type": "1",
+    "adress": "Itapipoca - CE",
+    "creationDate": "2019-11-07",
+    "modificationDate": "2026-03-11",
+    "createdBy": "SADJA",
+    "modifiedBy": "FARID",
+    "companyId": 1,
+    "companyName": "DINAMICA EMPREENDIMENTOS E SOLUCOES LTDA",
+    "costDatabaseId": 9,
+    "costDatabaseDescription": "MISTA",
+    "buildingTypeId": 1,
+    "buildingTypeDescription": "CONSTRUÇÃO CIVIL",
+    "enterpriseObservation": null
+  },
+  {
+    "id": 54,
+    "name": "IFCE MANUTENÇAO SUBESTAÇAO - CAMPUS TAUA",
+    "commercialName": null,
+    "cnpj": "",
+    "type": "1",
+    "adress": "Tauá - CE",
+    "creationDate": "2019-11-07",
+    "modificationDate": "2026-03-11",
+    "createdBy": "SADJA",
+    "modifiedBy": "FARID",
+    "companyId": 1,
+    "companyName": "DINAMICA EMPREENDIMENTOS E SOLUCOES LTDA",
+    "costDatabaseId": 9,
+    "costDatabaseDescription": "MISTA",
+    "buildingTypeId": 1,
+    "buildingTypeDescription": "CONSTRUÇÃO CIVIL",
+    "enterpriseObservation": null
+  },
+  {
+    "id": 55,
+    "name": "IFCE MANUTENÇAO SUBESTAÇAO - CAMPUS UBAJARA",
+    "commercialName": null,
+    "cnpj": "",
+    "type": "1",
+    "adress": "RUA LUIS CUNHA - 178 - MONTE CASTELO - Ubajara - CE - 62350-000",
+    "creationDate": "2019-11-07",
+    "modificationDate": "2022-10-19",
+    "createdBy": "SADJA",
+    "modifiedBy": "NATALIA",
+    "companyId": 1,
+    "companyName": "DINAMICA EMPREENDIMENTOS E SOLUCOES LTDA",
+    "costDatabaseId": 9,
+    "costDatabaseDescription": "MISTA",
+    "buildingTypeId": 1,
+    "buildingTypeDescription": "CONSTRUÇÃO CIVIL",
+    "enterpriseObservation": null
+  },
+  {
+    "id": 56,
+    "name": "IFCE MANUTENÇAO SUBESTAÇAO - CAMPUS ARACATI",
+    "commercialName": null,
+    "cnpj": "",
+    "type": "1",
+    "adress": "Aracati - CE",
+    "creationDate": "2019-11-07",
+    "modificationDate": "2026-03-11",
+    "createdBy": "SADJA",
+    "modifiedBy": "FARID",
+    "companyId": 1,
+    "companyName": "DINAMICA EMPREENDIMENTOS E SOLUCOES LTDA",
+    "costDatabaseId": 9,
+    "costDatabaseDescription": "MISTA",
+    "buildingTypeId": 1,
+    "buildingTypeDescription": "CONSTRUÇÃO CIVIL",
+    "enterpriseObservation": null
+  },
+  {
+    "id": 57,
+    "name": "IFCE MANUTENÇAO SUBESTAÇAO - CAMPUS CEDRO",
+    "commercialName": null,
+    "cnpj": "",
+    "type": "1",
+    "adress": "Cedro - CE",
+    "creationDate": "2019-11-07",
+    "modificationDate": "2026-03-11",
+    "createdBy": "SADJA",
+    "modifiedBy": "FARID",
+    "companyId": 1,
+    "companyName": "DINAMICA EMPREENDIMENTOS E SOLUCOES LTDA",
+    "costDatabaseId": 9,
+    "costDatabaseDescription": "MISTA",
+    "buildingTypeId": 1,
+    "buildingTypeDescription": "CONSTRUÇÃO CIVIL",
+    "enterpriseObservation": null
+  },
+  {
+    "id": 58,
+    "name": "IFCE MANUTENÇAO SUBESTAÇAO - CAMPUS JAGUARIBE",
+    "commercialName": null,
+    "cnpj": "",
+    "type": "1",
+    "adress": "RUA PEDRO BEZERRA DE MENEZES - MANOEL COSTA MORAIS - Jaguaribe - CE - 63475-000",
+    "creationDate": "2019-11-07",
+    "modificationDate": "2026-03-11",
+    "createdBy": "SADJA",
+    "modifiedBy": "FARID",
+    "companyId": 1,
+    "companyName": "DINAMICA EMPREENDIMENTOS E SOLUCOES LTDA",
+    "costDatabaseId": 9,
+    "costDatabaseDescription": "MISTA",
+    "buildingTypeId": 1,
+    "buildingTypeDescription": "CONSTRUÇÃO CIVIL",
+    "enterpriseObservation": null
+  },
+  {
+    "id": 59,
+    "name": "IFCE MANUTENÇAO SUBESTAÇAO - CAMPUS JUAZEIRO DO NORTE",
+    "commercialName": null,
+    "cnpj": "",
+    "type": "1",
+    "adress": "AV PLACIDO ADERALDO PLACIDO CASTELO - 1646 - PLANALTO - Juazeiro do Norte - CE - 63040-540",
+    "creationDate": "2019-11-07",
+    "modificationDate": "2026-03-11",
+    "createdBy": "SADJA",
+    "modifiedBy": "FARID",
+    "companyId": 1,
+    "companyName": "DINAMICA EMPREENDIMENTOS E SOLUCOES LTDA",
+    "costDatabaseId": 9,
+    "costDatabaseDescription": "MISTA",
+    "buildingTypeId": 1,
+    "buildingTypeDescription": "CONSTRUÇÃO CIVIL",
+    "enterpriseObservation": null
+  },
+  {
+    "id": 60,
+    "name": "IFCE MANUTENÇAO SUBESTAÇAO - CAMPUS MORADA NOVA",
+    "commercialName": null,
+    "cnpj": "",
+    "type": "1",
+    "adress": "AV SANTOS DUMONT - S/N - JULIA SANTIAGO - Morada Nova - CE - 62940-000",
+    "creationDate": "2019-11-07",
+    "modificationDate": "2026-03-11",
+    "createdBy": "SADJA",
+    "modifiedBy": "FARID",
+    "companyId": 1,
+    "companyName": "DINAMICA EMPREENDIMENTOS E SOLUCOES LTDA",
+    "costDatabaseId": 9,
+    "costDatabaseDescription": "MISTA",
+    "buildingTypeId": 1,
+    "buildingTypeDescription": "CONSTRUÇÃO CIVIL",
+    "enterpriseObservation": null
+  },
+  {
+    "id": 61,
+    "name": "IFCE MANUTENÇAO SUBESTAÇAO - CAMPUS ACOPIARA",
+    "commercialName": null,
+    "cnpj": "",
+    "type": "1",
+    "adress": "RODOVIA CE 060, KM 332 - S/N - VILA MARTINS - Acopiara - CE - 63560-000",
+    "creationDate": "2019-11-07",
+    "modificationDate": "2026-03-11",
+    "createdBy": "SADJA",
+    "modifiedBy": "FARID",
+    "companyId": 1,
+    "companyName": "DINAMICA EMPREENDIMENTOS E SOLUCOES LTDA",
+    "costDatabaseId": 9,
+    "costDatabaseDescription": "MISTA",
+    "buildingTypeId": 1,
+    "buildingTypeDescription": "CONSTRUÇÃO CIVIL",
+    "enterpriseObservation": null
+  },
+  {
+    "id": 62,
+    "name": "IFCE MANUTENÇAO SUBESTAÇAO - CAMPUS CRATEUS",
+    "commercialName": null,
+    "cnpj": "",
+    "type": "1",
+    "adress": "AV DR. GERALDO BARBOSA MARQUES - 567 - VENANCIO - Crateús - CE - 63708-260",
+    "creationDate": "2019-11-11",
+    "modificationDate": "2026-03-11",
+    "createdBy": "EMILSON",
+    "modifiedBy": "FARID",
+    "companyId": 1,
+    "companyName": "DINAMICA EMPREENDIMENTOS E SOLUCOES LTDA",
+    "costDatabaseId": 9,
+    "costDatabaseDescription": "MISTA",
+    "buildingTypeId": 1,
+    "buildingTypeDescription": "CONSTRUÇÃO CIVIL",
+    "enterpriseObservation": null
+  },
+  {
+    "id": 63,
+    "name": "IFCE MANUTENÇÃO PREDIAL - UMIRIM",
+    "commercialName": null,
+    "cnpj": "",
+    "type": "1",
+    "adress": "ROD CE 040 - S/N - KM 137 - AEROPORTO - Aracati - CE - 62800-000",
+    "creationDate": "2019-11-11",
+    "modificationDate": "2020-04-20",
+    "createdBy": "FERNANDO",
+    "modifiedBy": "EMILSON",
+    "companyId": 1,
+    "companyName": "DINAMICA EMPREENDIMENTOS E SOLUCOES LTDA",
+    "costDatabaseId": 9,
+    "costDatabaseDescription": "MISTA",
+    "buildingTypeId": 1,
+    "buildingTypeDescription": "CONSTRUÇÃO CIVIL",
+    "enterpriseObservation": null
+  },
+  {
+    "id": 64,
+    "name": "IFCE MANUTENÇAO SUBESTAÇAO - CAMPUS QUIXADA",
+    "commercialName": null,
+    "cnpj": "",
+    "type": "1",
+    "adress": "Quixadá - CE",
+    "creationDate": "2019-11-12",
+    "modificationDate": "2026-03-11",
+    "createdBy": "SADJA",
+    "modifiedBy": "FARID",
+    "companyId": 1,
+    "companyName": "DINAMICA EMPREENDIMENTOS E SOLUCOES LTDA",
+    "costDatabaseId": 9,
+    "costDatabaseDescription": "MISTA",
+    "buildingTypeId": 1,
+    "buildingTypeDescription": "CONSTRUÇÃO CIVIL",
+    "enterpriseObservation": null
+  },
+  {
+    "id": 65,
+    "name": "IFCE MANUTENÇÃO PREDIAL - TIANGUA",
+    "commercialName": null,
+    "cnpj": "",
+    "type": "1",
+    "adress": "CE-187 - S/N - ESTÁDIO - Tianguá - CE - 62320-000",
+    "creationDate": "2019-11-13",
+    "modificationDate": "2026-03-11",
+    "createdBy": "FERNANDO",
+    "modifiedBy": "FARID",
+    "companyId": 1,
+    "companyName": "DINAMICA EMPREENDIMENTOS E SOLUCOES LTDA",
+    "costDatabaseId": 9,
+    "costDatabaseDescription": "MISTA",
+    "buildingTypeId": 1,
+    "buildingTypeDescription": "CONSTRUÇÃO CIVIL",
+    "enterpriseObservation": null
+  },
+  {
+    "id": 66,
+    "name": "IFCE MANUTENÇAO SUBESTAÇAO - CAMPUS PECEM",
+    "commercialName": null,
+    "cnpj": "",
+    "type": "1",
+    "adress": "Complexo Industrial e Portuário do Pecém Highway CE - 422 - PECEM - Caucaia - CE - 62670-000",
+    "creationDate": "2019-11-18",
+    "modificationDate": "2026-03-11",
+    "createdBy": "SADJA",
+    "modifiedBy": "FARID",
+    "companyId": 1,
+    "companyName": "DINAMICA EMPREENDIMENTOS E SOLUCOES LTDA",
+    "costDatabaseId": 9,
+    "costDatabaseDescription": "MISTA",
+    "buildingTypeId": 1,
+    "buildingTypeDescription": "CONSTRUÇÃO CIVIL",
+    "enterpriseObservation": null
+  },
+  {
+    "id": 67,
+    "name": "IFCE MANUTENÇAO SUBESTAÇAO - CAMPUS ACARAU",
+    "commercialName": null,
+    "cnpj": "",
+    "type": "1",
+    "adress": "Acaraú - CE",
+    "creationDate": "2019-11-25",
+    "modificationDate": "2026-03-11",
+    "createdBy": "EMILSON",
+    "modifiedBy": "FARID",
+    "companyId": 1,
+    "companyName": "DINAMICA EMPREENDIMENTOS E SOLUCOES LTDA",
+    "costDatabaseId": 9,
+    "costDatabaseDescription": "MISTA",
+    "buildingTypeId": 1,
+    "buildingTypeDescription": "CONSTRUÇÃO CIVIL",
+    "enterpriseObservation": null
+  },
+  {
+    "id": 68,
+    "name": "IFCE MANUTENÇAO SUBESTAÇAO - CAMPUS TIANGUA",
+    "commercialName": null,
+    "cnpj": "",
+    "type": "1",
+    "adress": "Tianguá - CE",
+    "creationDate": "2019-11-25",
+    "modificationDate": "2026-03-11",
+    "createdBy": "SADJA",
+    "modifiedBy": "FARID",
+    "companyId": 1,
+    "companyName": "DINAMICA EMPREENDIMENTOS E SOLUCOES LTDA",
+    "costDatabaseId": 9,
+    "costDatabaseDescription": "MISTA",
+    "buildingTypeId": 1,
+    "buildingTypeDescription": "CONSTRUÇÃO CIVIL",
+    "enterpriseObservation": null
+  },
+  {
+    "id": 69,
+    "name": "IFCE MANUTENÇAO SUBESTAÇAO - CAMPUS SOBRAL",
+    "commercialName": null,
+    "cnpj": "",
+    "type": "1",
+    "adress": "Av. Dr. Guarani - 317 - Derby Clube - Sobral - CE - 62042-030",
+    "creationDate": "2019-11-28",
+    "modificationDate": "2026-03-11",
+    "createdBy": "SADJA",
+    "modifiedBy": "FARID",
+    "companyId": 1,
+    "companyName": "DINAMICA EMPREENDIMENTOS E SOLUCOES LTDA",
+    "costDatabaseId": 9,
+    "costDatabaseDescription": "MISTA",
+    "buildingTypeId": 1,
+    "buildingTypeDescription": "CONSTRUÇÃO CIVIL",
+    "enterpriseObservation": null
+  },
+  {
+    "id": 70,
+    "name": "PREFEITURA MUNICIPAL DE CAMOCIM - CONCLUSAO CRECHE",
+    "commercialName": null,
+    "cnpj": "",
+    "type": "1",
+    "adress": "Rua Dr Raimundo Veras - s/n - OLINDA - Camocim - CE - 62400-000",
+    "creationDate": "2019-12-04",
+    "modificationDate": "2026-03-06",
+    "createdBy": "SADJA",
+    "modifiedBy": "JACKSON",
+    "companyId": 1,
+    "companyName": "DINAMICA EMPREENDIMENTOS E SOLUCOES LTDA",
+    "costDatabaseId": 9,
+    "costDatabaseDescription": "MISTA",
+    "buildingTypeId": 1,
+    "buildingTypeDescription": "CONSTRUÇÃO CIVIL",
+    "enterpriseObservation": null
+  },
+  {
+    "id": 71,
+    "name": "IFCE MANUTENÇAO SUBESTAÇAO - CAMPUS BATURITE",
+    "commercialName": null,
+    "cnpj": "",
+    "type": "1",
+    "adress": "Av. Ouvidor Vitóriano Soares Barbosa - 160 - Sanharão - Baturité - CE",
+    "creationDate": "2019-12-11",
+    "modificationDate": "2026-03-11",
+    "createdBy": "SADJA",
+    "modifiedBy": "FARID",
+    "companyId": 1,
+    "companyName": "DINAMICA EMPREENDIMENTOS E SOLUCOES LTDA",
+    "costDatabaseId": 9,
+    "costDatabaseDescription": "MISTA",
+    "buildingTypeId": 1,
+    "buildingTypeDescription": "CONSTRUÇÃO CIVIL",
+    "enterpriseObservation": null
+  },
+  {
+    "id": 72,
+    "name": "IFCE MANUTENÇAO SUBESTAÇAO - CAMPUS TABULEIRO DO NORTE",
+    "commercialName": null,
+    "cnpj": "",
+    "type": "1",
+    "adress": "Tabuleiro do Norte - CE",
+    "creationDate": "2019-12-18",
+    "modificationDate": "2026-03-11",
+    "createdBy": "SADJA",
+    "modifiedBy": "FARID",
+    "companyId": 1,
+    "companyName": "DINAMICA EMPREENDIMENTOS E SOLUCOES LTDA",
+    "costDatabaseId": 9,
+    "costDatabaseDescription": "MISTA",
+    "buildingTypeId": 1,
+    "buildingTypeDescription": "CONSTRUÇÃO CIVIL",
+    "enterpriseObservation": null
+  },
+  {
+    "id": 73,
+    "name": "VT 03 - CAMINHÃO OKR 8293",
+    "commercialName": null,
+    "cnpj": "",
+    "type": "1",
+    "adress": "RUA CAPITAO GUTEMBER - 967 - CIDADE DOS FUNCIONARIOS - Fortaleza - CE - 60823-050",
+    "creationDate": "2020-01-08",
+    "modificationDate": "2020-04-13",
+    "createdBy": "EMILSON",
+    "modifiedBy": "EMILSON",
+    "companyId": 1,
+    "companyName": "DINAMICA EMPREENDIMENTOS E SOLUCOES LTDA",
+    "costDatabaseId": 9,
+    "costDatabaseDescription": "MISTA",
+    "buildingTypeId": 1,
+    "buildingTypeDescription": "CONSTRUÇÃO CIVIL",
+    "enterpriseObservation": null
+  },
+  {
+    "id": 74,
+    "name": "MONTANA PRETA 0RR-5194",
+    "commercialName": null,
+    "cnpj": "",
+    "type": "1",
+    "adress": "Fortaleza - CE",
+    "creationDate": "2020-01-08",
+    "modificationDate": "2026-03-11",
+    "createdBy": "EMILSON",
+    "modifiedBy": "FARID",
+    "companyId": 1,
+    "companyName": "DINAMICA EMPREENDIMENTOS E SOLUCOES LTDA",
+    "costDatabaseId": 9,
+    "costDatabaseDescription": "MISTA",
+    "buildingTypeId": 1,
+    "buildingTypeDescription": "CONSTRUÇÃO CIVIL",
+    "enterpriseObservation": null
+  },
+  {
+    "id": 75,
+    "name": "VT 02 - MONTANA POP-3760",
+    "commercialName": null,
+    "cnpj": "",
+    "type": "1",
+    "adress": "RUA CAPITÃO GUTEMBERG - 967 - A - CIDADE DOS FUNCIONÁRIOS - Fortaleza - CE - 60823-050",
+    "creationDate": "2020-01-08",
+    "modificationDate": "2020-04-13",
+    "createdBy": "EMILSON",
+    "modifiedBy": "EMILSON",
+    "companyId": 1,
+    "companyName": "DINAMICA EMPREENDIMENTOS E SOLUCOES LTDA",
+    "costDatabaseId": 9,
+    "costDatabaseDescription": "MISTA",
+    "buildingTypeId": 1,
+    "buildingTypeDescription": "CONSTRUÇÃO CIVIL",
+    "enterpriseObservation": null
+  },
+  {
+    "id": 76,
+    "name": "VT 01 - SAVEIRO PVZ-5019",
+    "commercialName": null,
+    "cnpj": "",
+    "type": "1",
+    "adress": "RUA CAPITAO GUTEMBERG - 967 - A - CIDADE DOS FUNCIONARIOS - Fortaleza - CE - 60823-050",
+    "creationDate": "2020-01-08",
+    "modificationDate": "2020-04-13",
+    "createdBy": "EMILSON",
+    "modifiedBy": "EMILSON",
+    "companyId": 1,
+    "companyName": "DINAMICA EMPREENDIMENTOS E SOLUCOES LTDA",
+    "costDatabaseId": 9,
+    "costDatabaseDescription": "MISTA",
+    "buildingTypeId": 1,
+    "buildingTypeDescription": "CONSTRUÇÃO CIVIL",
+    "enterpriseObservation": null
+  },
+  {
+    "id": 77,
+    "name": "VT 04 SAVEIRO GGA4519",
+    "commercialName": null,
+    "cnpj": "",
+    "type": "1",
+    "adress": "RUA CAPITAO GUTEMBERG - 967 - A - CIDADE DOS FUNCIONARIOS - Fortaleza - CE - 60823-050",
+    "creationDate": "2020-01-08",
+    "modificationDate": "2026-03-05",
+    "createdBy": "EMILSON",
+    "modifiedBy": "SARAH",
+    "companyId": 1,
+    "companyName": "DINAMICA EMPREENDIMENTOS E SOLUCOES LTDA",
+    "costDatabaseId": 9,
+    "costDatabaseDescription": "MISTA",
+    "buildingTypeId": 1,
+    "buildingTypeDescription": "CONSTRUÇÃO CIVIL",
+    "enterpriseObservation": null
+  },
+  {
+    "id": 78,
+    "name": "VT 05 - SAVEIRO FWX1895",
+    "commercialName": null,
+    "cnpj": "",
+    "type": "1",
+    "adress": "RUA CAPITAO GUTEMBERG - 967 - A - CIDADE DOS FUNCIONARIOS - Fortaleza - CE - 60823-050",
+    "creationDate": "2020-01-08",
+    "modificationDate": "2026-03-05",
+    "createdBy": "EMILSON",
+    "modifiedBy": "SARAH",
+    "companyId": 1,
+    "companyName": "DINAMICA EMPREENDIMENTOS E SOLUCOES LTDA",
+    "costDatabaseId": 9,
+    "costDatabaseDescription": "MISTA",
+    "buildingTypeId": 1,
+    "buildingTypeDescription": "CONSTRUÇÃO CIVIL",
+    "enterpriseObservation": null
+  },
+  {
+    "id": 79,
+    "name": "VT 06 L200 JVA-2907",
+    "commercialName": null,
+    "cnpj": "",
+    "type": "1",
+    "adress": "RUA CAPITAO GUTEMBERG - 967 - A - CIDADE DPS FUNCIONARIOS - Fortaleza - CE - 60823-050",
+    "creationDate": "2020-01-08",
+    "modificationDate": "2020-04-13",
+    "createdBy": "EMILSON",
+    "modifiedBy": "EMILSON",
+    "companyId": 1,
+    "companyName": "DINAMICA EMPREENDIMENTOS E SOLUCOES LTDA",
+    "costDatabaseId": 9,
+    "costDatabaseDescription": "MISTA",
+    "buildingTypeId": 1,
+    "buildingTypeDescription": "CONSTRUÇÃO CIVIL",
+    "enterpriseObservation": null
+  },
+  {
+    "id": 80,
+    "name": "VT 07 MOTO PME-7113",
+    "commercialName": null,
+    "cnpj": "",
+    "type": "1",
+    "adress": "RUA CAPITAO GUTEMBERG - 967 - A - CIDADE DOS FUNCIONARIOS - Fortaleza - CE - 60823-050",
+    "creationDate": "2020-01-08",
+    "modificationDate": "2026-03-24",
+    "createdBy": "EMILSON",
+    "modifiedBy": "SARAH",
+    "companyId": 1,
+    "companyName": "DINAMICA EMPREENDIMENTOS E SOLUCOES LTDA",
+    "costDatabaseId": 9,
+    "costDatabaseDescription": "MISTA",
+    "buildingTypeId": 1,
+    "buildingTypeDescription": "CONSTRUÇÃO CIVIL",
+    "enterpriseObservation": null
+  },
+  {
+    "id": 81,
+    "name": "HILUX PNR 1985",
+    "commercialName": null,
+    "cnpj": "",
+    "type": "1",
+    "adress": "RUA CAPITAO GUTEMBERG - 967 - A - CIDADE DOS FUNCIONARIOS - Fortaleza - CE - 60823-050",
+    "creationDate": "2020-01-08",
+    "modificationDate": "2026-03-11",
+    "createdBy": "EMILSON",
+    "modifiedBy": "FARID",
+    "companyId": 1,
+    "companyName": "DINAMICA EMPREENDIMENTOS E SOLUCOES LTDA",
+    "costDatabaseId": 9,
+    "costDatabaseDescription": "MISTA",
+    "buildingTypeId": 1,
+    "buildingTypeDescription": "CONSTRUÇÃO CIVIL",
+    "enterpriseObservation": null
+  },
+  {
+    "id": 82,
+    "name": "L200  PWN 5994",
+    "commercialName": null,
+    "cnpj": "",
+    "type": "1",
+    "adress": "RUA CAPITAO GUTEMBERG - 967 - CIDADE DOS FUNCIONARIOS - Fortaleza - CE - 60823-050",
+    "creationDate": "2020-01-14",
+    "modificationDate": "2026-03-11",
+    "createdBy": "EMILSON",
+    "modifiedBy": "FARID",
+    "companyId": 1,
+    "companyName": "DINAMICA EMPREENDIMENTOS E SOLUCOES LTDA",
+    "costDatabaseId": 9,
+    "costDatabaseDescription": "MISTA",
+    "buildingTypeId": 1,
+    "buildingTypeDescription": "CONSTRUÇÃO CIVIL",
+    "enterpriseObservation": null
+  },
+  {
+    "id": 83,
+    "name": "AMPLIAÇÃO DO HOSPITAL E MATERNIDADE LUZIA TEODORO DA COSTA NO MUNICÍPIO DE ORÓS",
+    "commercialName": null,
+    "cnpj": "07.670.821/0001-84",
+    "type": "1",
+    "adress": "RUA ANTONIO AMARO COSTA - 2 - CENTRO - Orós - CE - 63520-000",
+    "creationDate": "2020-01-15",
+    "modificationDate": "2020-08-19",
+    "createdBy": "BARBARA",
+    "modifiedBy": "LARISSA",
+    "companyId": 1,
+    "companyName": "DINAMICA EMPREENDIMENTOS E SOLUCOES LTDA",
+    "costDatabaseId": 9,
+    "costDatabaseDescription": "MISTA",
+    "buildingTypeId": 1,
+    "buildingTypeDescription": "CONSTRUÇÃO CIVIL",
+    "enterpriseObservation": null
+  },
+  {
+    "id": 84,
+    "name": "IFCE MANUTENÇAO SUBESTAÇAO - CAMPUS IGUATU",
+    "commercialName": null,
+    "cnpj": "",
+    "type": "1",
+    "adress": "Iguatu - CE",
+    "creationDate": "2020-01-22",
+    "modificationDate": "2026-03-11",
+    "createdBy": "SADJA",
+    "modifiedBy": "FARID",
+    "companyId": 1,
+    "companyName": "DINAMICA EMPREENDIMENTOS E SOLUCOES LTDA",
+    "costDatabaseId": 9,
+    "costDatabaseDescription": "MISTA",
+    "buildingTypeId": 1,
+    "buildingTypeDescription": "CONSTRUÇÃO CIVIL",
+    "enterpriseObservation": null
+  },
+  {
+    "id": 85,
+    "name": "PREFEITURA MUNICIPAL DE MORRINHOS  - CENTRO DE FEIRAS",
+    "commercialName": null,
+    "cnpj": "",
+    "type": "1",
+    "adress": "Morrinhos - CE",
+    "creationDate": "2020-01-27",
+    "modificationDate": "2026-03-11",
+    "createdBy": "SADJA",
+    "modifiedBy": "FARID",
+    "companyId": 1,
+    "companyName": "DINAMICA EMPREENDIMENTOS E SOLUCOES LTDA",
+    "costDatabaseId": 9,
+    "costDatabaseDescription": "MISTA",
+    "buildingTypeId": 1,
+    "buildingTypeDescription": "CONSTRUÇÃO CIVIL",
+    "enterpriseObservation": null
+  },
+  {
+    "id": 86,
+    "name": "IFCE MANUTENÇAO SUBESTAÇAO - CAMPUS POLO",
+    "commercialName": null,
+    "cnpj": "",
+    "type": "1",
+    "adress": "Fortaleza - CE",
+    "creationDate": "2020-02-04",
+    "modificationDate": "2026-03-11",
+    "createdBy": "SADJA",
+    "modifiedBy": "FARID",
+    "companyId": 1,
+    "companyName": "DINAMICA EMPREENDIMENTOS E SOLUCOES LTDA",
+    "costDatabaseId": 9,
+    "costDatabaseDescription": "MISTA",
+    "buildingTypeId": 1,
+    "buildingTypeDescription": "CONSTRUÇÃO CIVIL",
+    "enterpriseObservation": null
+  },
+  {
+    "id": 87,
+    "name": "UNIDADE BASICA DE SAUDE (UBS) - CAUCAIA",
+    "commercialName": null,
+    "cnpj": "",
+    "type": "1",
+    "adress": "Caucaia - CE",
+    "creationDate": "2020-02-06",
+    "modificationDate": "2026-03-11",
+    "createdBy": "EMILSON",
+    "modifiedBy": "FARID",
+    "companyId": 1,
+    "companyName": "DINAMICA EMPREENDIMENTOS E SOLUCOES LTDA",
+    "costDatabaseId": 9,
+    "costDatabaseDescription": "MISTA",
+    "buildingTypeId": 1,
+    "buildingTypeDescription": "CONSTRUÇÃO CIVIL",
+    "enterpriseObservation": null
+  },
+  {
+    "id": 88,
+    "name": "IFCE MANUTENÇAO SUBESTAÇAO - CAMPUS GUARAMIRANGA",
+    "commercialName": null,
+    "cnpj": "",
+    "type": "1",
+    "adress": "Guaramiranga - CE",
+    "creationDate": "2020-02-10",
+    "modificationDate": "2026-03-11",
+    "createdBy": "EMILSON",
+    "modifiedBy": "FARID",
+    "companyId": 1,
+    "companyName": "DINAMICA EMPREENDIMENTOS E SOLUCOES LTDA",
+    "costDatabaseId": 9,
+    "costDatabaseDescription": "MISTA",
+    "buildingTypeId": 1,
+    "buildingTypeDescription": "CONSTRUÇÃO CIVIL",
+    "enterpriseObservation": null
+  },
+  {
+    "id": 89,
+    "name": "INSTITUTO FEDERAL DE EDUCAÇÃO, CIÊNCIA E TECNOLOGIA DO CEARÁ - CAMPUS LIMOEIRO",
+    "commercialName": null,
+    "cnpj": "",
+    "type": "1",
+    "adress": "Limoeiro do Norte - CE",
+    "creationDate": "2020-02-10",
+    "modificationDate": "2026-03-11",
+    "createdBy": "SADJA",
+    "modifiedBy": "FARID",
+    "companyId": 1,
+    "companyName": "DINAMICA EMPREENDIMENTOS E SOLUCOES LTDA",
+    "costDatabaseId": 9,
+    "costDatabaseDescription": "MISTA",
+    "buildingTypeId": 1,
+    "buildingTypeDescription": "CONSTRUÇÃO CIVIL",
+    "enterpriseObservation": null
+  },
+  {
+    "id": 90,
+    "name": "CRATO - CASA DE FARINHA PSJ",
+    "commercialName": null,
+    "cnpj": "",
+    "type": "1",
+    "adress": "Crato - CE",
+    "creationDate": "2020-02-18",
+    "modificationDate": "2026-03-11",
+    "createdBy": "FERNANDO",
+    "modifiedBy": "FARID",
+    "companyId": 1,
+    "companyName": "DINAMICA EMPREENDIMENTOS E SOLUCOES LTDA",
+    "costDatabaseId": 9,
+    "costDatabaseDescription": "MISTA",
+    "buildingTypeId": 1,
+    "buildingTypeDescription": "CONSTRUÇÃO CIVIL",
+    "enterpriseObservation": null
+  },
+  {
+    "id": 91,
+    "name": "REFORMA DE FÓRUM VELHO - ADEQUAÇÃO DE GABINETE - MARACANAÚ",
+    "commercialName": null,
+    "cnpj": "07.605.850/0001-62",
+    "type": "1",
+    "adress": "AVENIDA II - 150 - CENTRO ADMINISTRATIVO - CONJUNTO JEREISSATI I - Maracanaú - CE - 61900-370",
+    "creationDate": "2020-02-19",
+    "modificationDate": "2020-06-02",
+    "createdBy": "BARBARA",
+    "modifiedBy": "JOHHANESCOSTA",
+    "companyId": 1,
+    "companyName": "DINAMICA EMPREENDIMENTOS E SOLUCOES LTDA",
+    "costDatabaseId": 9,
+    "costDatabaseDescription": "MISTA",
+    "buildingTypeId": 1,
+    "buildingTypeDescription": "CONSTRUÇÃO CIVIL",
+    "enterpriseObservation": null
+  },
+  {
+    "id": 92,
+    "name": "IFCE MANUTENÇÃO PREDIAL - CRATEUS",
+    "commercialName": null,
+    "cnpj": "",
+    "type": "1",
+    "adress": "AV. DR. GERALDO BARBOSA MARQUES - 567 - VENANCIO - Crateús - CE - 63708-260",
+    "creationDate": "2020-02-21",
+    "modificationDate": "2020-12-14",
+    "createdBy": "FERNANDO",
+    "modifiedBy": "BARBARA",
+    "companyId": 1,
+    "companyName": "DINAMICA EMPREENDIMENTOS E SOLUCOES LTDA",
+    "costDatabaseId": 9,
+    "costDatabaseDescription": "MISTA",
+    "buildingTypeId": 1,
+    "buildingTypeDescription": "CONSTRUÇÃO CIVIL",
+    "enterpriseObservation": null
+  },
+  {
+    "id": 93,
+    "name": "IFCE MANUTENÇAO SUBESTAÇAO - CAMPUS CANINDE",
+    "commercialName": null,
+    "cnpj": "",
+    "type": "1",
+    "adress": "Canindé - CE",
+    "creationDate": "2020-03-03",
+    "modificationDate": "2026-03-11",
+    "createdBy": "SADJA",
+    "modifiedBy": "FARID",
+    "companyId": 1,
+    "companyName": "DINAMICA EMPREENDIMENTOS E SOLUCOES LTDA",
+    "costDatabaseId": 9,
+    "costDatabaseDescription": "MISTA",
+    "buildingTypeId": 1,
+    "buildingTypeDescription": "CONSTRUÇÃO CIVIL",
+    "enterpriseObservation": null
+  },
+  {
+    "id": 94,
+    "name": "IFCE MANUTENÇAO SUBESTAÇAO - CAMPUS CRATO",
+    "commercialName": null,
+    "cnpj": "",
+    "type": "1",
+    "adress": "Crato - CE",
+    "creationDate": "2020-03-16",
+    "modificationDate": "2026-03-11",
+    "createdBy": "SADJA",
+    "modifiedBy": "FARID",
+    "companyId": 1,
+    "companyName": "DINAMICA EMPREENDIMENTOS E SOLUCOES LTDA",
+    "costDatabaseId": 9,
+    "costDatabaseDescription": "MISTA",
+    "buildingTypeId": 1,
+    "buildingTypeDescription": "CONSTRUÇÃO CIVIL",
+    "enterpriseObservation": null
+  },
+  {
+    "id": 95,
+    "name": "IFCE MANUTENÇÃO PREDIAL - IGUATU",
+    "commercialName": null,
+    "cnpj": "",
+    "type": "4",
+    "adress": "Iguatu - CE",
+    "creationDate": "2020-03-27",
+    "modificationDate": "2026-03-11",
+    "createdBy": "EMILSON",
+    "modifiedBy": "FARID",
+    "companyId": 1,
+    "companyName": "DINAMICA EMPREENDIMENTOS E SOLUCOES LTDA",
+    "costDatabaseId": null,
+    "costDatabaseDescription": null,
+    "buildingTypeId": null,
+    "buildingTypeDescription": null,
+    "enterpriseObservation": null
+  },
+  {
+    "id": 96,
+    "name": "IFCE MANUTENÇÃO PREDIAL - ACARAU",
+    "commercialName": null,
+    "cnpj": "",
+    "type": "1",
+    "adress": "AVENIDA DESEMBARGADOR ARMANDO DE SOUZA LOUZADA - S/N - SITIO BURITI - Acaraú - CE - 62580-000",
+    "creationDate": "2020-03-31",
+    "modificationDate": "2020-04-28",
+    "createdBy": "SADJA",
+    "modifiedBy": "EMILSON",
+    "companyId": 1,
+    "companyName": "DINAMICA EMPREENDIMENTOS E SOLUCOES LTDA",
+    "costDatabaseId": 9,
+    "costDatabaseDescription": "MISTA",
+    "buildingTypeId": 1,
+    "buildingTypeDescription": "CONSTRUÇÃO CIVIL",
+    "enterpriseObservation": null
+  },
+  {
+    "id": 97,
+    "name": "IFCE MANUTENÇÃO PREDIAL - SOBRAL",
+    "commercialName": null,
+    "cnpj": "",
+    "type": "1",
+    "adress": "AVENIDA. Dr. GUARANI, - 317 - DERBY CLUB - Sobral - CE - 62042-030",
+    "creationDate": "2020-04-02",
+    "modificationDate": "2020-04-28",
+    "createdBy": "SADJA",
+    "modifiedBy": "EMILSON",
+    "companyId": 1,
+    "companyName": "DINAMICA EMPREENDIMENTOS E SOLUCOES LTDA",
+    "costDatabaseId": 9,
+    "costDatabaseDescription": "MISTA",
+    "buildingTypeId": 1,
+    "buildingTypeDescription": "CONSTRUÇÃO CIVIL",
+    "enterpriseObservation": null
+  },
+  {
+    "id": 98,
+    "name": "IFCE MANUTENÇAO SUBESTAÇAO - CAMPUS LIMOEIRO",
+    "commercialName": null,
+    "cnpj": "",
+    "type": "1",
+    "adress": "Limoeiro do Norte - CE",
+    "creationDate": "2020-04-13",
+    "modificationDate": "2026-03-11",
+    "createdBy": "SADJA",
+    "modifiedBy": "FARID",
+    "companyId": 1,
+    "companyName": "DINAMICA EMPREENDIMENTOS E SOLUCOES LTDA",
+    "costDatabaseId": 9,
+    "costDatabaseDescription": "MISTA",
+    "buildingTypeId": 1,
+    "buildingTypeDescription": "CONSTRUÇÃO CIVIL",
+    "enterpriseObservation": null
+  },
+  {
+    "id": 99,
+    "name": "IFCE MANUTENÇÃO PREDIAL - MARACANAU",
+    "commercialName": null,
+    "cnpj": "",
+    "type": "1",
+    "adress": "AV CONTORNO NORTE - S/N - DISTRITO INDUSTRIAL - Maracanaú - CE - 61936-000",
+    "creationDate": "2020-04-14",
+    "modificationDate": "2026-03-11",
+    "createdBy": "SADJA",
+    "modifiedBy": "FARID",
+    "companyId": 1,
+    "companyName": "DINAMICA EMPREENDIMENTOS E SOLUCOES LTDA",
+    "costDatabaseId": 9,
+    "costDatabaseDescription": "MISTA",
+    "buildingTypeId": 1,
+    "buildingTypeDescription": "CONSTRUÇÃO CIVIL",
+    "enterpriseObservation": null
+  },
+  {
+    "id": 100,
+    "name": "IFCE MANUTENÇÃO PREDIAL - FORTALEZA",
+    "commercialName": null,
+    "cnpj": "",
+    "type": "4",
+    "adress": "AV 13 DE MAIO - 2081 - BENFICA - Brasília - DF - 60040-531",
+    "creationDate": "2020-04-22",
+    "modificationDate": "2026-03-11",
+    "createdBy": "EMILSON",
+    "modifiedBy": "FARID",
+    "companyId": 1,
+    "companyName": "DINAMICA EMPREENDIMENTOS E SOLUCOES LTDA",
+    "costDatabaseId": null,
+    "costDatabaseDescription": null,
+    "buildingTypeId": null,
+    "buildingTypeDescription": null,
+    "enterpriseObservation": null
   }
 ]
