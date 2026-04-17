@@ -1,14 +1,15 @@
-import { useState, useEffect, useMemo, useCallback, useRef, Fragment } from 'react';
+﻿import { useState, useEffect, useMemo, useCallback, useRef, Fragment } from 'react';
 import { 
   LayoutDashboard, Bell, Filter, Download, TrendingUp, TrendingDown, 
   DollarSign, Package, Calendar as CalendarIcon, RefreshCw, 
   User as UserIcon, Building2, ChevronRight, Search, Map as MapIcon,
   Wifi, WifiOff, CheckCircle2, AlertCircle, FileText, Printer, X,
-  Menu, ChevronDown, SlidersHorizontal, Truck
+  Menu, ChevronDown, SlidersHorizontal, Truck, LogOut
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { LogisticsTab } from './components/Logistics';
+import { LogisticsTab } from './components/LogisticsTab';
 import { AccessControlTab } from './components/AccessControl';
+import { LoginScreen } from './components/LoginScreen';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -24,18 +25,23 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, 
   AreaChart, Area, Cell, PieChart, Pie, LineChart, Line, Legend
 } from 'recharts';
-import { api, Building, User, Creditor, PurchaseOrder, PriceAlert } from './lib/api';
+import { api, Building, User, Creditor, PurchaseOrder, PriceAlert, type AuthUser } from './lib/api';
 import { cn } from './lib/utils';
+import { fixText } from './lib/text';
 
 export default function App() {
+  const [sessionUser, setSessionUser] = useState<AuthUser | null>(null);
+  const [authReady, setAuthReady] = useState(false);
   const [activeTab, setActiveTab] = useState<'dashboard' | 'alerts' | 'map' | 'finance' | 'logistics' | 'access'>('dashboard');
   const [loading, setLoading] = useState(false);
+  const [syncing, setSyncing] = useState(false);
   const [apiStatus, setApiStatus] = useState<'online' | 'offline' | 'checking'>('checking');
   const [lastUpdate, setLastUpdate] = useState<Date>(new Date());
   const [startDate, setStartDate] = useState<Date | undefined>();
   const [endDate, setEndDate] = useState<Date | undefined>(new Date());
   const [isPrinting, setIsPrinting] = useState(false);
   const [newOrderAlert, setNewOrderAlert] = useState<PurchaseOrder | null>(null);
+  const [selectedAlertOrder, setSelectedAlertOrder] = useState<PurchaseOrder | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const knownOrderIdsRef = useRef<Set<number>>(new Set());
@@ -44,6 +50,7 @@ export default function App() {
   const [reportType, setReportType] = useState<ReportType>(null);
   
   const [alertSortConfig, setAlertSortConfig] = useState<{ key: 'date' | 'vlrUnit' | 'vlrAtual' | 'valorTotal', direction: 'asc' | 'desc' } | null>(null);
+  const isRestrictedUser = sessionUser?.role === 'user';
 
   const toggleSort = (key: 'date' | 'vlrUnit' | 'vlrAtual' | 'valorTotal') => {
     setAlertSortConfig(prev => {
@@ -56,8 +63,8 @@ export default function App() {
   };
 
   const renderSortIcon = (key: string) => {
-    if (alertSortConfig?.key !== key) return <span className="opacity-0 group-hover:opacity-40 transition-opacity ml-1">▼</span>;
-    return alertSortConfig.direction === 'asc' ? <span className="text-orange-500 ml-1">▲</span> : <span className="text-orange-500 ml-1">▼</span>;
+    if (alertSortConfig?.key !== key) return <span className="ml-1 opacity-0 transition-opacity group-hover:opacity-40">▼</span>;
+    return alertSortConfig.direction === 'asc' ? <span className="ml-1 text-orange-500">▲</span> : <span className="ml-1 text-orange-500">▼</span>;
   };
 
   useEffect(() => {
@@ -81,6 +88,7 @@ export default function App() {
   const [financialTitles, setFinancialTitles] = useState<any[]>([]);
   const [allFinancialTitles, setAllFinancialTitles] = useState<any[]>([]);
   const [receivableTitles, setReceivableTitles] = useState<any[]>([]);
+  const [allReceivableTitles, setAllReceivableTitles] = useState<any[]>([]);
   const [itemsDetailsMap, setItemsDetailsMap] = useState<Record<string, any>>({});
   const [latestPricesMap, setLatestPricesMap] = useState<Record<string, number>>({});
   const [baselinePricesMap, setBaselinePricesMap] = useState<Record<string, number>>({});
@@ -138,8 +146,7 @@ export default function App() {
   const [engineerDraft, setEngineerDraft] = useState('');
   const [savingEngineer, setSavingEngineer] = useState(false);
 
-  // "admin" role - change this to a real auth check once login is implemented
-  const isAdmin = true;
+  const isAdmin = sessionUser?.role === 'developer' || sessionUser?.role === 'admin';
 
   // Filter State
   const [selectedBuilding, setSelectedBuilding] = useState<string>('all');
@@ -159,20 +166,133 @@ export default function App() {
 
   const checkConnection = useCallback(async () => {
     try {
-      await api.get('/test');
-      setApiStatus('online');
-      return true;
+      const response = await api.get('/test');
+      const hasCache = Boolean(response.data?.ok || response.data?.cache?.pedidos || response.data?.cache?.financeiro || response.data?.cache?.receber);
+      setApiStatus(hasCache ? 'online' : 'offline');
+      return hasCache;
     } catch (error) {
-      console.error("Connection test failed:", error);
+      console.error('Connection test failed:', error);
       setApiStatus('offline');
       return false;
     }
   }, []);
 
+  const applyBootstrapData = useCallback((payload: any) => {
+    const bDataRaw = Array.isArray(payload?.obras) ? payload.obras : [];
+    const uDataRaw = Array.isArray(payload?.usuarios) ? payload.usuarios : [];
+    const cDataRaw = Array.isArray(payload?.credores) ? payload.credores : [];
+    const compDataRaw = Array.isArray(payload?.companies) ? payload.companies : [];
+    const rawOrdersArray = Array.isArray(payload?.pedidos) ? payload.pedidos : [];
+    const fDataRaw = Array.isArray(payload?.financeiro) ? payload.financeiro : [];
+    const rDataRaw = Array.isArray(payload?.receber) ? payload.receber : [];
+
+    const bData = bDataRaw.map((b: any) => ({
+      id: b.id,
+      name: fixText(b.nome || b.name || b.tradeName || b.enterpriseName || b.address || `Obra ${b.code || b.codigoVisivel || b.id}`),
+      code: String(b.code || b.codigoVisivel || b.id || ''),
+      latitude: typeof b.latitude === 'number' ? b.latitude : undefined,
+      longitude: typeof b.longitude === 'number' ? b.longitude : undefined,
+      address: fixText(b.endereco || b.address || b.adress),
+      companyId: b.idCompany || b.companyId,
+      engineer: fixText(b.engineer || b.responsavel || b.nomeResponsavel || b.gerente || b.engenheiro || b.responsavelTecnico || 'Aguardando Avaliação'),
+    }));
+
+    const uData = uDataRaw.map((u: any) => ({
+      id: String(u.id),
+      name: fixText(u.nome || u.name || `Usuário ${u.id}`),
+    }));
+
+    const cData = cDataRaw.map((c: any) => ({
+      id: c.id,
+      name: fixText(c.nome || c.name || c.nomeFantasia || c.creditorName || `Credor ${c.id}`),
+      cnpj: c.cnpj || c.cpfCnpj,
+    }));
+
+    setBuildings(bData);
+    setUsers(uData);
+    setCreditors(cData);
+    setCompanies(compDataRaw);
+
+    const uniqueRequesters = new Map<string, User>();
+    rawOrdersArray.forEach((o: any) => {
+      const solName = fixText(String(o.solicitante || o.requesterId || o.createdBy || '')).replace(/^Comprador\s+/i, '').trim();
+      if (solName) {
+        uniqueRequesters.set(solName, { id: solName, name: solName });
+      }
+    });
+    setRequesters(Array.from(uniqueRequesters.values()));
+
+    const allOData: PurchaseOrder[] = rawOrdersArray.map((o: any) => {
+      const dStr = o.dataEmissao || o.data || o.date || '---';
+      const d = parseISO(dStr);
+      return {
+        id: o.id || o.numero || 0,
+        buildingId: o.idObra || o.codigoVisivelObra || o.buildingId || 0,
+        buyerId: o.idComprador ? String(o.idComprador) : (o.codigoComprador ? String(o.codigoComprador) : (o.buyerId ? String(o.buyerId) : '0')),
+        date: dStr,
+        dateNumeric: isNaN(d.getTime()) ? 0 : d.getTime(),
+        totalAmount: parseFloat(o.valorTotal || o.totalAmount) || 0,
+        supplierId: o.codigoFornecedor || o.supplierId,
+        status: o.situacao || o.status || 'N/A',
+        paymentCondition: o.condicaoPagamento || o.paymentMethod || 'A Prazo',
+        deliveryDate: o.dataEntrega || o.prazoEntrega || '---',
+        internalNotes: o.internalNotes || o.observacao || '',
+        createdBy: fixText(o.nomeComprador || o.createdBy || o.criadoPor || ''),
+        requesterId: fixText(String(o.solicitante || o.requesterId || o.createdBy || '0')).replace(/^Comprador\s+/i, '').trim(),
+      };
+    });
+
+    if (knownOrderIdsRef.current.size > 0) {
+      const newOrders = allOData.filter(o => !knownOrderIdsRef.current.has(o.id));
+      if (newOrders.length > 0) {
+        setNewOrderAlert(newOrders[0]);
+      }
+    }
+    allOData.forEach(o => knownOrderIdsRef.current.add(o.id));
+
+    const allFData = fDataRaw.map((f: any) => {
+      const dStr = f.dataVencimento || f.issueDate || f.dueDate || f.dataVencimentoProjetado || f.dataEmissao || f.dataContabil || '---';
+      const d = parseISO(dStr);
+      return {
+        id: f.id || f.numero || f.codigoTitulo || f.documentNumber || 0,
+        buildingId: f.idObra || f.codigoObra || f.enterpriseId || f.buildingId || 0,
+        description: fixText(f.descricao || f.historico || f.tipoDocumento || f.notes || f.observacao || 'Título a Pagar'),
+        creditorName: fixText(f.nomeCredor || f.creditorName || f.nomeFantasiaCredor || f.fornecedor || f.credor || 'Credor sem nome'),
+        _rawCreditorId: String(f.creditorId || f.debtorId || ''),
+        dueDate: dStr,
+        dueDateNumeric: isNaN(d.getTime()) ? 0 : d.getTime(),
+        amount: parseFloat(f.totalInvoiceAmount || f.valor || f.amount || f.valorTotal || f.valorLiquido || f.valorBruto) || 0,
+        status: f.situacao || f.status || 'Pendente',
+      };
+    });
+
+    const allRData = rDataRaw.map((r: any) => {
+      const dStr = r.data || r.date || r.dataVencimento || r.dataEmissao || r.issueDate || r?.dataVencimentoProjetado || '---';
+      const d = parseISO(dStr);
+      return {
+        id: r.id || r.numero || r.numeroTitulo || r.codigoTitulo || r.documentNumber || 0,
+        buildingId: r.idObra || r.codigoObra || r.buildingId || 0,
+        description: fixText(r.descricao || r.historico || r.observacao || r.notes || r.description || 'Título a Receber'),
+        clientName: fixText(r.nomeCliente || r.nomeFantasiaCliente || r.cliente || r.clientName || 'Extrato/Cliente'),
+        dueDate: dStr,
+        dueDateNumeric: isNaN(d.getTime()) ? 0 : d.getTime(),
+        amount: parseFloat(r.value || r.valor || r.valorSaldo || r.totalInvoiceAmount || r.valorTotal || r.amount) || 0,
+        status: String(r.situacao || r.status || 'ABERTO').toUpperCase(),
+      };
+    });
+
+    setItemsDetailsMap(payload?.itensPedidos || {});
+    setAllOrders(allOData);
+    setAllFinancialTitles(allFData);
+    setAllReceivableTitles(allRData);
+    setLastUpdate(new Date());
+    setApiStatus('online');
+  }, []);
+
   const fetchInitialData = useCallback(async () => {
     setLoading(true);
     setApiStatus('checking');
-    
+
     const isConnected = await checkConnection();
     if (!isConnected) {
       setLoading(false);
@@ -180,68 +300,44 @@ export default function App() {
     }
 
     try {
-      const [bRes, uRes, cRes, compRes] = await Promise.allSettled([
-        api.get('/obras'),
-        api.get('/usuarios'),
-        api.get('/credores'),
-        api.get('/companies')
-      ]);
-      
-      const bDataRaw = bRes.status === 'fulfilled' && bRes.value.data ? (bRes.value.data.results || bRes.value.data) : [];
-      const uDataRaw = uRes.status === 'fulfilled' && uRes.value.data ? (uRes.value.data.results || uRes.value.data) : [];
-      const cDataRaw = cRes.status === 'fulfilled' && cRes.value.data ? (cRes.value.data.results || cRes.value.data) : [];
-      const compDataRaw = compRes.status === 'fulfilled' && compRes.value.data ? (compRes.value.data.results || compRes.value.data) : [];
-
-      const bData = Array.isArray(bDataRaw) ? bDataRaw.map((b: any) => ({
-        id: b.id,
-        name: b.nome || b.name || `Obra ${b.id}`,
-        latitude: b.latitude || -23.5505 + (Math.random() - 0.5) * 0.1,
-        longitude: b.longitude || -46.6333 + (Math.random() - 0.5) * 0.1,
-        address: b.endereco || b.address,
-        companyId: b.idCompany,
-        engineer: b.responsavel || b.nomeResponsavel || b.gerente || b.engenheiro || b.responsavelTecnico || "Aguardando Avaliação"
-      })) : [];
-
-      const uData = Array.isArray(uDataRaw) ? uDataRaw.map((u: any) => ({
-        id: String(u.id),
-        name: u.nome || u.name || `Usuário ${u.id}`
-      })) : [];
-
-      const cData = Array.isArray(cDataRaw) ? cDataRaw.map((c: any) => ({
-        id: c.id,
-        name: c.nome || c.name || `Credor ${c.id}`,
-        cnpj: c.cnpj || c.cpfCnpj
-      })) : [];
-
-      setBuildings(bData);
-      setUsers(uData);
-      setCreditors(cData);
-      setCompanies(Array.isArray(compDataRaw) ? compDataRaw : []);
-      
-      // Only set online if we actually got some arrays back
-      if (Array.isArray(bDataRaw) || Array.isArray(uDataRaw) || Array.isArray(cDataRaw)) {
-        setApiStatus('online');
-      } else {
-        setApiStatus('offline');
-      }
-      
-      const itemsRes = await api.get('/itens-pedidos').catch(() => null);
-      if (itemsRes && itemsRes.data) {
-        setItemsDetailsMap(itemsRes.data);
-      }
-      
-      await refreshData();
+      const response = await api.get('/bootstrap');
+      applyBootstrapData(response.data);
     } catch (error) {
-      console.error("Error fetching initial data:", error);
+      console.error('Error fetching initial data:', error);
       setApiStatus('offline');
       setBuildings([]);
       setUsers([]);
       setCreditors([]);
-      await refreshData();
+      setOrders([]);
+      setFinancialTitles([]);
+      setReceivableTitles([]);
     } finally {
       setLoading(false);
     }
-  }, [startDate, endDate, selectedBuilding, selectedUser]);
+  }, [applyBootstrapData, checkConnection]);
+
+  const handleLogin = useCallback((user: AuthUser) => {
+    localStorage.setItem('dinamica_session', JSON.stringify(user));
+    setSessionUser(user);
+  }, []);
+
+  const handleLogout = useCallback(() => {
+    localStorage.removeItem('dinamica_session');
+    setSessionUser(null);
+  }, []);
+
+  const availableTabs = useMemo(() => (
+    isRestrictedUser
+      ? [{ id: 'logistics', label: 'Logística', icon: Truck }]
+      : [
+          { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+          { id: 'finance', label: 'Financeiro', icon: DollarSign },
+          { id: 'alerts', label: 'Alertas', icon: Bell },
+          { id: 'map', label: 'Mapa de Obras', icon: MapIcon },
+          { id: 'logistics', label: 'Logística', icon: Truck },
+          { id: 'access', label: 'Acessos', icon: UserIcon },
+        ]
+  ), [isRestrictedUser]);
 
   useEffect(() => {
     if (activeTab === 'alerts' && orders.length > 0) {
@@ -261,9 +357,9 @@ export default function App() {
   }, [activeTab, orders, itemsDetailsMap]);
 
   useEffect(() => {
-    if (allOrders.length === 0) return;
+    if (orders.length === 0) return;
     const historyMap: Record<string, any[]> = {};
-    allOrders.forEach(o => {
+    orders.forEach(o => {
       const items = itemsDetailsMap[o.id];
       if (!items) return;
       items.forEach((it: any) => {
@@ -278,37 +374,28 @@ export default function App() {
 
     const pricesMap: Record<string, number> = {};
     const baseMap: Record<string, number> = {};
-    
+
     Object.keys(historyMap).forEach(desc => {
       const purchases = historyMap[desc].sort((a,b) => parseISO(a.date).getTime() - parseISO(b.date).getTime());
       pricesMap[desc] = purchases[purchases.length - 1].price;
-      
-      const beforeFilter = purchases.filter(p => {
-        const d = parseISO(p.date);
-        return isNaN(d.getTime()) ? false : (startDate ? d <= addDays(startDate, 1) : true);
-      });
-      if (beforeFilter.length > 0) {
-        baseMap[desc] = beforeFilter[beforeFilter.length - 1].price;
-      } else {
-        baseMap[desc] = purchases[0].price;
-      }
+      baseMap[desc] = purchases[0].price;
     });
     setLatestPricesMap(pricesMap);
     setBaselinePricesMap(baseMap);
-  }, [allOrders, itemsDetailsMap, startDate]);
+  }, [orders, itemsDetailsMap]);
 
   const syncSienge = async () => {
-    setLoading(true);
+    setSyncing(true);
     setApiStatus('checking');
     try {
       await api.post('/sync');
       await refreshData();
       setApiStatus('online');
     } catch (e) {
-      console.error("Sync error:", e);
+      console.error('Sync error:', e);
       setApiStatus('offline');
     } finally {
-      setLoading(false);
+      setSyncing(false);
     }
   };
 
@@ -321,177 +408,10 @@ export default function App() {
     }
 
     try {
-      const [ordersRes, financeRes, receivableRes] = await Promise.allSettled([
-        api.get('/pedidos-compra', { params: { limit: 5000 } }),
-        api.get('/financeiro', { params: { limit: 5000 } }),
-        api.get('/financeiro/receber', { params: { limit: 5000 } })
-      ]);
-
-      let oDataRaw = ordersRes.status === 'fulfilled' && ordersRes.value.data ? (ordersRes.value.data.results || ordersRes.value.data) : [];
-      let fDataRaw = financeRes.status === 'fulfilled' && financeRes.value.data ? (financeRes.value.data.results || financeRes.value.data) : [];
-      let rDataRaw = receivableRes.status === 'fulfilled' && receivableRes.value.data ? (receivableRes.value.data.results || receivableRes.value.data) : [];
-
-      const rawOrdersArray = Array.isArray(oDataRaw) ? oDataRaw : [];
-      
-      // Auto-reconstruir catálogos caso a Sienge esteja bloqueando endpoints /obras ou /usuarios
-      if (rawOrdersArray.length > 0) {
-        const uniqueBuildings = new Map<string, Building>();
-        const uniqueUsers = new Map<string, User>();
-        const uniqueRequesters = new Map<string, User>();
-        
-        rawOrdersArray.forEach((o: any) => {
-          const bId = Number(o.idObra || o.codigoVisivelObra || o.buildingId);
-          if (bId && !uniqueBuildings.has(String(bId))) {
-            uniqueBuildings.set(String(bId), { id: bId, name: o.nomeObra || `Obra ${bId}`, latitude: 0, longitude: 0, address: '', companyId: 0, engineer: '' });
-          }
-          const uId = String(o.idComprador || o.codigoComprador || o.buyerId || "0");
-          if (uId && uId !== "0" && !uniqueUsers.has(uId)) {
-            uniqueUsers.set(uId, { id: uId, name: o.nomeComprador || o.nomeUsuario || o.buyerName || `Comprador ${uId}` });
-          }
-          // Prioridade: solicitante (requesterUser da Solicitação de Compra Sienge) -> fallback comprador
-          const solName = o.solicitante || o.nomeSolicitante || o.createdBy || "";
-          if (solName && !uniqueRequesters.has(solName)) {
-            uniqueRequesters.set(solName, { id: solName, name: solName });
-          }
-        });
-        
-        if (buildings.length === 0 && uniqueBuildings.size > 0) setBuildings(Array.from(uniqueBuildings.values()));
-        if (users.length === 0 && uniqueUsers.size > 0) setUsers(Array.from(uniqueUsers.values()));
-        // Sempre atualiza solicitantes pois novos podem surgir do cache da Sienge
-        if (uniqueRequesters.size > 0) setRequesters(Array.from(uniqueRequesters.values()));
-      }
-
-      // Mapping Raw Data First (All-Time Data)
-      const allOData: PurchaseOrder[] = rawOrdersArray.map((o: any) => {
-        const dStr = o.dataEmissao || o.data || o.date || "---";
-        const d = parseISO(dStr);
-        return {
-          id: o.id || o.numero || 0,
-          buildingId: o.idObra || o.codigoVisivelObra || o.buildingId || 0,
-          buyerId: o.idComprador ? String(o.idComprador) : (o.codigoComprador ? String(o.codigoComprador) : (o.buyerId ? String(o.buyerId) : "0")),
-          date: dStr,
-          dateNumeric: isNaN(d.getTime()) ? 0 : d.getTime(),
-          totalAmount: parseFloat(o.valorTotal || o.totalAmount) || 0,
-          supplierId: o.codigoFornecedor || o.supplierId,
-          status: o.situacao || o.status || 'N/A',
-          paymentCondition: o.condicaoPagamento || o.paymentMethod || 'A Prazo',
-          deliveryDate: o.dataEntrega || o.prazoEntrega || '---',
-          internalNotes: o.internalNotes || o.observacao || "",
-          createdBy: o.createdBy || o.criadoPor || "",
-          // 'solicitante' é preenchido pelo server.ts via requesterUser da Solicitação de Compra
-          // Se não existir (compra direta sem solicitação), cai no createdBy (comprador)
-          requesterId: o.solicitante || o.requesterId || o.createdBy || "0"
-        };
-      });
-
-      // --- LOGIC FOR NEW ORDER POPUP ---
-      if (knownOrderIdsRef.current.size > 0) {
-        const newOrders = allOData.filter(o => !knownOrderIdsRef.current.has(o.id));
-        if (newOrders.length > 0) {
-          setNewOrderAlert(newOrders[0]); 
-        }
-      }
-      allOData.forEach(o => knownOrderIdsRef.current.add(o.id));
-      // ---------------------------------
-
-      const allFData = (Array.isArray(fDataRaw) ? fDataRaw : []).map((f: any) => {
-        const dStr = f.dataVencimento || f.issueDate || f.dueDate || f.dataVencimentoProjetado || f.dataEmissao || f.dataContabil || "---";
-        const d = parseISO(dStr);
-        const creditorId = String(f.creditorId || f.debtorId || '');
-        const creditorNameResolved = creditorMap[creditorId] || f.nomeCredor || f.nomeFantasiaCredor || f.fornecedor || f.creditorName || f.credor || (creditorId ? `Credor ${creditorId}` : 'N/A');
-        return {
-          id: f.id || f.numero || f.codigoTitulo || f.documentNumber || 0,
-          buildingId: f.idObra || f.codigoObra || f.enterpriseId || 0,
-          description: f.descricao || f.historico || f.tipoDocumento || f.notes || f.observacao || 'Título a Pagar',
-          creditorName: creditorNameResolved,
-          _rawCreditorId: creditorId,
-          dueDate: dStr,
-          dueDateNumeric: isNaN(d.getTime()) ? 0 : d.getTime(),
-          amount: parseFloat(f.totalInvoiceAmount || f.valor || f.amount || f.valorTotal || f.valorLiquido || f.valorBruto) || 0,
-          status: f.situacao || f.status || 'Pendente',
-        };
-      });
-
-
-      const allRData = (Array.isArray(rDataRaw) ? rDataRaw : []).map((r: any) => {
-        const dStr = r.data || r.date || r.dataVencimento || r.dataEmissao || r.issueDate || r?.dataVencimentoProjetado || "---";
-        const d = parseISO(dStr);
-        return {
-          id: r.id || r.numero || r.numeroTitulo || r.codigoTitulo || r.documentNumber || 0,
-          buildingId: r.idObra || r.codigoObra || 0,
-          description: r.descricao || r.historico || r.observacao || r.notes || r.description || 'Título a Receber',
-          clientName: r.nomeCliente || r.nomeFantasiaCliente || r.cliente || r.clientName || 'Extrato/Cliente',
-          dueDate: dStr,
-          dueDateNumeric: isNaN(d.getTime()) ? 0 : d.getTime(),
-          amount: parseFloat(r.value || r.valor || r.valorSaldo || r.totalInvoiceAmount || r.valorTotal || r.amount) || 0,
-          status: String(r.situacao || r.status || 'ABERTO').toUpperCase(),
-        };
-      });
-
-      // Apply Local Filters for Dashboard Tables (Date/Building Selection)
-      const startDateNum = startDate ? startDate.getTime() : null;
-      const endDateNum = startDate ? addDays(endDate || new Date(), 1).getTime() : null;
-
-      const filteredOData = allOData.filter((o) => {
-        const inDate = startDateNum ? (o.dateNumeric !== 0 && o.dateNumeric! >= startDateNum && o.dateNumeric! <= endDateNum!) : true;
-        const inBuilding = selectedBuilding === 'all' || String(o.buildingId) === selectedBuilding;
-        const inUser = selectedUser === 'all' || String(o.buyerId) === selectedUser;
-        const inRequester = selectedRequester === 'all' || String(o.requesterId) === selectedRequester || o.requesterId === selectedRequester;
-        return inDate && inBuilding && inUser && inRequester;
-      }).sort((a, b) => (b.dateNumeric || 0) - (a.dateNumeric || 0));
-
-      const filteredFData = allFData.filter((f) => {
-        const inDate = startDateNum ? (f.dueDateNumeric !== 0 && f.dueDateNumeric >= startDateNum && f.dueDateNumeric <= endDateNum!) : true;
-        const inBuilding = selectedBuilding === 'all' || String(f.buildingId) === selectedBuilding;
-        return inDate && inBuilding;
-      });
-
-      const filteredRData = allRData.filter((r) => {
-        const inDate = startDateNum ? (r.dueDateNumeric !== 0 && r.dueDateNumeric >= startDateNum && r.dueDateNumeric <= endDateNum!) : true;
-        const inBuilding = selectedBuilding === 'all' || String(r.buildingId) === selectedBuilding;
-        return inDate && inBuilding;
-      });
-
-      setAllOrders(allOData);
-      setAllFinancialTitles(allFData);
-      
-      setOrders(filteredOData);
-      setFinancialTitles(filteredFData);
-      setReceivableTitles(filteredRData);
-
-      // Fetch items for the most recent orders (limit to 15 for performance)
-      const ordersWithItems = [...filteredOData];
-      const ordersToFetchItems = ordersWithItems.slice(0, 15);
-      
-      await Promise.all(ordersToFetchItems.map(async (order) => {
-        try {
-          const itemsRes = await api.get(`/pedidos-compra/${order.id}/itens`);
-          const itemsRaw = itemsRes.data.results || itemsRes.data;
-          if (Array.isArray(itemsRaw)) {
-            order.items = itemsRaw.map((item: any) => ({
-              id: item.id,
-              description: item.descricao || item.itemNome || 'Item',
-              quantity: item.quantidade || 0,
-              unitPrice: item.valorUnitario || 0,
-              totalPrice: item.valorTotal || 0,
-              unit: item.unidadeMedidaSigla || 'UN'
-            }));
-          }
-        } catch (e) {
-          console.warn(`Could not fetch items for order ${order.id}`);
-        }
-      }));
-
-      setOrders(ordersWithItems);
-      
-      if (Array.isArray(oDataRaw) || Array.isArray(fDataRaw) || Array.isArray(rDataRaw)) {
-        setLastUpdate(new Date());
-        setApiStatus('online');
-      } else {
-        throw new Error("API returned non-array data");
-      }
+      const response = await api.get('/bootstrap');
+      applyBootstrapData(response.data);
     } catch (error) {
-      console.error("Error refreshing data:", error);
+      console.error('Error refreshing data:', error);
       setOrders([]);
       setFinancialTitles([]);
       setReceivableTitles([]);
@@ -503,7 +423,7 @@ export default function App() {
   // Memoized lookup maps - rebuilt whenever master lists change
   const buildingMap = useMemo(() => {
     const m: Record<string, string> = {};
-    buildings.forEach(b => { m[String(b.id)] = b.name; });
+    buildings.forEach(b => { m[String(b.id)] = b.name; if (b.code) m[String(b.code)] = b.name; });
     return m;
   }, [buildings]);
 
@@ -513,14 +433,118 @@ export default function App() {
     return m;
   }, [creditors]);
 
+  const userMap = useMemo(() => {
+    const m: Record<string, string> = {};
+    users.forEach(u => { m[String(u.id)] = u.name; });
+    return m;
+  }, [users]);
+
+  const toStartOfDay = useCallback((value: Date) => (
+    new Date(value.getFullYear(), value.getMonth(), value.getDate()).getTime()
+  ), []);
+
+  const dateRange = useMemo(() => {
+    const start = startDate ? toStartOfDay(startDate) : null;
+    const effectiveEndDate = endDate || startDate || null;
+    const endExclusive = effectiveEndDate ? addDays(new Date(
+      effectiveEndDate.getFullYear(),
+      effectiveEndDate.getMonth(),
+      effectiveEndDate.getDate()
+    ), 1).getTime() : null;
+    return { start, endExclusive };
+  }, [endDate, startDate, toStartOfDay]);
+
+  const matchesDateRange = useCallback((numericValue?: number) => {
+    if (!dateRange.start && !dateRange.endExclusive) return true;
+    if (!numericValue || numericValue === 0) return false;
+    if (dateRange.start !== null && numericValue < dateRange.start) return false;
+    if (dateRange.endExclusive !== null && numericValue >= dateRange.endExclusive) return false;
+    return true;
+  }, [dateRange]);
+
+  const selectedBuildingAliases = useMemo(() => {
+    if (selectedBuilding === 'all') return new Set<string>();
+    const selected = buildings.find((building) => String(building.id) === selectedBuilding || String(building.code) === selectedBuilding);
+    return new Set(
+      [selectedBuilding, selected?.id != null ? String(selected.id) : '', selected?.code ? String(selected.code) : '']
+        .filter(Boolean)
+    );
+  }, [buildings, selectedBuilding]);
+
+  const matchesBuildingFilter = useCallback((buildingId?: string | number) => {
+    if (selectedBuilding === 'all') return true;
+    return selectedBuildingAliases.has(String(buildingId ?? ''));
+  }, [selectedBuilding, selectedBuildingAliases]);
+
+  const buildingOptions = useMemo(() => {
+    if (!dateRange.start && !dateRange.endExclusive) return buildings;
+
+    const activeIds = new Set<string>();
+    allOrders.forEach(o => {
+      if (matchesDateRange(o.dateNumeric)) activeIds.add(String(o.buildingId));
+    });
+    allFinancialTitles.forEach(f => {
+      if (matchesDateRange(f.dueDateNumeric)) activeIds.add(String(f.buildingId));
+    });
+    allReceivableTitles.forEach(r => {
+      if (matchesDateRange(r.dueDateNumeric)) activeIds.add(String(r.buildingId));
+    });
+
+    return buildings.filter(b => activeIds.has(String(b.id)) || Boolean(b.code && activeIds.has(String(b.code))));
+  }, [allFinancialTitles, allOrders, allReceivableTitles, buildings, dateRange.endExclusive, dateRange.start, matchesDateRange]);
+
+  const ordersForUserOptions = useMemo(() => {
+    return allOrders.filter(o => {
+      const inDate = matchesDateRange(o.dateNumeric);
+      const inBuilding = matchesBuildingFilter(o.buildingId);
+      const inRequester = selectedRequester === 'all' || String(o.requesterId) === selectedRequester || o.requesterId === selectedRequester;
+      return inDate && inBuilding && inRequester;
+    });
+  }, [allOrders, matchesBuildingFilter, matchesDateRange, selectedRequester]);
+
+  const ordersForRequesterOptions = useMemo(() => {
+    return allOrders.filter(o => {
+      const inDate = matchesDateRange(o.dateNumeric);
+      const inBuilding = matchesBuildingFilter(o.buildingId);
+      const inUser = selectedUser === 'all' || String(o.buyerId) === selectedUser;
+      return inDate && inBuilding && inUser;
+    });
+  }, [allOrders, matchesBuildingFilter, matchesDateRange, selectedUser]);
+
+  const availableUsers = useMemo(() => {
+    const seen = new Map<string, User>();
+    ordersForUserOptions.forEach((o) => {
+      const id = String(o.buyerId || '');
+      if (!id || id === '0' || id === 'undefined') return;
+      seen.set(id, { id, name: userMap[id] || (o as any).nomeComprador || (o as any).buyerName || `Comprador ${id}` });
+    });
+    return Array.from(seen.values()).sort((a, b) => a.name.localeCompare(b.name));
+  }, [ordersForUserOptions, userMap]);
+
+  const availableRequesters = useMemo(() => {
+    const seen = new Map<string, User>();
+    ordersForRequesterOptions.forEach((o) => {
+      const id = String(o.requesterId || (o as any).solicitante || '');
+      if (!id || id === '0' || id === 'undefined') return;
+      const requesterName = fixText(String((o as any).solicitante || (o as any).nomeSolicitante || userMap[id] || id)).replace(/^Comprador\\s+/i, '').trim();
+      seen.set(id, { id, name: requesterName || id });
+    });
+    return Array.from(seen.values()).sort((a, b) => a.name.localeCompare(b.name));
+  }, [ordersForRequesterOptions, userMap]);
+
   const resolveBuildingName = (o: any): string => {
     const id = String(o.buildingId || o.enterpriseId || o.idObra || '');
-    return buildingMap[id] || o.nomeObra || o.enterpriseName || (id ? `Obra ${id}` : 'N/A');
+    return fixText(buildingMap[id] || o.nomeObra || o.enterpriseName || 'Obra sem nome');
   };
 
   const resolveCreditorName = (o: any): string => {
     const id = String(o.supplierId || o.creditorId || o.idCredor || o.codigoFornecedor || '');
-    return creditorMap[id] || o.nomeFornecedor || o.supplierName || o.creditorName || (id ? `Credor ${id}` : 'N/A');
+    return fixText(creditorMap[id] || o.nomeFornecedor || o.supplierName || o.creditorName || 'Credor sem nome');
+  };
+
+  const resolveUserName = (id?: string, fallback?: string): string => {
+    if (!id || id === '0' || id === 'undefined') return fallback || 'N/A';
+    return userMap[String(id)] || fallback || String(id);
   };
 
   // Re-resolve creditor names whenever the creditor list loads (fixes the race with refreshData)
@@ -536,22 +560,122 @@ export default function App() {
   }, [creditorMap]);
 
   useEffect(() => {
-    fetchInitialData();
+    if (startDate && endDate && endDate < startDate) {
+      setEndDate(startDate);
+    }
+  }, [endDate, startDate]);
 
-    
-    // Agora o Client Puxa passivamente o cache em background a cada 20min (o servidor atualiza pesado autonomamente)
+  useEffect(() => {
+    if (selectedBuilding !== 'all' && !buildingOptions.some((b) => String(b.id) === selectedBuilding)) {
+      setSelectedBuilding('all');
+    }
+  }, [buildingOptions, selectedBuilding]);
+
+  useEffect(() => {
+    if (selectedUser !== 'all' && !availableUsers.some((u) => String(u.id) === selectedUser)) {
+      setSelectedUser('all');
+    }
+  }, [availableUsers, selectedUser]);
+
+  useEffect(() => {
+    if (selectedRequester !== 'all' && !availableRequesters.some((r) => String(r.id) === selectedRequester)) {
+      setSelectedRequester('all');
+    }
+  }, [availableRequesters, selectedRequester]);
+
+  useEffect(() => {
+    if (selectedMapBuilding !== null && !buildingOptions.some((b) => b.id === selectedMapBuilding)) {
+      setSelectedMapBuilding(null);
+    }
+  }, [buildingOptions, selectedMapBuilding]);
+
+  useEffect(() => {
+    const filteredOrders = allOrders.filter((o) => {
+      const inDate = matchesDateRange(o.dateNumeric);
+      const inBuilding = matchesBuildingFilter(o.buildingId);
+      const inUser = selectedUser === 'all' || String(o.buyerId) === selectedUser;
+      const inRequester = selectedRequester === 'all' || String(o.requesterId) === selectedRequester || o.requesterId === selectedRequester;
+      return inDate && inBuilding && inUser && inRequester;
+    }).sort((a, b) => (b.dateNumeric || 0) - (a.dateNumeric || 0));
+
+    const filteredFinancial = allFinancialTitles.filter((f) => {
+      const inDate = matchesDateRange(f.dueDateNumeric);
+      const inBuilding = matchesBuildingFilter(f.buildingId);
+      return inDate && inBuilding;
+    });
+
+    const filteredReceivable = allReceivableTitles.filter((r) => {
+      const inDate = matchesDateRange(r.dueDateNumeric);
+      const inBuilding = matchesBuildingFilter(r.buildingId);
+      return inDate && inBuilding;
+    });
+
+    setOrders(filteredOrders);
+    setFinancialTitles(filteredFinancial);
+    setReceivableTitles(filteredReceivable);
+  }, [
+    allFinancialTitles,
+    allOrders,
+    allReceivableTitles,
+    matchesBuildingFilter,
+    matchesDateRange,
+    selectedBuilding,
+    selectedRequester,
+    selectedUser
+  ]);
+
+  useEffect(() => {
+    const visibleIds = orders.slice(0, 15).map((o) => o.id);
+    const missingIds = visibleIds.filter((id) => !itemsDetailsMap[id] && !requestedItemsRef.current.has(String(id)));
+    if (missingIds.length === 0) return;
+
+    missingIds.forEach((id) => requestedItemsRef.current.add(String(id)));
+    api.post('/fetch-items', { ids: missingIds })
+      .then((res) => {
+        if (res.data) {
+          setItemsDetailsMap((prev) => ({ ...prev, ...res.data }));
+        }
+      })
+      .catch((error) => {
+        console.error('Error fetching filtered items:', error);
+      });
+  }, [orders, itemsDetailsMap]);
+
+  useEffect(() => {
+    try {
+      const storedSession = localStorage.getItem('dinamica_session');
+      setSessionUser(storedSession ? JSON.parse(storedSession) : null);
+    } catch {
+      setSessionUser(null);
+    } finally {
+      setAuthReady(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    const handleAfterPrint = () => setIsPrinting(false);
+    window.addEventListener('afterprint', handleAfterPrint);
+    return () => {
+      window.removeEventListener('afterprint', handleAfterPrint);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!sessionUser) return;
+
+    if (sessionUser.role === 'user') {
+      setActiveTab('logistics');
+    }
+
+    fetchInitialData();
     const syncInterval = setInterval(() => {
       fetchInitialData();
     }, 20 * 60 * 1000);
 
-    const handleAfterPrint = () => setIsPrinting(false);
-    window.addEventListener('afterprint', handleAfterPrint);
-
     return () => {
       clearInterval(syncInterval);
-      window.removeEventListener('afterprint', handleAfterPrint);
     };
-  }, []);
+  }, [fetchInitialData, sessionUser]);
 
   const handlePrint = () => {
     setIsPrinting(true);
@@ -560,18 +684,64 @@ export default function App() {
     }, 500); // 500ms window para renderizar 100% dos dados na VDOM
   };
 
+  const toMoney = (value: unknown) => {
+    const numeric = Number(value);
+    return Number.isFinite(numeric) ? numeric : 0;
+  };
+
+  const normalizeStatus = useCallback((value: unknown) => (
+    fixText(String(value || ''))
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .trim()
+      .toUpperCase()
+  ), []);
+
+  const isSettledFinancialStatus = useCallback((value: unknown) => {
+    const status = normalizeStatus(value);
+    return ['S', 'BAIXADO', 'BAIXADA', 'PAGO', 'PAGA', 'LIQUIDADO', 'LIQUIDADA', 'QUITADO', 'QUITADA'].includes(status);
+  }, [normalizeStatus]);
+
+  const activeBuildingCount = useMemo(() => {
+    const ids = new Set<string>();
+
+    orders.forEach((o) => {
+      if (o?.buildingId) ids.add(String(o.buildingId));
+    });
+    financialTitles.forEach((f) => {
+      if (f?.buildingId) ids.add(String(f.buildingId));
+    });
+    receivableTitles.forEach((r) => {
+      if (r?.buildingId) ids.add(String(r.buildingId));
+    });
+
+    return ids.size || buildings.length;
+  }, [buildings.length, financialTitles, orders, receivableTitles]);
+
   // Analytics Calculations
   const stats = useMemo(() => {
     const ordersArray = Array.isArray(orders) ? orders : [];
-    const total = ordersArray.reduce((acc, curr) => acc + (curr.totalAmount || 0), 0);
+    const total = ordersArray.reduce((acc, curr) => acc + toMoney(curr.totalAmount), 0);
     const avg = ordersArray.length > 0 ? total / ordersArray.length : 0;
     
-    const fTotal = financialTitles.reduce((acc, curr) => acc + (curr.amount || 0), 0);
-    const rTotal = receivableTitles.reduce((acc, curr) => acc + (curr.amount || 0), 0);
+    const fTotal = financialTitles.reduce((acc, curr) => acc + toMoney(curr.amount), 0);
+    const rTotal = receivableTitles.reduce((acc, curr) => acc + toMoney(curr.amount), 0);
     const balance = rTotal - fTotal;
 
     return { total, avg, fTotal, rTotal, balance };
   }, [orders, financialTitles, receivableTitles]);
+
+  const historicalStats = useMemo(() => {
+    const historicalOrders = Array.isArray(allOrders) ? allOrders : [];
+    const historicalFinancial = Array.isArray(allFinancialTitles) ? allFinancialTitles : [];
+
+    const totalPurchases = historicalOrders.reduce((acc, curr) => acc + toMoney(curr.totalAmount), 0);
+    const totalPaid = historicalFinancial
+      .filter((title) => isSettledFinancialStatus(title.status))
+      .reduce((acc, curr) => acc + toMoney(curr.amount), 0);
+
+    return { totalPurchases, totalPaid };
+  }, [allFinancialTitles, allOrders, isSettledFinancialStatus]);
 
 
   const chartData = useMemo(() => {
@@ -616,7 +786,7 @@ export default function App() {
     ordersArray.forEach(o => {
       const id = String(o.supplierId || o.creditorId || o.idCredor || '');
       if (!id || id === 'undefined') return;
-      const name = creditorMap[id] || o.nomeFornecedor || o.supplierName || `Credor ${id}`;
+      const name = creditorMap[id] || o.nomeFornecedor || o.supplierName || o.creditorName || 'Credor sem nome';
       if (!map[id]) map[id] = { name, value: 0 };
       map[id].value += (o.totalAmount || o.valorTotal || o.amount || 0);
     });
@@ -660,7 +830,7 @@ export default function App() {
       const valorStr = String(o.totalAmount || 0).replace('.', ',');
       return `${o.id};"${obra}";"${user}";${safeFormat(o.date)};${valorStr};${o.status}`;
     }).join("\n");
-    // Adicionar BOM (\uFEFF) para forçar o Excel a reconhecer UTF-8
+    // Adiciona BOM (\uFEFF) para forçar o Excel a reconhecer UTF-8
     const blob = new Blob(["\uFEFF" + headers + rows], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
@@ -708,12 +878,20 @@ export default function App() {
     link.click();
     document.body.removeChild(link);
   };
+  if (!authReady) {
+    return <div className="min-h-screen bg-[#0F0F10]" />;
+  }
+
+  if (!sessionUser) {
+    return <LoginScreen onLogin={handleLogin} />;
+  }
+
   return (
     <>
-    <div className={cn("min-h-screen bg-[#0F0F10] text-gray-100 font-sans selection:bg-orange-500/30", reportType ? "print:hidden" : "")}>
+    <div className={cn("min-h-screen overflow-x-hidden bg-[#0F0F10] text-gray-100 font-sans selection:bg-orange-500/30", reportType ? "print:hidden" : "")}>
       {/* Header */}
       <header className="border-b border-white/5 bg-[#161618]/80 backdrop-blur-xl sticky top-0 z-50 print:hidden">
-        <div className="w-full max-w-[98%] 2xl:max-w-[1800px] mx-auto px-4 sm:px-6 h-16 sm:h-20 flex items-center justify-between gap-3">
+        <div className="tablet-safe-wrap w-full max-w-[98%] 2xl:max-w-[1800px] mx-auto px-4 sm:px-6 h-16 sm:h-20 flex items-center justify-between gap-3">
           {/* Logo */}
           <div className="flex items-center gap-3 shrink-0">
             <div className="w-9 h-9 sm:w-12 sm:h-12 bg-gradient-to-br from-orange-500 to-orange-700 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-lg shadow-orange-500/20">
@@ -734,15 +912,8 @@ export default function App() {
           </div>
 
           {/* Desktop Nav */}
-          <nav className="hidden md:flex items-center bg-black/40 p-1 rounded-xl border border-white/5">
-            {[
-              { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-              { id: 'finance', label: 'Financeiro', icon: DollarSign },
-              { id: 'alerts', label: 'Alertas', icon: Bell },
-              { id: 'map', label: 'Mapa de Obras', icon: MapIcon },
-              { id: 'logistics', label: 'Logística', icon: Truck },
-              { id: 'access', label: 'Acessos', icon: UserIcon },
-            ].map((tab) => (
+          <nav className="hidden xl:flex items-center bg-black/40 p-1 rounded-xl border border-white/5">
+            {availableTabs.map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id as any)}
@@ -760,33 +931,47 @@ export default function App() {
           </nav>
 
           {/* Desktop Actions */}
-          <div className="hidden md:flex items-center gap-3">
+          <div className="hidden xl:flex items-center gap-2 2xl:gap-3">
+            <div className="flex flex-col rounded-xl border border-white/5 bg-white/5 px-3 py-2 text-xs font-bold text-gray-300 min-w-[128px] max-w-[150px]">
+              <div className="flex items-center gap-2">
+                <UserIcon size={14} className="text-orange-500" />
+                <span className="truncate">{sessionUser.name}</span>
+              </div>
+              <Button
+                onClick={handleLogout}
+                variant="outline"
+                className="mt-2 h-9 border-white/10 bg-transparent text-white hover:bg-white/10 font-bold rounded-lg px-3 gap-2"
+              >
+                <LogOut size={14} />
+                <span>Sair</span>
+              </Button>
+            </div>
             <Button 
               onClick={downloadData}
               variant="outline"
-              className="bg-orange-600/10 text-orange-500 border-orange-600/20 hover:bg-orange-600 hover:text-white font-bold rounded-xl h-11 px-4 gap-2"
+              className="bg-orange-600/10 text-orange-500 border-orange-600/20 hover:bg-orange-600 hover:text-white font-bold rounded-xl h-11 px-3 2xl:px-4 gap-2"
             >
               <Download size={16} />
-              <span className="hidden lg:inline">Baixar Dados</span>
+              <span className="hidden 2xl:inline">Baixar Dados</span>
             </Button>
             <Button 
               onClick={syncSienge} 
-              disabled={loading}
-              className="bg-white text-black hover:bg-gray-200 font-bold rounded-xl h-11 px-4 gap-2"
+              disabled={syncing}
+              className="bg-white text-black hover:bg-gray-200 font-bold rounded-xl h-11 px-3 2xl:px-4 gap-2 shrink-0"
             >
-              <RefreshCw size={16} className={cn(loading && "animate-spin")} />
-              <span className="hidden lg:inline">{loading ? "Sincronizando..." : "Sincronizar"}</span>
+              <RefreshCw size={16} className={cn(syncing && "animate-spin")} />
+              <span className="hidden 2xl:inline">{syncing ? "Sincronizando..." : "Sincronizar"}</span>
             </Button>
           </div>
 
           {/* Mobile Action Buttons */}
-          <div className="flex md:hidden items-center gap-2">
+          <div className="flex xl:hidden items-center gap-2 ml-auto">
             <button
               onClick={syncSienge}
-              disabled={loading}
+              disabled={syncing}
               className="w-9 h-9 flex items-center justify-center rounded-xl bg-white/10 text-white"
             >
-              <RefreshCw size={16} className={cn(loading && "animate-spin")} />
+              <RefreshCw size={16} className={cn(syncing && "animate-spin")} />
             </button>
             <button
               onClick={downloadData}
@@ -794,20 +979,19 @@ export default function App() {
             >
               <Download size={16} />
             </button>
+            <button
+              onClick={handleLogout}
+              className="w-9 h-9 flex items-center justify-center rounded-xl bg-white/10 text-white"
+            >
+              <LogOut size={16} />
+            </button>
           </div>
         </div>
       </header>
 
       {/* Mobile Bottom Navigation */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-[#161618]/95 backdrop-blur-xl border-t border-white/5 flex flex-wrap print:hidden">
-        {[
-          { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-          { id: 'finance', label: 'Finance', icon: DollarSign },
-          { id: 'alerts', label: 'Alertas', icon: Bell },
-          { id: 'map', label: 'Mapa', icon: MapIcon },
-          { id: 'logistics', label: 'Logística', icon: Truck },
-          { id: 'access', label: 'Acessos', icon: UserIcon },
-        ].map((tab) => (
+      <nav className="xl:hidden fixed bottom-0 left-0 right-0 z-50 bg-[#161618]/95 backdrop-blur-xl border-t border-white/5 flex flex-wrap print:hidden">
+        {availableTabs.map((tab) => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id as any)}
@@ -822,7 +1006,7 @@ export default function App() {
         ))}
       </nav>
 
-      <main className="w-full max-w-[98%] 2xl:max-w-[1800px] mx-auto px-4 sm:px-6 py-6 sm:py-10 pb-24 md:pb-10">
+      <main className="w-full max-w-full 2xl:max-w-[1800px] mx-auto px-4 sm:px-6 py-6 sm:py-10 pb-24 xl:pb-10">
         {/* Global Date Filter - Mobile Collapsible */}
         {activeTab !== 'logistics' && activeTab !== 'access' && (
           <div className="mb-6 sm:mb-10 bg-[#161618] rounded-2xl border border-white/5 shadow-xl print:hidden overflow-hidden">
@@ -891,9 +1075,9 @@ export default function App() {
                   </SelectTrigger>
                   <SelectContent className="bg-[#161618] border-white/10 text-white">
                     <SelectItem value="all">Todas as Obras</SelectItem>
-                    {buildings.map(b => (
-                      <SelectItem key={b.id} value={String(b.id)}>{b.name}</SelectItem>
-                    ))}
+                     {buildingOptions.map(b => (
+                       <SelectItem key={b.id} value={String(b.id)}>{b.name}</SelectItem>
+                     ))}
                   </SelectContent>
                 </Select>
               </div>
@@ -906,9 +1090,9 @@ export default function App() {
                   </SelectTrigger>
                   <SelectContent className="bg-[#161618] border-white/10 text-white">
                     <SelectItem value="all">Todos os Compradores</SelectItem>
-                    {users.map(u => (
-                      <SelectItem key={u.id} value={String(u.id)}>{u.name}</SelectItem>
-                    ))}
+                     {availableUsers.map(u => (
+                       <SelectItem key={u.id} value={String(u.id)}>{u.name}</SelectItem>
+                     ))}
                   </SelectContent>
                 </Select>
               </div>
@@ -921,15 +1105,15 @@ export default function App() {
                   </SelectTrigger>
                   <SelectContent className="bg-[#161618] border-white/10 text-white">
                     <SelectItem value="all">Todos os Solicitantes</SelectItem>
-                    {requesters.map(r => (
-                      <SelectItem key={`req-${r.id}`} value={String(r.id)}>{r.name}</SelectItem>
-                    ))}
+                     {availableRequesters.map(r => (
+                       <SelectItem key={`req-${r.id}`} value={String(r.id)}>{r.name}</SelectItem>
+                     ))}
                   </SelectContent>
                 </Select>
               </div>
 
               <Button 
-                onClick={() => { refreshData(); setMobileFiltersOpen(false); }} 
+                onClick={() => { setMobileFiltersOpen(false); }} 
                 className="h-11 px-6 bg-orange-600 hover:bg-orange-700 text-white font-black rounded-xl shadow-lg shadow-orange-600/20 w-full sm:w-auto"
               >
                 Filtrar Dados
@@ -953,7 +1137,7 @@ export default function App() {
                 {[
                   { label: 'COMPRAS EFETUADAS', value: `R$ ${stats.total.toLocaleString('pt-BR', { maximumFractionDigits: 0 })}`, description: `${orders.length} pedidos processados`, icon: TrendingUp, color: 'orange' },
                   { label: 'Saldo Financeiro (R-P)', value: `R$ ${stats.balance.toLocaleString('pt-BR', { maximumFractionDigits: 0 })}`, description: 'Receber - Pagar', icon: DollarSign, color: stats.balance >= 0 ? 'green' : 'red' },
-                  { label: 'Obras Ativas (Filtro)', value: new Set([...orders.map(o => o.buildingId), ...financialTitles.map(f => f.buildingId)]).size || buildings.length, description: 'Com atividade no período', icon: Building2, color: 'orange' },
+                  { label: 'Obras Ativas (Filtro)', value: activeBuildingCount, description: 'Com atividade no período', icon: Building2, color: 'orange' },
                   { label: 'Pedidos Solicitados', value: orders.length, description: 'Pedidos processados no período', icon: Package, color: 'orange' },
                 ].map((kpi, i) => (
                   <Card key={i} className="bg-[#161618] border-white/5 shadow-2xl overflow-hidden relative group">
@@ -982,7 +1166,7 @@ export default function App() {
                   <CardContent className="p-5 sm:p-8 flex items-center justify-between">
                     <div>
                       <p className="text-orange-200 text-[10px] sm:text-xs font-black uppercase tracking-widest mb-1 sm:mb-2">Volume de Compras</p>
-                      <h3 className="text-2xl sm:text-4xl font-black text-white">R$ {stats.total.toLocaleString('pt-BR', { maximumFractionDigits: 0 })}</h3>
+                      <h3 className="text-2xl sm:text-4xl font-black text-white">R$ {historicalStats.totalPurchases.toLocaleString('pt-BR', { maximumFractionDigits: 0 })}</h3>
                     </div>
                     <div className="bg-white/20 p-3 sm:p-4 rounded-xl sm:rounded-2xl">
                       <Package className="text-white" size={24} />
@@ -993,8 +1177,8 @@ export default function App() {
                 <Card className="bg-[#161618] border-white/5 shadow-2xl">
                   <CardContent className="p-5 sm:p-8 flex items-center justify-between">
                     <div>
-                      <p className="text-gray-500 text-[10px] sm:text-xs font-black uppercase tracking-widest mb-1 sm:mb-2">Contas a Pagar</p>
-                      <h3 className="text-2xl sm:text-4xl font-black text-red-500">R$ {stats.fTotal.toLocaleString('pt-BR', { maximumFractionDigits: 0 })}</h3>
+                      <p className="text-gray-500 text-[10px] sm:text-xs font-black uppercase tracking-widest mb-1 sm:mb-2">Contas Pagas</p>
+                      <h3 className="text-2xl sm:text-4xl font-black text-red-500">R$ {historicalStats.totalPaid.toLocaleString('pt-BR', { maximumFractionDigits: 0 })}</h3>
                     </div>
                     <div className="bg-red-500/10 p-3 sm:p-4 rounded-xl sm:rounded-2xl">
                       <TrendingDown className="text-red-500" size={24} />
@@ -1257,7 +1441,7 @@ export default function App() {
                       </TableRow>
                     </TableHeader>
                       <TableBody>
-                        {allOrders.length === 0 ? (
+                        {orders.length === 0 ? (
                           <TableRow>
                             <TableCell colSpan={9} className="text-center py-10 text-gray-500 font-bold">
                               Nenhum pedido ou alerta registrado para o período e filtros selecionados.
@@ -1268,7 +1452,7 @@ export default function App() {
                           orders.forEach(o => {
                             const itemsList = itemsDetailsMap[o.id];
                             const comprador = o.buyerId || "N/A";
-                            const solicitante = o.requesterId && o.requesterId !== "0" ? o.requesterId : (o.createdBy || "N/A");
+                            const solicitante = o.requesterId && o.requesterId !== '0' ? String(o.requesterId).replace(/^Comprador\\s+/i, '').trim() : String(o.createdBy || 'N/A').replace(/^Comprador\\s+/i, '').trim();
                             
                             if (!itemsList || itemsList.length === 0) {
                               flatItems.push({
@@ -1329,10 +1513,17 @@ export default function App() {
                             
                             const isCheaper = vlrAtual > 0 && vlrAtual < vlrBase;
                             const isExpensive = vlrAtual > vlrBase;
-                            const colorClass = isCheaper ? "text-green-500 font-black drop-shadow-[0_0_5px_rgba(34,197,94,0.5)]" : isExpensive ? "text-orange-500 font-black drop-shadow-[0_0_5px_rgba(249,115,22,0.5)]" : "text-gray-400";
+                            const colorClass = isCheaper ? "text-green-500 font-black drop-shadow-[0_0_6px_rgba(34,197,94,0.75)]" : isExpensive ? "text-red-500 font-black drop-shadow-[0_0_6px_rgba(239,68,68,0.75)]" : "text-gray-400";
                             
                             return (
-                              <TableRow key={`alert-${o.id}-${flat.idx}-${i}`} className="border-white/5 hover:bg-white/5 transition-colors">
+                              <TableRow
+                                key={`alert-${o.id}-${flat.idx}-${i}`}
+                                className={cn(
+                                  "border-white/5 hover:bg-white/5 transition-colors border-l-2",
+                                  isCheaper && "border-l-green-500 shadow-[inset_4px_0_0_rgba(34,197,94,0.95)] bg-[linear-gradient(90deg,rgba(34,197,94,0.12),transparent_18%)]",
+                                  isExpensive && "border-l-red-500 shadow-[inset_4px_0_0_rgba(239,68,68,0.95)] bg-[linear-gradient(90deg,rgba(239,68,68,0.12),transparent_18%)]"
+                                )}
+                              >
                                 <TableCell className="font-bold text-orange-500" title={desc}>
                                   <div className="max-w-[200px] truncate">{desc}</div>
                                 </TableCell>
@@ -1530,7 +1721,7 @@ export default function App() {
                 <CardHeader className="pb-4">
                   <CardTitle className="text-white font-black uppercase text-sm tracking-tight">Obras Ativas</CardTitle>
                   <CardDescription className="text-xs">
-                    {(buildings.filter(b => b.name.toLowerCase().includes(buildingSearch.toLowerCase()) || String(b.id).includes(buildingSearch)) || []).length} encontradas
+                    {(buildingOptions.filter(b => b.name.toLowerCase().includes(buildingSearch.toLowerCase()) || String(b.id).includes(buildingSearch)) || []).length} encontradas
                   </CardDescription>
                   <div className="mt-3 relative">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" size={14} />
@@ -1545,13 +1736,13 @@ export default function App() {
                 </CardHeader>
                 <CardContent className="flex-1 overflow-y-auto px-2 pb-4 space-y-1 custom-scrollbar">
                   {(() => {
-                    const filtered = buildings.filter(b =>
+                    const filtered = buildingOptions.filter(b =>
                       b.name.toLowerCase().includes(buildingSearch.toLowerCase()) ||
                       String(b.id).includes(buildingSearch)
                     );
-                    // Compute volume per building from allOrders for sorting
+                    // Compute volume per building from filtered orders for sorting
                     const buildingVolume: Record<string, number> = {};
-                    allOrders.forEach(o => {
+                    orders.forEach(o => {
                       const key = String(o.buildingId);
                       buildingVolume[key] = (buildingVolume[key] || 0) + (o.totalAmount || 0);
                     });
@@ -1634,9 +1825,9 @@ export default function App() {
                       {(() => {
                         const currentBuilding = buildings.find(b => b.id === selectedMapBuilding);
                         // Use ALL orders (no date filter) for accurate building totals
-                        const buildingOrders = allOrders.filter(o => String(o.buildingId) === String(selectedMapBuilding));
-                        // financial titles may not have buildingId — sum ALL if 0-based
-                        const buildingPayable = allFinancialTitles.filter(f => {
+                        const buildingOrders = orders.filter(o => String(o.buildingId) === String(selectedMapBuilding));
+                        // Financial titles sem vínculo de obra podem vir zerados; aqui somamos apenas os vinculados.
+                        const buildingPayable = financialTitles.filter(f => {
                           if (String(f.buildingId) === String(selectedMapBuilding)) return true;
                           return false;
                         });
@@ -1710,7 +1901,7 @@ export default function App() {
                                           onClick={() => { setEngineerDraft(currentBuilding?.engineer || ''); setEditingEngineer(true); }}
                                           className="shrink-0 text-[9px] font-black uppercase text-orange-500/70 hover:text-orange-500 border border-orange-500/20 hover:border-orange-500/50 px-2 py-1 rounded-md transition-colors"
                                         >
-                                          ✏️ Editar
+                                          Editar
                                         </button>
                                       )}
                                     </div>
@@ -1730,7 +1921,7 @@ export default function App() {
                                 <p className="text-[10px] font-black text-gray-500 uppercase mb-1">Pendente a Pagar</p>
                                 <p className="text-2xl font-black text-red-500 leading-tight">R$ {totalPayable.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
                                 {buildingPayable.length === 0 && (
-                                  <p className="text-[9px] text-gray-600 mt-1">⚠️ Títulos financeiros sem vínculo de obra</p>
+                                  <p className="text-[9px] text-gray-600 mt-1">Títulos financeiros sem vínculo de obra</p>
                                 )}
                               </div>
                             </div>
@@ -1756,7 +1947,7 @@ export default function App() {
               exit={{ opacity: 0, scale: 0.95 }}
               className="w-full"
             >
-              <LogisticsTab />
+              <LogisticsTab buildings={buildings} readOnly={isRestrictedUser} />
             </motion.div>
           )}
 
@@ -1831,7 +2022,8 @@ export default function App() {
             initial={{ opacity: 0, y: 50, x: 50 }}
             animate={{ opacity: 1, y: 0, x: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 50, x: 50 }}
-            className="fixed bottom-6 right-6 z-[9999] bg-gradient-to-br from-orange-600 to-orange-800 p-6 rounded-2xl shadow-[0_20px_50px_rgba(234,88,12,0.3)] border border-white/10 flex items-start gap-4 max-w-sm"
+            className="fixed bottom-6 right-6 z-[9999] bg-gradient-to-br from-orange-600 to-orange-800 p-6 rounded-2xl shadow-[0_20px_50px_rgba(234,88,12,0.3)] border border-white/10 flex items-start gap-4 max-w-sm cursor-pointer"
+            onClick={() => setSelectedAlertOrder(newOrderAlert)}
           >
             <div className="bg-white/20 p-3 rounded-xl shadow-inner shrink-0">
               <Package className="text-white" size={28} />
@@ -1841,7 +2033,7 @@ export default function App() {
               <p className="text-orange-100 text-sm mt-1 leading-snug">Pedido <span className="font-bold">#{newOrderAlert.id}</span> processado no valor de <span className="font-bold">R$ {newOrderAlert.totalAmount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>.</p>
               <p className="text-orange-300 text-xs mt-2 font-bold uppercase tracking-wider">{buildings.find(b => b.id === newOrderAlert.buildingId)?.name || 'Obra não identificada'}</p>
             </div>
-            <button onClick={() => setNewOrderAlert(null)} className="absolute top-4 right-4 text-white/50 hover:text-white transition-colors">
+            <button onClick={(e) => { e.stopPropagation(); setNewOrderAlert(null); }} className="absolute top-4 right-4 text-white/50 hover:text-white transition-colors">
               &times;
             </button>
           </motion.div>
@@ -1939,6 +2131,82 @@ export default function App() {
         </div>
       </div>
     )}
+    {selectedAlertOrder && (
+      <div className="fixed inset-0 z-[110] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4" onClick={() => setSelectedAlertOrder(null)}>
+        <div className="bg-[#161618] rounded-2xl border border-white/10 shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+          <div className="flex items-center justify-between p-6 border-b border-white/5">
+            <div>
+              <h2 className="text-xl font-black text-white uppercase">Detalhes da Compra</h2>
+              <p className="text-sm text-gray-400 mt-1">Pedido #{selectedAlertOrder.id}</p>
+            </div>
+            <button onClick={() => setSelectedAlertOrder(null)} className="text-gray-400 hover:text-white p-2">
+              <X size={24} />
+            </button>
+          </div>
+          <div className="p-6 space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="bg-black/20 rounded-xl border border-white/5 p-4">
+                <p className="text-[10px] font-black uppercase text-gray-500 mb-1">Obra</p>
+                <p className="text-white font-bold">{resolveBuildingName(selectedAlertOrder)}</p>
+              </div>
+              <div className="bg-black/20 rounded-xl border border-white/5 p-4">
+                <p className="text-[10px] font-black uppercase text-gray-500 mb-1">Fornecedor</p>
+                <p className="text-white font-bold">{resolveCreditorName(selectedAlertOrder)}</p>
+              </div>
+              <div className="bg-black/20 rounded-xl border border-white/5 p-4">
+                <p className="text-[10px] font-black uppercase text-gray-500 mb-1">Comprador</p>
+                <p className="text-white font-bold">
+                  {resolveUserName(selectedAlertOrder.buyerId, selectedAlertOrder.createdBy || 'N/A')}
+                </p>
+              </div>
+              <div className="bg-black/20 rounded-xl border border-white/5 p-4">
+                <p className="text-[10px] font-black uppercase text-gray-500 mb-1">Solicitante</p>
+                <p className="text-white font-bold">
+                  {selectedAlertOrder.requesterId && selectedAlertOrder.requesterId !== '0'
+                    ? selectedAlertOrder.requesterId
+                    : selectedAlertOrder.createdBy || 'N/A'}
+                </p>
+              </div>
+              <div className="bg-black/20 rounded-xl border border-white/5 p-4">
+                <p className="text-[10px] font-black uppercase text-gray-500 mb-1">Data</p>
+                <p className="text-white font-bold">{safeFormat(selectedAlertOrder.date)}</p>
+              </div>
+              <div className="bg-black/20 rounded-xl border border-white/5 p-4">
+                <p className="text-[10px] font-black uppercase text-gray-500 mb-1">Entrega</p>
+                <p className="text-white font-bold">{safeFormat(selectedAlertOrder.deliveryDate)}</p>
+              </div>
+              <div className="bg-black/20 rounded-xl border border-white/5 p-4">
+                <p className="text-[10px] font-black uppercase text-gray-500 mb-1">Status</p>
+                <p className="text-white font-bold">{selectedAlertOrder.status || 'N/A'}</p>
+              </div>
+              <div className="bg-black/20 rounded-xl border border-white/5 p-4">
+                <p className="text-[10px] font-black uppercase text-gray-500 mb-1">Valor Total</p>
+                <p className="text-orange-500 font-black text-lg">
+                  {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(selectedAlertOrder.totalAmount || 0)}
+                </p>
+              </div>
+            </div>
+
+            <div className="bg-black/20 rounded-xl border border-white/5 p-4">
+              <p className="text-[10px] font-black uppercase text-gray-500 mb-2">Condição de Pagamento</p>
+              <p className="text-white font-bold">{selectedAlertOrder.paymentCondition || 'N/A'}</p>
+            </div>
+
+            <div className="bg-black/20 rounded-xl border border-white/5 p-4">
+              <p className="text-[10px] font-black uppercase text-gray-500 mb-2">Observações</p>
+              <p className="text-gray-300 leading-relaxed">
+                {selectedAlertOrder.internalNotes || 'Nenhuma observação informada.'}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    )}
     </>
   );
 }
+
+
+
+
+

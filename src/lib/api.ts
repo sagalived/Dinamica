@@ -4,9 +4,15 @@ export const api = axios.create({
   baseURL: '/api/sienge',
 });
 
+export const authApi = axios.create({
+  baseURL: '/api/auth',
+  timeout: 8000,
+});
+
 export interface Building {
   id: number;
   name: string;
+  code?: string;
   latitude?: number;
   longitude?: number;
   address?: string;
@@ -14,9 +20,29 @@ export interface Building {
   companyId?: number;
 }
 
+export interface LogisticsLocation {
+  id: number;
+  code: string;
+  name: string;
+  address?: string;
+  latitude?: number;
+  longitude?: number;
+  type: string;
+  source: string;
+}
+
 export interface User {
   id: string;
   name: string;
+}
+
+export interface AuthUser {
+  id: number;
+  username: string;
+  email: string;
+  name: string;
+  role: string;
+  department?: string;
 }
 
 export interface Creditor {
