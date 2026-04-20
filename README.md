@@ -1,13 +1,23 @@
+Este projeto roda 100% em Python.
 
-This contains everything you need to run your app locally.
+O frontend ja esta compilado na pasta `dist` e e servido diretamente pelo FastAPI.
 
-## Run Locally
+## Rodar localmente
 
-**Prerequisites:**  Node.js
+Pre-requisitos:
+- Python 3.11+
 
+1. Instale dependencias do backend:
+   `pip install -r requirements.txt`
+2. Configure variaveis de ambiente com base no arquivo `.env.example`.
+3. Inicie a aplicacao:
+   `python app.py`
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+Aplicacao (frontend + backend): `http://localhost:8000`
+
+## Build de producao
+
+1. Instale dependencias Python:
+   `pip install -r requirements.txt`
+2. Suba o backend Python:
+   `python app.py`
