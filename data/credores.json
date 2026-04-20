@@ -160171,5 +160171,94 @@
         "href": "https://api.sienge.com.br/dinamicaempreendimentos/public/api/v1/creditors/3355/bank-informations"
       }
     ]
+  },
+  {
+    "id": 3356,
+    "name": "DIAS E SANTOS LOGISTICA E TRANSPORTE LTDA",
+    "tradeName": "",
+    "cpf": null,
+    "cnpj": "50.561.253/0001-02",
+    "supplier": "S",
+    "broker": "N",
+    "employee": "N",
+    "active": true,
+    "stateRegistrationNumber": "",
+    "stateRegistrationType": "N",
+    "taxClassificationId": null,
+    "taxClassification": "",
+    "paymentTypeId": null,
+    "creationDate": "2026-04-17",
+    "lastModificationDate": "2026-04-17",
+    "address": {
+      "cityId": 5068,
+      "cityName": "Jacareí",
+      "streetName": "AVENIDA LOURENCO DA SILVA",
+      "number": "1916 D",
+      "complement": "SLJ   SOBRELOJA",
+      "neighborhood": "PARQUE MEIA LUA",
+      "state": "SP",
+      "zipCode": "12335-200"
+    },
+    "phones": [
+      {
+        "ddd": "11",
+        "number": "3142-9599",
+        "main": true,
+        "type": 5,
+        "extension": null,
+        "observation": null
+      }
+    ],
+    "contacts": [],
+    "otherContactMethods": [
+      {
+        "type": 2,
+        "address": "CONTATO@INNOCATECHCONTABIL.COM.BR",
+        "observation": null
+      }
+    ],
+    "links": [
+      {
+        "rel": "bank-informations",
+        "href": "https://api.sienge.com.br/dinamicaempreendimentos/public/api/v1/creditors/3356/bank-informations"
+      }
+    ]
+  },
+  {
+    "id": 3357,
+    "name": "MOURA E ALENCAR LTDA",
+    "tradeName": "POSTO VITORIA N 01",
+    "cpf": null,
+    "cnpj": "04.885.816/0001-09",
+    "supplier": "S",
+    "broker": "N",
+    "employee": "N",
+    "active": true,
+    "stateRegistrationNumber": "066688760",
+    "stateRegistrationType": "C",
+    "taxClassificationId": null,
+    "taxClassification": "",
+    "paymentTypeId": null,
+    "creationDate": "2026-04-20",
+    "lastModificationDate": "2026-04-20",
+    "address": {
+      "cityId": 660,
+      "cityName": "Assaré",
+      "streetName": "PRACA DO  MERCADO",
+      "number": "100",
+      "complement": "",
+      "neighborhood": "CENTRO",
+      "state": "CE",
+      "zipCode": "63140000"
+    },
+    "phones": [],
+    "contacts": [],
+    "otherContactMethods": [],
+    "links": [
+      {
+        "rel": "bank-informations",
+        "href": "https://api.sienge.com.br/dinamicaempreendimentos/public/api/v1/creditors/3357/bank-informations"
+      }
+    ]
   }
 ]

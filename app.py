@@ -16,7 +16,7 @@ from typing import Any
 
 import requests
 from dotenv import load_dotenv
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, HTTPException, Request, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse, Response
 from fastapi.staticfiles import StaticFiles
@@ -316,6 +316,19 @@ def init_db() -> None:
           finished_at TEXT,
           status TEXT NOT NULL,
           notes TEXT DEFAULT ''
+        );
+
+        CREATE TABLE IF NOT EXISTS obras_kanban (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          building_id TEXT NOT NULL,
+          title TEXT NOT NULL,
+          description TEXT DEFAULT '',
+          status TEXT NOT NULL DEFAULT 'todo',
+          progress_pct INTEGER DEFAULT 0,
+          drive_link TEXT DEFAULT '',
+          created_by TEXT DEFAULT '',
+          created_at TEXT NOT NULL,
+          updated_at TEXT NOT NULL
         );
         """
     )
@@ -1611,10 +1624,12 @@ def api_bootstrap() -> Any:
             requester_name = normalize_person_name(user_map.get(raw_requester) or raw_requester)
             buyer_name = normalize_person_name(pedido.get("nomeComprador") or pedido.get("buyerName") or user_map.get(buyer_id) or buyer_id)
             building = building_map.get(building_id, {})
+            company_id = building.get("companyId")
             normalized_orders.append(
                 {
                     "id": pedido.get("id") or pedido.get("numero") or 0,
                     "buildingId": int(building_id) if building_id.isdigit() else 0,
+                    "companyId": int(company_id) if company_id is not None else None,
                     "buyerId": buyer_id,
                     "supplierId": int(supplier_id) if supplier_id.isdigit() else 0,
                     "date": pedido.get("data") or pedido.get("dataEmissao") or pedido.get("date") or "",
@@ -1639,9 +1654,12 @@ def api_bootstrap() -> Any:
             creditor_id = str(item.get("creditorId") or item.get("idCredor") or item.get("codigoFornecedor") or item.get("debtorId") or "")
             building_id = str(item.get("idObra") or item.get("codigoObra") or item.get("enterpriseId") or "")
             creditor_name = creditor_map.get(creditor_id) or creditor_name_hints.get(creditor_id) or normalize_creditor_name(item, creditor_id)
+            building_info = building_map.get(building_id, {})
+            company_id = building_info.get("companyId")
             normalized_financial.append(
                 {
                     "id": item.get("id") or item.get("numero") or item.get("codigoTitulo") or item.get("documentNumber") or 0,
+                    "companyId": int(company_id) if company_id is not None else None,
                     "creditorId": creditor_id,
                     "buildingId": int(building_id) if building_id.isdigit() else 0,
                     "dataVencimento": item.get("dataVencimento")
@@ -1678,6 +1696,8 @@ def api_bootstrap() -> Any:
         normalized_receivable: list[dict[str, Any]] = []
         for item in receber:
             building_id = str(item.get("idObra") or item.get("codigoObra") or item.get("enterpriseId") or "")
+            building_info = building_map.get(building_id, {})
+            company_id = building_info.get("companyId")
             normalized_receivable.append(
                 {
                     "id": item.get("id")
@@ -1686,6 +1706,7 @@ def api_bootstrap() -> Any:
                     or item.get("codigoTitulo")
                     or item.get("documentNumber")
                     or 0,
+                    "companyId": int(company_id) if company_id is not None else None,
                     "buildingId": int(building_id) if building_id.isdigit() else 0,
                     "dataVencimento": item.get("data")
                     or item.get("date")
@@ -1721,7 +1742,10 @@ def api_bootstrap() -> Any:
                 }
             )
 
+        saldo_bancario_calc = sum(float(item.get("value") or 0) for item in receber if str(item.get("type")).strip().lower() == "income") - sum(float(item.get("value") or 0) for item in receber if str(item.get("type")).strip().lower() == "expense")
+
         return {
+            "saldoBancario": saldo_bancario_calc,
             "latestSync": get_latest_sync_info(),
             "obras": list(building_map.values()),
             "usuarios": [
@@ -1789,6 +1813,100 @@ async def api_fetch_items(request: Request) -> Any:
     if changed:
         save_to_file("itens_pedidos.json", items_map)
     return items_map
+
+
+@app.post("/api/sienge/fetch-quotations")
+async def api_fetch_quotations(request: Request) -> Any:
+    """Busca as cotações (concorrência de fornecedores) de pedidos de compra no Sienge.
+    Cada pedido pode ter múltiplas cotações de fornecedores distintos.
+    Endpoint Sienge: /public/api/v1/purchase-orders/{id}/quotations
+    """
+    body = await request.json()
+    ids = body.get("ids") if isinstance(body, dict) else None
+    if not isinstance(ids, list):
+        return {}
+
+    quotations_map = read_from_file("cotacoes_pedidos.json") or {}
+    changed = False
+    for order_id in ids:
+        key = str(order_id)
+        if quotations_map.get(key):
+            continue
+        try:
+            result = sienge_get(f"/public/api/v1/purchase-orders/{order_id}/quotations")
+            if result.status_code < 400:
+                payload = result.json()
+                quotations_map[key] = payload.get("results", payload) if isinstance(payload, dict) else payload
+                changed = True
+            else:
+                # Tentar alternativa com outro endpoint
+                result2 = sienge_get(f"{DETECTED_PREFIX}/purchase-orders/{order_id}/quotations")
+                if result2.status_code < 400:
+                    payload2 = result2.json()
+                    quotations_map[key] = payload2.get("results", payload2) if isinstance(payload2, dict) else payload2
+                    changed = True
+        except Exception:
+            continue
+
+    if changed:
+        save_to_file("cotacoes_pedidos.json", quotations_map)
+    return quotations_map
+
+
+@app.get("/api/sienge/debug-order/{order_id}")
+def api_debug_order(order_id: str) -> Any:
+    """Diagnóstico: retorna todos os dados brutos do Sienge para um pedido específico,
+    incluindo tentativas em múltiplos endpoints relacionados a cotações."""
+    result = {"order_id": order_id, "endpoints": {}}
+
+    # 1. Dados do pedido
+    for ep in [
+        f"/public/api/v1/purchase-orders/{order_id}",
+        f"{DETECTED_PREFIX}/purchase-orders/{order_id}",
+    ]:
+        try:
+            r = sienge_get(ep)
+            result["endpoints"][ep] = {"status": r.status_code, "data": r.json() if r.content else {}}
+        except Exception as exc:
+            result["endpoints"][ep] = {"error": str(exc)}
+
+    # 2. Cotações do pedido (vários endpoints possíveis)
+    for ep in [
+        f"/public/api/v1/purchase-orders/{order_id}/quotations",
+        f"{DETECTED_PREFIX}/purchase-orders/{order_id}/quotations",
+        f"/public/api/v1/purchase-orders/{order_id}/quotation",
+        f"{DETECTED_PREFIX}/purchase-orders/{order_id}/quotation",
+    ]:
+        try:
+            r = sienge_get(ep)
+            result["endpoints"][ep] = {"status": r.status_code, "data": r.json() if r.content else {}}
+        except Exception as exc:
+            result["endpoints"][ep] = {"error": str(exc)}
+
+    return result
+
+
+@app.get("/api/sienge/debug-quotation/{quotation_id}")
+def api_debug_quotation(quotation_id: str) -> Any:
+    """Diagnóstico: busca cotação pelo ID da cotação (ex: 4641), não pelo ID do pedido."""
+    result = {"quotation_id": quotation_id, "endpoints": {}}
+
+    for ep in [
+        f"/public/api/v1/quotations/{quotation_id}",
+        f"{DETECTED_PREFIX}/quotations/{quotation_id}",
+        f"/public/api/v1/quotations/{quotation_id}/items",
+        f"{DETECTED_PREFIX}/quotations/{quotation_id}/items",
+        f"/public/api/v1/quotations/{quotation_id}/suppliers",
+        f"{DETECTED_PREFIX}/quotations/{quotation_id}/suppliers",
+        f"/public/api/v1/purchase-requests/quotations/{quotation_id}",
+    ]:
+        try:
+            r = sienge_get(ep)
+            result["endpoints"][ep] = {"status": r.status_code, "data": r.json() if r.content else {}}
+        except Exception as exc:
+            result["endpoints"][ep] = {"error": str(exc)}
+
+    return result
 
 
 def passthrough_or_cached(cache_key: str, filename: str, endpoint: str, req: Request) -> Any:
@@ -1913,6 +2031,140 @@ async def api_obras_meta(request: Request) -> Any:
     save_obras_meta(meta)
     save_building_meta_to_db(key, str(engineer or "").strip())
     return {"success": True, "meta": meta[key]}
+
+@app.get("/api/sienge/global/{module}/{endpoint:path}")
+def api_sienge_global_proxy(module: str, endpoint: str, request: Request) -> Any:
+    """
+    Universal Proxy: routes requests like /api/sienge/global/commercial/customers
+    directly to https://api.sienge.com.br/{subdomain}/api/v1/commercial/customers
+    """
+    query_params = str(request.query_params)
+    path = f"/api/v1/{module}/{endpoint}"
+    if query_params:
+        path += f"?{query_params}"
+    
+    response = sienge_get(path)
+    if response.status_code >= 400:
+        return JSONResponse(status_code=response.status_code, content=response.json() if response.content else {"error": response.text})
+    return response.json()
+
+@app.post("/api/admin/backup/drive")
+def api_trigger_backup() -> Any:
+    try:
+        from backup_manager import run_backup
+        result = run_backup()
+        if result.get("success"):
+            return {"success": True, "message": "Backup enviado ao Google Drive com sucesso!", "file_id": result.get("file_id")}
+        return JSONResponse(status_code=500, content={"error": result.get("error", "Erro desconhecido")})
+    except Exception as e:
+        return JSONResponse(status_code=500, content={"error": str(e)})
+
+
+@app.get("/api/sienge/obras/{building_id}/kanban")
+def api_get_obras_kanban(building_id: str) -> Any:
+    conn = get_db()
+    cur = conn.cursor()
+    if building_id == "all":
+        rows = cur.execute(
+            "SELECT id, building_id, title, description, status, progress_pct, drive_link, created_by, created_at, updated_at FROM obras_kanban ORDER BY updated_at DESC"
+        ).fetchall()
+    else:
+        rows = cur.execute(
+            "SELECT id, building_id, title, description, status, progress_pct, drive_link, created_by, created_at, updated_at FROM obras_kanban WHERE building_id = ?",
+            (building_id,)
+        ).fetchall()
+    conn.close()
+    return {"results": [dict(r) for r in rows]}
+
+@app.post("/api/sienge/obras/{building_id}/kanban")
+async def api_create_obras_kanban(building_id: str, request: Request) -> Any:
+    body = await request.json()
+    title = body.get("title", "")
+    description = body.get("description", "")
+    status = body.get("status", "todo")
+    progress_pct = int(body.get("progress_pct", 0))
+    drive_link = body.get("drive_link", "")
+    created_by = body.get("created_by", "")
+    now = now_iso()
+
+    conn = get_db()
+    cur = conn.cursor()
+    cur.execute(
+        "INSERT INTO obras_kanban (building_id, title, description, status, progress_pct, drive_link, created_by, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        (building_id, title, description, status, progress_pct, drive_link, created_by, now, now)
+    )
+    task_id = cur.lastrowid
+    conn.commit()
+    conn.close()
+    return {"success": True, "id": task_id}
+
+@app.post("/api/sienge/obras/kanban/{task_id}/upload")
+async def api_upload_kanban_media(task_id: int, file: UploadFile = File(...)) -> Any:
+    uploads_dir = DATA_DIR / "uploads"
+    uploads_dir.mkdir(parents=True, exist_ok=True)
+    
+    timestamp = int(datetime.now().timestamp())
+    safe_filename = f"{task_id}_{timestamp}_{file.filename}"
+    file_path = uploads_dir / safe_filename
+    
+    with open(file_path, "wb") as buffer:
+        buffer.write(await file.read())
+        
+    url_path = f"/data/uploads/{safe_filename}"
+    
+    conn = get_db()
+    cur = conn.cursor()
+    row = cur.execute("SELECT drive_link FROM obras_kanban WHERE id = ?", (task_id, )).fetchone()
+    if row:
+        current_links = row[0] or ""
+        new_links = f"{current_links},{url_path}" if current_links else url_path
+        cur.execute("UPDATE obras_kanban SET drive_link = ?, updated_at = ? WHERE id = ?", (new_links, now_iso(), task_id))
+    conn.commit()
+    conn.close()
+    
+    return {"success": True, "url": url_path}
+
+@app.get("/data/uploads/{filename}")
+def server_uploads(filename: str):
+    file_path = DATA_DIR / "uploads" / filename
+    if not file_path.exists():
+        raise HTTPException(status_code=404, detail="File not found")
+    media_type, _ = mimetypes.guess_type(str(file_path))
+    return FileResponse(path=str(file_path), media_type=media_type)
+
+@app.put("/api/sienge/obras/kanban/{task_id}")
+async def api_update_obras_kanban(task_id: int, request: Request) -> Any:
+    body = await request.json()
+    updates = []
+    params = []
+    
+    for key in ["title", "description", "status", "progress_pct", "drive_link"]:
+        if key in body:
+            updates.append(f"{key} = ?")
+            params.append(body[key])
+            
+    if not updates:
+        return {"success": False, "message": "Nothing to update"}
+        
+    updates.append("updated_at = ?")
+    params.append(now_iso())
+    params.append(task_id)
+
+    conn = get_db()
+    cur = conn.cursor()
+    cur.execute(f"UPDATE obras_kanban SET {', '.join(updates)} WHERE id = ?", tuple(params))
+    conn.commit()
+    conn.close()
+    return {"success": True}
+
+@app.delete("/api/sienge/obras/kanban/{task_id}")
+def api_delete_obras_kanban(task_id: int) -> Any:
+    conn = get_db()
+    cur = conn.cursor()
+    cur.execute("DELETE FROM obras_kanban WHERE id = ?", (task_id,))
+    conn.commit()
+    conn.close()
+    return {"success": True}
 
 
 @app.get("/api/sienge/usuarios")
