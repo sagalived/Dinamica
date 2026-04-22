@@ -1,3 +1,4 @@
+import uuid
 import csv
 import gzip
 import hashlib
@@ -29,12 +30,16 @@ DATA_DIR = BASE_DIR / "data"
 DATA_DIR.mkdir(parents=True, exist_ok=True)
 DB_PATH = DATA_DIR / "dinamica.db"
 
-SIENGE_USERNAME = os.getenv("SIENGE_USERNAME", "dinamicaempreendimentos-jrmorais")
-SIENGE_PASSWORD = os.getenv("SIENGE_PASSWORD", "5jT2uxIW6YYAPL2epk9QUUvCEGM2eX9z")
-SIENGE_INSTANCE = os.getenv("SIENGE_INSTANCE", "dinamicaempreendimentos").split(".")[0]
+SIENGE_USERNAME = os.getenv("SIENGE_USERNAME", "").strip()
+SIENGE_PASSWORD = os.getenv("SIENGE_PASSWORD", "").strip()
+SIENGE_INSTANCE = os.getenv("SIENGE_INSTANCE", "").strip().split(".")[0]
 SIENGE_BASE_URL = f"https://api.sienge.com.br/{SIENGE_INSTANCE}"
 DETECTED_PREFIX = "/public/api/v1"
 PORT = int(os.getenv("PORT", "8000"))
+
+
+def has_sienge_credentials() -> bool:
+    return bool(SIENGE_USERNAME and SIENGE_PASSWORD and SIENGE_INSTANCE)
 
 @asynccontextmanager
 async def lifespan(_: FastAPI) -> Any:
@@ -329,6 +334,35 @@ def init_db() -> None:
           created_by TEXT DEFAULT '',
           created_at TEXT NOT NULL,
           updated_at TEXT NOT NULL
+        );
+
+        CREATE TABLE IF NOT EXISTS kanban_sprints (
+          id TEXT PRIMARY KEY,
+          building_id TEXT NOT NULL,
+          name TEXT NOT NULL,
+          start_date TEXT DEFAULT '',
+          end_date TEXT DEFAULT '',
+          color TEXT DEFAULT '#f97316',
+          created_at TEXT NOT NULL,
+          updated_at TEXT NOT NULL
+        );
+
+        CREATE TABLE IF NOT EXISTS kanban_cards (
+          id TEXT PRIMARY KEY,
+          sprint_id TEXT NOT NULL,
+          building_id TEXT NOT NULL,
+          title TEXT NOT NULL,
+          description TEXT DEFAULT '',
+          status TEXT NOT NULL DEFAULT 'planned',
+          priority TEXT NOT NULL DEFAULT 'medium',
+          responsible TEXT DEFAULT '',
+          due_date TEXT DEFAULT '',
+          tags TEXT DEFAULT '[]',
+          attachments TEXT DEFAULT '[]',
+          created_by TEXT DEFAULT '',
+          created_at TEXT NOT NULL,
+          updated_at TEXT NOT NULL,
+          FOREIGN KEY (sprint_id) REFERENCES kanban_sprints(id) ON DELETE CASCADE
         );
         """
     )
@@ -857,6 +891,11 @@ def list_today_orders_for_alerts(live_fetch: bool = True, limit: int = 200) -> l
 
 
 def sienge_get(endpoint: str, params: dict[str, Any] | None = None) -> requests.Response:
+    if not has_sienge_credentials():
+        raise HTTPException(
+            status_code=503,
+            detail="Credenciais do Sienge nao configuradas. Defina SIENGE_USERNAME, SIENGE_PASSWORD e SIENGE_INSTANCE.",
+        )
     url = f"{SIENGE_BASE_URL}{endpoint}"
     return requests.get(
         url,
@@ -869,6 +908,47 @@ def sienge_get(endpoint: str, params: dict[str, Any] | None = None) -> requests.
         },
         timeout=60,
     )
+
+
+def sienge_healthcheck() -> dict[str, Any]:
+    if not has_sienge_credentials():
+        return {
+            "ok": False,
+            "statusCode": 503,
+            "detail": "Credenciais do Sienge nao configuradas.",
+        }
+    try:
+        response = requests.get(
+            f"{SIENGE_BASE_URL}{DETECTED_PREFIX}/companies",
+            params={"limit": 1, "offset": 0},
+            auth=(SIENGE_USERNAME, SIENGE_PASSWORD),
+            headers={
+                "Content-Type": "application/json",
+                "Accept": "application/json",
+                "User-Agent": "Mozilla/5.0",
+            },
+            timeout=15,
+        )
+
+        detail = ""
+        try:
+            payload = response.json() if response.content else {}
+            if isinstance(payload, dict):
+                detail = str(payload.get("message") or payload.get("error") or "")
+        except Exception:
+            detail = response.text[:200]
+
+        return {
+            "ok": response.status_code < 400,
+            "statusCode": response.status_code,
+            "detail": detail,
+        }
+    except Exception as exc:
+        return {
+            "ok": False,
+            "statusCode": None,
+            "detail": str(exc),
+        }
 
 
 def fetch_all(endpoint: str, base_params: dict[str, Any] | None = None) -> dict[str, Any]:
@@ -1440,9 +1520,11 @@ def api_test() -> Any:
     obras = to_array(read_dataset_cache("obras") or read_from_file("obras.json"))
     credores = to_array(read_dataset_cache("credores") or read_from_file("credores.json"))
     usuarios = to_array(read_dataset_cache("usuarios") or read_from_file("usuarios.json"))
+    live = sienge_healthcheck()
     return {
-        "ok": len(pedidos) > 0 or len(financeiro) > 0 or len(receber) > 0,
+        "ok": live["ok"] or len(pedidos) > 0 or len(financeiro) > 0 or len(receber) > 0,
         "baseURL": f"{SIENGE_BASE_URL}{DETECTED_PREFIX}",
+        "live": live,
         "cache": {
             "pedidos": len(pedidos),
             "financeiro": len(financeiro),
@@ -1651,11 +1733,20 @@ def api_bootstrap() -> Any:
 
         normalized_financial: list[dict[str, Any]] = []
         for item in financeiro:
-            creditor_id = str(item.get("creditorId") or item.get("idCredor") or item.get("codigoFornecedor") or item.get("debtorId") or "")
+            creditor_id = str(item.get("creditorId") or item.get("idCredor") or item.get("codigoFornecedor") or "")
             building_id = str(item.get("idObra") or item.get("codigoObra") or item.get("enterpriseId") or "")
             creditor_name = creditor_map.get(creditor_id) or creditor_name_hints.get(creditor_id) or normalize_creditor_name(item, creditor_id)
             building_info = building_map.get(building_id, {})
             company_id = building_info.get("companyId")
+            # Fallback: usar debtorId como companyId quando a obra nao tem empresa vinculada.
+            # O debtorId nos titulos do Sienge (/bills) indica a empresa emitente (empresa pagadora).
+            if company_id is None:
+                debtor_id = item.get("debtorId")
+                if debtor_id is not None:
+                    try:
+                        company_id = int(debtor_id)
+                    except (ValueError, TypeError):
+                        pass
             normalized_financial.append(
                 {
                     "id": item.get("id") or item.get("numero") or item.get("codigoTitulo") or item.get("documentNumber") or 0,
@@ -1815,11 +1906,15 @@ async def api_fetch_items(request: Request) -> Any:
     return items_map
 
 
+
 @app.post("/api/sienge/fetch-quotations")
 async def api_fetch_quotations(request: Request) -> Any:
     """Busca as cotações (concorrência de fornecedores) de pedidos de compra no Sienge.
-    Cada pedido pode ter múltiplas cotações de fornecedores distintos.
-    Endpoint Sienge: /public/api/v1/purchase-orders/{id}/quotations
+
+    Estratégia: O Sienge não expõe via GET os preços dos fornecedores concorrentes por cotação.
+    Para cada pedido vencedor, identificamos o purchaseQuotationId nos seus itens, e depois
+    escaneamos todos os pedidos em cache para encontrar outros que referenciam o mesmo
+    purchaseQuotationId — cada um representando um fornecedor concorrente com seus preços.
     """
     body = await request.json()
     ids = body.get("ids") if isinstance(body, dict) else None
@@ -1827,28 +1922,170 @@ async def api_fetch_quotations(request: Request) -> Any:
         return {}
 
     quotations_map = read_from_file("cotacoes_pedidos.json") or {}
+    items_map = read_from_file("itens_pedidos.json") or {}
     changed = False
+
+    # Load all pedidos from cache to find orders sharing the same quotation
+    pedidos_cache = read_dataset_cache("pedidos") or read_from_file("pedidos.json") or {}
+    all_pedidos = to_array(pedidos_cache)
+
+    # Build a lookup: orderId -> pedido info
+    pedido_lookup: dict[str, dict] = {}
+    for p in all_pedidos:
+        pid = str(p.get("id") or p.get("numero") or "")
+        if pid:
+            pedido_lookup[pid] = p
+
+    # Build a reverse index: quotationId -> list of order IDs that reference it
+    # (from cached items only, to avoid N+1 API calls)
+    quotation_order_index: dict[int, list[str]] = {}
+    for oid, o_items in items_map.items():
+        if not isinstance(o_items, list):
+            continue
+        for item in o_items:
+            for pq in (item.get("purchaseQuotations") or []):
+                qid = pq.get("purchaseQuotationId")
+                if qid:
+                    qid_int = int(qid)
+                    if qid_int not in quotation_order_index:
+                        quotation_order_index[qid_int] = []
+                    if oid not in quotation_order_index[qid_int]:
+                        quotation_order_index[qid_int].append(oid)
+
+    def build_quote_from_order(oid: str, order_info: dict, o_items: list) -> dict:
+        sup_id = order_info.get("supplierId") or order_info.get("codigoFornecedor")
+        return {
+            "orderId": int(oid) if str(oid).isdigit() else 0,
+            "supplierId": sup_id,
+            "creditorId": sup_id,
+            "supplierName": None,
+            "date": order_info.get("date") or order_info.get("dataEmissao") or "",
+            "totalAmount": float(order_info.get("totalAmount") or order_info.get("valorTotal") or 0),
+            "items": [
+                {
+                    "description": it.get("resourceDescription") or it.get("descricao") or "",
+                    "resourceId": it.get("resourceId"),
+                    "unitPrice": float(it.get("netPrice") or it.get("unitPrice") or it.get("valorUnitario") or 0),
+                    "quantity": float(it.get("quantity") or it.get("quantidade") or 0),
+                    "unitOfMeasure": it.get("unitOfMeasure") or it.get("unidadeMedidaSigla") or "",
+                    "quotationIds": [pq.get("purchaseQuotationId") for pq in (it.get("purchaseQuotations") or [])],
+                }
+                for it in o_items
+            ],
+        }
+
     for order_id in ids:
         key = str(order_id)
         if quotations_map.get(key):
             continue
         try:
-            result = sienge_get(f"/public/api/v1/purchase-orders/{order_id}/quotations")
-            if result.status_code < 400:
-                payload = result.json()
-                quotations_map[key] = payload.get("results", payload) if isinstance(payload, dict) else payload
+            # Step 1: Get items for this order
+            order_items = items_map.get(key)
+            if not order_items:
+                try:
+                    res = sienge_get(f"/public/api/v1/purchase-orders/{order_id}/items")
+                    if res.status_code < 400:
+                        p = res.json()
+                        order_items = p.get("results", p) if isinstance(p, dict) else p
+                        items_map[key] = order_items
+                        # Update index for newly fetched items
+                        for item in (order_items or []):
+                            for pq in (item.get("purchaseQuotations") or []):
+                                qid = pq.get("purchaseQuotationId")
+                                if qid:
+                                    qid_int = int(qid)
+                                    if qid_int not in quotation_order_index:
+                                        quotation_order_index[qid_int] = []
+                                    if key not in quotation_order_index[qid_int]:
+                                        quotation_order_index[qid_int].append(key)
+                except Exception:
+                    pass
+
+            if not order_items or not isinstance(order_items, list):
+                quotations_map[key] = []
                 changed = True
-            else:
-                # Tentar alternativa com outro endpoint
-                result2 = sienge_get(f"{DETECTED_PREFIX}/purchase-orders/{order_id}/quotations")
-                if result2.status_code < 400:
-                    payload2 = result2.json()
-                    quotations_map[key] = payload2.get("results", payload2) if isinstance(payload2, dict) else payload2
-                    changed = True
+                continue
+
+            # Step 2: Collect all purchaseQuotationIds used by this order
+            quotation_ids: set[int] = set()
+            for item in order_items:
+                for pq in (item.get("purchaseQuotations") or []):
+                    qid = pq.get("purchaseQuotationId")
+                    if qid:
+                        quotation_ids.add(int(qid))
+
+            if not quotation_ids:
+                quotations_map[key] = []
+                changed = True
+                continue
+
+            # Step 3: Find all orders sharing the same quotation IDs (competitor orders).
+            # NOTE: In Sienge, each purchase quotation typically generates exactly ONE
+            # purchase order (for the winning supplier). Other supplier bids are stored
+            # internally in the quotation and are NOT accessible via the public API GET.
+            # This index lookup will find competitors if they happened to be synced
+            # independently with the same purchaseQuotationId.
+            competitor_order_ids: set[str] = set()
+            for qid in quotation_ids:
+                for oid in quotation_order_index.get(qid, []):
+                    if oid != key:
+                        competitor_order_ids.add(oid)
+
+            # Step 4: Fetch items for competitor orders (if not already cached)
+            for oid in list(competitor_order_ids):
+                if not items_map.get(oid):
+                    try:
+                        r2 = sienge_get(f"/public/api/v1/purchase-orders/{oid}/items")
+                        if r2.status_code < 400:
+                            p2 = r2.json()
+                            comp_items = p2.get("results", p2) if isinstance(p2, dict) else p2
+                            items_map[oid] = comp_items
+                    except Exception:
+                        continue
+
+            # Step 5: Fetch metadata from the purchase quotation endpoint
+            quotation_meta: dict = {}
+            order_data = pedido_lookup.get(key, {})  # Get order info for the winning order
+            winning_supplier_id = int(order_data.get("supplierId") or 0)
+            if quotation_ids:
+                qid_meta = next(iter(quotation_ids))
+                try:
+                    r_meta = sienge_get(f"/public/api/v1/purchase-quotations/{qid_meta}")
+                    if r_meta.status_code < 400:
+                        quotation_meta = r_meta.json() or {}
+                except Exception:
+                    pass
+
+            # Step 6: Build the competitor quotes list
+            competitor_quotes: list[dict] = []
+
+            for oid in competitor_order_ids:
+                comp_items = items_map.get(oid)
+                if not comp_items or not isinstance(comp_items, list):
+                    continue
+                comp_order = pedido_lookup.get(oid, {})
+                competitor_quotes.append(build_quote_from_order(oid, comp_order, comp_items))
+
+            # Include the winning order
+            competitor_quotes.append(build_quote_from_order(key, order_data, order_items))
+
+            # Sort by orderId for deterministic output
+            competitor_quotes.sort(key=lambda x: x.get("orderId") or 0)
+
+            # Store quotes with metadata
+            quotations_map[key] = {
+                "quotes": competitor_quotes,
+                "quotationIds": sorted(quotation_ids),
+                "quotationMeta": quotation_meta,
+                "winningSupplier": winning_supplier_id,
+            }
+            changed = True
+
         except Exception:
             continue
 
     if changed:
+        save_to_file("itens_pedidos.json", items_map)
         save_to_file("cotacoes_pedidos.json", quotations_map)
     return quotations_map
 
@@ -2439,6 +2676,337 @@ def _run_interval_sync() -> None:
         except Exception:
             continue
 
+
+
+
+# ─────────────────────────────────────────────────────────────────
+# KANBAN DE OBRAS — Rotas internas (sem Sienge)
+# ─────────────────────────────────────────────────────────────────
+
+UPLOADS_DIR = DATA_DIR / "uploads"
+UPLOADS_DIR.mkdir(parents=True, exist_ok=True)
+
+def _gen_id() -> str:
+    return str(uuid.uuid4())
+
+
+def _kanban_sprints_for_building(building_id: str) -> list[dict]:
+    conn = get_db()
+    cur = conn.cursor()
+    sprints = cur.execute(
+        "SELECT id, building_id, name, start_date, end_date, color, created_at, updated_at "
+        "FROM kanban_sprints WHERE building_id = ? ORDER BY created_at ASC",
+        (building_id,),
+    ).fetchall()
+    result = []
+    for s in sprints:
+        cards = cur.execute(
+            "SELECT id, sprint_id, building_id, title, description, status, priority, "
+            "responsible, due_date, tags, attachments, created_by, created_at, updated_at "
+            "FROM kanban_cards WHERE sprint_id = ? ORDER BY created_at ASC",
+            (s[0],),
+        ).fetchall()
+        sprint_cards = []
+        for c in cards:
+            try:
+                tags = json.loads(c[9] or "[]")
+            except Exception:
+                tags = []
+            try:
+                attachments = json.loads(c[10] or "[]")
+            except Exception:
+                attachments = []
+            sprint_cards.append({
+                "id": c[0], "sprintId": c[1], "buildingId": c[2],
+                "title": c[3], "description": c[4], "status": c[5],
+                "priority": c[6], "responsible": c[7], "dueDate": c[8],
+                "tags": tags, "attachments": attachments,
+                "createdBy": c[11], "createdAt": c[12], "updatedAt": c[13],
+            })
+        result.append({
+            "id": s[0], "buildingId": s[1], "name": s[2],
+            "startDate": s[3], "endDate": s[4], "color": s[5],
+            "createdAt": s[6], "updatedAt": s[7],
+            "cards": sprint_cards,
+        })
+    conn.close()
+    return result
+
+
+@app.get("/api/kanban")
+async def api_kanban_get(building_id: str = "") -> Any:
+    """Returns all sprints and cards for a building (or all buildings)."""
+    conn = get_db()
+    cur = conn.cursor()
+    if building_id:
+        rows = cur.execute(
+            "SELECT DISTINCT building_id FROM kanban_sprints WHERE building_id = ?",
+            (building_id,),
+        ).fetchall()
+    else:
+        rows = cur.execute("SELECT DISTINCT building_id FROM kanban_sprints").fetchall()
+    conn.close()
+
+    buildings_data: dict[str, list] = {}
+    for row in rows:
+        bid = row[0]
+        buildings_data[bid] = _kanban_sprints_for_building(bid)
+    return {"buildings": buildings_data}
+
+
+@app.post("/api/kanban/sprint")
+async def api_kanban_create_sprint(request: Request) -> Any:
+    body = await request.json()
+    building_id = str((body or {}).get("buildingId") or "").strip()
+    name = str((body or {}).get("name") or "").strip()
+    start_date = str((body or {}).get("startDate") or "").strip()
+    end_date = str((body or {}).get("endDate") or "").strip()
+    color = str((body or {}).get("color") or "#f97316").strip()
+
+    if not building_id or not name:
+        raise HTTPException(status_code=400, detail="buildingId e name sao obrigatorios.")
+
+    sprint_id = _gen_id()
+    now = now_iso()
+    conn = get_db()
+    cur = conn.cursor()
+    cur.execute(
+        "INSERT INTO kanban_sprints (id, building_id, name, start_date, end_date, color, created_at, updated_at) "
+        "VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+        (sprint_id, building_id, name, start_date, end_date, color, now, now),
+    )
+    conn.commit()
+    conn.close()
+    return {"success": True, "id": sprint_id}
+
+
+@app.patch("/api/kanban/sprint/{sprint_id}")
+async def api_kanban_update_sprint(sprint_id: str, request: Request) -> Any:
+    body = await request.json()
+    name = str((body or {}).get("name") or "").strip()
+    start_date = str((body or {}).get("startDate") or "").strip()
+    end_date = str((body or {}).get("endDate") or "").strip()
+    color = str((body or {}).get("color") or "").strip()
+
+    conn = get_db()
+    cur = conn.cursor()
+    fields, vals = [], []
+    if name:
+        fields.append("name = ?"); vals.append(name)
+    if start_date is not None:
+        fields.append("start_date = ?"); vals.append(start_date)
+    if end_date is not None:
+        fields.append("end_date = ?"); vals.append(end_date)
+    if color:
+        fields.append("color = ?"); vals.append(color)
+    if not fields:
+        conn.close()
+        raise HTTPException(status_code=400, detail="Nenhum campo para atualizar.")
+    fields.append("updated_at = ?"); vals.append(now_iso())
+    vals.append(sprint_id)
+    cur.execute(f"UPDATE kanban_sprints SET {', '.join(fields)} WHERE id = ?", vals)
+    conn.commit()
+    conn.close()
+    return {"success": True}
+
+
+@app.delete("/api/kanban/sprint/{sprint_id}")
+async def api_kanban_delete_sprint(sprint_id: str) -> Any:
+    conn = get_db()
+    cur = conn.cursor()
+    # Also delete related uploads
+    cards = cur.execute(
+        "SELECT attachments FROM kanban_cards WHERE sprint_id = ?", (sprint_id,)
+    ).fetchall()
+    for row in cards:
+        try:
+            attachments = json.loads(row[0] or "[]")
+            for att in attachments:
+                fpath = UPLOADS_DIR / str(att.get("filename", ""))
+                if fpath.exists():
+                    fpath.unlink(missing_ok=True)
+        except Exception:
+            pass
+    cur.execute("DELETE FROM kanban_cards WHERE sprint_id = ?", (sprint_id,))
+    cur.execute("DELETE FROM kanban_sprints WHERE id = ?", (sprint_id,))
+    conn.commit()
+    conn.close()
+    return {"success": True}
+
+
+@app.post("/api/kanban/card")
+async def api_kanban_create_card(request: Request) -> Any:
+    body = await request.json()
+    sprint_id = str((body or {}).get("sprintId") or "").strip()
+    building_id = str((body or {}).get("buildingId") or "").strip()
+    title = str((body or {}).get("title") or "").strip()
+    description = str((body or {}).get("description") or "").strip()
+    status = str((body or {}).get("status") or "planned").strip()
+    priority = str((body or {}).get("priority") or "medium").strip()
+    responsible = str((body or {}).get("responsible") or "").strip()
+    due_date = str((body or {}).get("dueDate") or "").strip()
+    tags = json.dumps((body or {}).get("tags") or [], ensure_ascii=False)
+    created_by = str((body or {}).get("createdBy") or "").strip()
+
+    if not sprint_id or not title:
+        raise HTTPException(status_code=400, detail="sprintId e title sao obrigatorios.")
+
+    card_id = _gen_id()
+    now = now_iso()
+    conn = get_db()
+    cur = conn.cursor()
+    cur.execute(
+        "INSERT INTO kanban_cards (id, sprint_id, building_id, title, description, status, "
+        "priority, responsible, due_date, tags, attachments, created_by, created_at, updated_at) "
+        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        (card_id, sprint_id, building_id, title, description, status, priority,
+         responsible, due_date, tags, "[]", created_by, now, now),
+    )
+    conn.commit()
+    conn.close()
+    return {"success": True, "id": card_id}
+
+
+@app.patch("/api/kanban/card/{card_id}")
+async def api_kanban_update_card(card_id: str, request: Request) -> Any:
+    body = await request.json()
+    conn = get_db()
+    cur = conn.cursor()
+    fields, vals = [], []
+    for key, col in [
+        ("title", "title"), ("description", "description"), ("status", "status"),
+        ("priority", "priority"), ("responsible", "responsible"), ("dueDate", "due_date"),
+        ("sprintId", "sprint_id"),
+    ]:
+        if key in (body or {}):
+            fields.append(f"{col} = ?"); vals.append(str(body[key] or ""))
+    if "tags" in (body or {}):
+        fields.append("tags = ?"); vals.append(json.dumps(body["tags"] or [], ensure_ascii=False))
+    if "attachments" in (body or {}):
+        fields.append("attachments = ?"); vals.append(json.dumps(body["attachments"] or [], ensure_ascii=False))
+    if not fields:
+        conn.close()
+        raise HTTPException(status_code=400, detail="Nenhum campo para atualizar.")
+    fields.append("updated_at = ?"); vals.append(now_iso())
+    vals.append(card_id)
+    cur.execute(f"UPDATE kanban_cards SET {', '.join(fields)} WHERE id = ?", vals)
+    conn.commit()
+    conn.close()
+    return {"success": True}
+
+
+@app.delete("/api/kanban/card/{card_id}")
+async def api_kanban_delete_card(card_id: str) -> Any:
+    conn = get_db()
+    cur = conn.cursor()
+    row = cur.execute("SELECT attachments FROM kanban_cards WHERE id = ?", (card_id,)).fetchone()
+    if row:
+        try:
+            attachments = json.loads(row[0] or "[]")
+            for att in attachments:
+                fpath = UPLOADS_DIR / str(att.get("filename", ""))
+                if fpath.exists():
+                    fpath.unlink(missing_ok=True)
+        except Exception:
+            pass
+    cur.execute("DELETE FROM kanban_cards WHERE id = ?", (card_id,))
+    conn.commit()
+    conn.close()
+    return {"success": True}
+
+
+@app.post("/api/kanban/upload")
+async def api_kanban_upload(
+    card_id: str,
+    file: UploadFile = File(...),
+) -> Any:
+    allowed_types = {
+        "image/jpeg", "image/png", "image/gif", "image/webp",
+        "video/mp4", "video/webm", "video/quicktime",
+        "application/pdf",
+        "application/xml", "text/xml",
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    }
+    content_type = file.content_type or "application/octet-stream"
+    if content_type not in allowed_types:
+        raise HTTPException(status_code=415, detail=f"Tipo de arquivo nao permitido: {content_type}")
+
+    max_size = 50 * 1024 * 1024  # 50 MB
+    file_data = await file.read()
+    if len(file_data) > max_size:
+        raise HTTPException(status_code=413, detail="Arquivo muito grande (max 50 MB).")
+
+    ext = Path(file.filename or "file").suffix or ".bin"
+    filename = f"{card_id}_{_gen_id()}{ext}"
+    dest = UPLOADS_DIR / filename
+    dest.write_bytes(file_data)
+
+    file_type = "image" if content_type.startswith("image/") else (
+        "video" if content_type.startswith("video/") else "document"
+    )
+
+    attachment = {
+        "id": _gen_id(),
+        "filename": filename,
+        "originalName": file.filename or filename,
+        "type": file_type,
+        "contentType": content_type,
+        "url": f"/api/kanban/files/{filename}",
+        "uploadedAt": now_iso(),
+    }
+
+    # Persist attachment to card
+    conn = get_db()
+    cur = conn.cursor()
+    row = cur.execute("SELECT attachments FROM kanban_cards WHERE id = ?", (card_id,)).fetchone()
+    if not row:
+        conn.close()
+        raise HTTPException(status_code=404, detail="Card nao encontrado.")
+    try:
+        existing = json.loads(row[0] or "[]")
+    except Exception:
+        existing = []
+    existing.append(attachment)
+    cur.execute(
+        "UPDATE kanban_cards SET attachments = ?, updated_at = ? WHERE id = ?",
+        (json.dumps(existing, ensure_ascii=False), now_iso(), card_id),
+    )
+    conn.commit()
+    conn.close()
+    return {"success": True, "attachment": attachment}
+
+
+@app.delete("/api/kanban/upload")
+async def api_kanban_delete_upload(card_id: str, filename: str) -> Any:
+    conn = get_db()
+    cur = conn.cursor()
+    row = cur.execute("SELECT attachments FROM kanban_cards WHERE id = ?", (card_id,)).fetchone()
+    if not row:
+        conn.close()
+        raise HTTPException(status_code=404, detail="Card nao encontrado.")
+    try:
+        existing = json.loads(row[0] or "[]")
+    except Exception:
+        existing = []
+    existing = [a for a in existing if a.get("filename") != filename]
+    cur.execute(
+        "UPDATE kanban_cards SET attachments = ?, updated_at = ? WHERE id = ?",
+        (json.dumps(existing, ensure_ascii=False), now_iso(), card_id),
+    )
+    conn.commit()
+    conn.close()
+    fpath = UPLOADS_DIR / filename
+    fpath.unlink(missing_ok=True)
+    return {"success": True}
+
+
+@app.get("/api/kanban/files/{filename}")
+async def api_kanban_serve_file(filename: str) -> Any:
+    fpath = UPLOADS_DIR / filename
+    if not fpath.exists():
+        raise HTTPException(status_code=404, detail="Arquivo nao encontrado.")
+    media_type, _ = mimetypes.guess_type(str(fpath))
+    return FileResponse(str(fpath), media_type=media_type or "application/octet-stream")
 
 dist_path = BASE_DIR / "dist"
 if dist_path.exists():

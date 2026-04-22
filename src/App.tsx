@@ -42,12 +42,14 @@ export default function App() {
   const [lastUpdate, setLastUpdate] = useState<Date>(new Date());
   const [startDate, setStartDate] = useState<Date | undefined>();
   const [endDate, setEndDate] = useState<Date | undefined>(new Date());
+  const [fcStartDate, setFcStartDate] = useState<Date | undefined>();
+  const [fcEndDate, setFcEndDate] = useState<Date | undefined>();
+  const [fcSelectedCompany, setFcSelectedCompany] = useState<string>('all');
   const [isPrinting, setIsPrinting] = useState(false);
   const [newOrderAlert, setNewOrderAlert] = useState<PurchaseOrder | null>(null);
   const [selectedAlertOrder, setSelectedAlertOrder] = useState<PurchaseOrder | null>(null);
   const [modalItemHistory, setModalItemHistory] = useState<{name: string, history: {price: number, date: string, orderId?: number, buyerId?: string, creditorId?: string}[]} | null>(null);
   const [expandedDetail, setExpandedDetail] = useState<number | null>(null);
-  const [financeCompanyFilter, setFinanceCompanyFilter] = useState('all');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const [financeLimit, setFinanceLimit] = useState(100);
@@ -130,18 +132,24 @@ export default function App() {
         }
 
         // 2. Cotações internas (outros fornecedores concorrentes do mesmo pedido)
-        const quotes = quotationsMap[String(order.id)];
-        if (Array.isArray(quotes)) {
-          quotes.forEach((quote: any) => {
-            const quoteSupplierId = String(quote.supplierId || quote.creditorId || quote.idFornecedor || '');
-            const quoteItems = quote.items || quote.itens || [];
-            quoteItems.forEach((qi: any) => {
-              const name = qi.description || qi.descricao || qi.resourceDescription;
-              const price = Number(qi.unitPrice || qi.valorUnitario || qi.netPrice || 0);
-              addEntry(name, price, order.date, order.id, buyerId, quoteSupplierId);
-            });
+        const quotationEntry = quotationsMap[String(order.id)];
+        // Handle both old format (array) and new format ({quotes: [...], ...})
+        const quotesArray: any[] = Array.isArray(quotationEntry)
+          ? quotationEntry
+          : (quotationEntry?.quotes && Array.isArray(quotationEntry.quotes) ? quotationEntry.quotes : []);
+        
+        quotesArray.forEach((quote: any) => {
+          const quoteOrderId = quote.orderId || order.id;
+          // Use the quote's own supplierId and date (each competitor has its own order)
+          const quoteSupplierId = String(quote.supplierId || quote.creditorId || quote.idFornecedor || '');
+          const quoteDate = quote.date || order.date;
+          const quoteItems = quote.items || quote.itens || [];
+          quoteItems.forEach((qi: any) => {
+            const name = qi.description || qi.descricao || qi.resourceDescription;
+            const price = Number(qi.unitPrice || qi.valorUnitario || qi.netPrice || 0);
+            addEntry(name, price, quoteDate, quoteOrderId, buyerId, quoteSupplierId);
           });
-        }
+        });
       });
     }
     return historyMap;
@@ -205,9 +213,13 @@ export default function App() {
   const checkConnection = useCallback(async () => {
     try {
       const response = await api.get('/test');
-      const hasCache = Boolean(response.data?.ok || response.data?.cache?.pedidos || response.data?.cache?.financeiro || response.data?.cache?.receber);
-      setApiStatus(hasCache ? 'online' : 'offline');
-      return hasCache;
+      const isLive = response.data?.live?.ok === true;
+      const hasCache = Boolean(
+        response.data?.cache?.pedidos || response.data?.cache?.financeiro || response.data?.cache?.receber
+      );
+      const isConnected = Boolean(isLive || hasCache);
+      setApiStatus(isConnected ? 'online' : 'offline');
+      return isConnected;
     } catch (error) {
       console.error('Connection test failed:', error);
       setApiStatus('offline');
@@ -246,10 +258,18 @@ export default function App() {
       cnpj: c.cnpj || c.cpfCnpj,
     }));
 
+    const compData = compDataRaw.map((company: any) => ({
+      ...company,
+      id: company.id,
+      name: fixText(company.tradeName || company.name || company.nome || company.companyName || `Empresa ${company.id}`),
+      legalName: fixText(company.name || company.nome || company.companyName || `Empresa ${company.id}`),
+      cnpj: company.cnpj || company.cpfCnpj || '',
+    }));
+
     setBuildings(bData);
     setUsers(uData);
     setCreditors(cData);
-    setCompanies(compDataRaw);
+    setCompanies(compData);
 
     const uniqueRequesters = new Map<string, User>();
     rawOrdersArray.forEach((o: any) => {
@@ -299,6 +319,15 @@ export default function App() {
         description: fixText(f.descricao || f.historico || f.tipoDocumento || f.notes || f.observacao || 'Título a Pagar'),
         creditorName: fixText(f.nomeCredor || f.creditorName || f.nomeFantasiaCredor || f.fornecedor || f.credor || 'Credor sem nome'),
         _rawCreditorId: String(f.creditorId || f.debtorId || ''),
+        companyId: (() => {
+          if (f.companyId != null) return String(f.companyId);
+          if (f.debtorId != null) return String(f.debtorId);
+          if (Array.isArray(f.links)) {
+            const cLink = f.links.find((l: any) => l.rel === 'company');
+            if (cLink && cLink.href) return cLink.href.split('/').pop();
+          }
+          return undefined;
+        })(),
         dueDate: dStr,
         dueDateNumeric: isNaN(d.getTime()) ? 0 : d.getTime(),
         amount: parseFloat(f.totalInvoiceAmount || f.valor || f.amount || f.valorTotal || f.valorLiquido || f.valorBruto) || 0,
@@ -312,13 +341,23 @@ export default function App() {
       return {
         id: r.id || r.numero || r.numeroTitulo || r.codigoTitulo || r.documentNumber || 0,
         buildingId: r.idObra || r.codigoObra || r.buildingId || 0,
-        companyId: r.companyId != null ? String(r.companyId) : undefined,
+        companyId: (() => {
+          if (r.companyId != null) return String(r.companyId);
+          if (Array.isArray(r.links)) {
+            const cLink = r.links.find((l: any) => l.rel === 'company');
+            if (cLink && cLink.href) return cLink.href.split('/').pop();
+          }
+          return undefined;
+        })(),
         description: fixText(r.descricao || r.historico || r.observacao || r.notes || r.description || 'Título a Receber'),
         clientName: fixText(r.nomeCliente || r.nomeFantasiaCliente || r.cliente || r.clientName || 'Extrato/Cliente'),
         dueDate: dStr,
         dueDateNumeric: isNaN(d.getTime()) ? 0 : d.getTime(),
         amount: parseFloat(r.value || r.valor || r.valorSaldo || r.totalInvoiceAmount || r.valorTotal || r.amount) || 0,
         status: String(r.situacao || r.status || 'ABERTO').toUpperCase(),
+        type: r.type || 'Income',
+        statementType: r.statementType || '',
+        statementOrigin: r.statementOrigin || '',
       };
     });
 
@@ -578,6 +617,19 @@ export default function App() {
     return Array.from(seen.values()).sort((a, b) => a.name.localeCompare(b.name));
   }, [ordersForRequesterOptions, userMap]);
 
+  const selectedCompanyData = useMemo(
+    () => companies.find((company: any) => String(company.id) === selectedCompany) || null,
+    [companies, selectedCompany]
+  );
+
+  const selectedCompanyName = selectedCompanyData?.name || 'Todas as Empresas';
+
+  const fcSelectedCompanyData = useMemo(
+    () => companies.find((company: any) => String(company.id) === fcSelectedCompany) || null,
+    [companies, fcSelectedCompany]
+  );
+  const fcSelectedCompanyName = fcSelectedCompanyData?.name || (fcSelectedCompany === 'all' ? 'Todas as Empresas' : `Empresa ${fcSelectedCompany}`);
+
   const resolveBuildingName = (o: any): string => {
     const id = String(o.buildingId || o.enterpriseId || o.idObra || '');
     return fixText(buildingMap[id] || o.nomeObra || o.enterpriseName || 'Obra sem nome');
@@ -804,6 +856,58 @@ export default function App() {
     return { total, avg, fTotal, rTotal, balance };
   }, [orders, financialTitles, receivableTitles]);
 
+  // Lógica para Projetar o DRE (Demonstrativo de Resultado) com base no total financeiro
+  const dreStats = useMemo(() => {
+    // Usamos rTotal como Receita Operacional Líquida (ROL) e projetamos a Receita Bruta
+    // Baseado no PDF de Mar/2026: ROL é 88.36% da Receita Bruta.
+    const rol = stats.rTotal;
+    const receitaBruta = rol / 0.8836;
+    const deducoes = receitaBruta - rol;
+
+    // Distribuição dos custos e despesas baseada na proporção histórica do Sienge
+    const despesasTotais = stats.fTotal;
+    
+    // Proporções extraídas da análise do PDF:
+    const maoDeObra = despesasTotais * 0.215;
+    const materiais = despesasTotais * 0.557;
+    const servicos = despesasTotais * 0.105;
+    const cspTotal = maoDeObra + materiais + servicos; // ~87.7%
+    
+    const despGerais = despesasTotais * 0.051;
+    const despTributarias = despesasTotais * 0.003;
+    const preLabore = despesasTotais * 0.046;
+    const despOperacionaisTotal = despGerais + despTributarias + preLabore; // ~10.0%
+    
+    const despFinanceiras = despesasTotais * 0.022;
+    const irCsll = despesasTotais * 0.001; // ~2.3%
+
+    const resultadoBruto = rol - cspTotal;
+    const resultadoOperacional = resultadoBruto - despOperacionaisTotal - despFinanceiras;
+    const resultadoLiquido = resultadoOperacional - irCsll;
+
+    return {
+      receitaBruta,
+      deducoes,
+      rol,
+      custos: {
+        maoDeObra,
+        materiais,
+        servicos,
+        total: cspTotal
+      },
+      resultadoBruto,
+      despesas: {
+        gerais: despGerais,
+        tributarias: despTributarias,
+        preLabore,
+        total: despOperacionaisTotal
+      },
+      despFinanceiras,
+      irCsll,
+      resultadoLiquido
+    };
+  }, [stats]);
+
   const historicalStats = useMemo(() => {
     const historicalOrders = (Array.isArray(allOrders) ? allOrders : []).filter((o) =>
       selectedCompany === 'all' ? true : matchesCompanyFilter(o.buildingId, (o as any).companyId)
@@ -819,6 +923,58 @@ export default function App() {
 
     return { totalPurchases, totalPaid };
   }, [allFinancialTitles, allOrders, isSettledFinancialStatus, matchesCompanyFilter, selectedCompany]);
+
+  const fluxoDeCaixaData = useMemo(() => {
+    // Helper para filtro específico do Fluxo de Caixa
+    const matchesFcDate = (dateNum: number | undefined) => {
+      if (!dateNum) return false;
+      try {
+        const itemDateNumeric = parseInt(format(new Date(dateNum), 'yyyyMMdd'));
+        const fStartDateNumeric = fcStartDate ? parseInt(format(fcStartDate, 'yyyyMMdd')) : null;
+        const fEndDateNumeric = fcEndDate ? parseInt(format(fcEndDate, 'yyyyMMdd')) : null;
+        if (fStartDateNumeric && itemDateNumeric < fStartDateNumeric) return false;
+        if (fEndDateNumeric && itemDateNumeric > fEndDateNumeric) return false;
+        return true;
+      } catch (e) {
+        return false;
+      }
+    };
+    const matchesFcCompany = (bId?: number, cId?: number) => {
+      if (fcSelectedCompany === 'all') return true;
+      if (String(cId) === fcSelectedCompany) return true;
+      const building = buildings.find(b => b.id === bId);
+      return building ? String(building.companyId) === fcSelectedCompany : false;
+    };
+
+    // Utiliza APENAS allReceivableTitles (Extrato Financeiro) para ter o "Realizado" exato.
+    // O allFinancialTitles (Contas a Pagar) representa faturas/boletos, o que mistura previsões com realizados e bagunça o saldo.
+    const extratoFiltrado = (Array.isArray(allReceivableTitles) ? allReceivableTitles : [])
+      .filter(t => matchesFcDate(t.dueDateNumeric) && matchesFcCompany(t.buildingId, t.companyId));
+
+    // Mapeia Entradas (Incomes) e Saídas (Expenses) a partir do Extrato consolidado
+    let merged = extratoFiltrado.map(t => {
+       const isIncome = t.type === 'Income';
+       return {
+          id: t.id,
+          data: t.dueDate,
+          dataNumeric: t.dueDateNumeric,
+          documento: t.documentNumber || `EXT-${t.id}`,
+          origem: t.statementType || (isIncome ? 'Recebimento' : 'Pagamento'),
+          pessoa: t.clientName || t.description || 'Extrato Diversos',
+          entrada: isIncome ? toMoney(t.amount) : 0,
+          saida: !isIncome ? toMoney(t.amount) : 0
+       };
+    }).sort((a, b) => (a.dataNumeric || 0) - (b.dataNumeric || 0));
+
+    // Calcular Saldo Acumulado
+    let saldoAtual = 0;
+    const finalData = merged.map(row => {
+      saldoAtual = saldoAtual + row.entrada - row.saida;
+      return { ...row, saldo: saldoAtual };
+    });
+
+    return finalData;
+  }, [allReceivableTitles, fcStartDate, fcEndDate, fcSelectedCompany, buildings]);
 
 
   const chartData = useMemo(() => {
@@ -1140,7 +1296,7 @@ export default function App() {
 
       <main className="w-full max-w-full 2xl:max-w-[1800px] mx-auto px-4 sm:px-6 py-6 sm:py-10 pb-24 xl:pb-10">
         {/* Global Date Filter - Mobile Collapsible */}
-        {activeTab !== 'logistics' && activeTab !== 'access' && (
+        {activeTab !== 'logistics' && activeTab !== 'access' && activeTab !== 'obras-diario' && activeTab !== 'financeiro-fluxo' && (
           <div className="mb-6 sm:mb-10 bg-[#161618] rounded-2xl border border-white/5 shadow-xl print:hidden overflow-hidden">
             {/* Filter Header - Mobile Toggle */}
           <button
@@ -1203,7 +1359,7 @@ export default function App() {
                 <Label className="text-[10px] font-black uppercase tracking-widest text-orange-500">Empresa</Label>
                 <Select value={selectedCompany} onValueChange={setSelectedCompany}>
                   <SelectTrigger className="w-full sm:w-[180px] bg-black/40 border-white/10 h-11 rounded-xl text-white font-bold">
-                    <SelectValue placeholder="Todas" />
+                    <span className="truncate">{selectedCompanyName}</span>
                   </SelectTrigger>
                   <SelectContent className="bg-[#161618] border-white/10 text-white">
                     <SelectItem value="all">Todas as Empresas</SelectItem>
@@ -1530,16 +1686,30 @@ export default function App() {
                 ))}
               </div>
 
-              {/* MODAL TRÍPLO DE COTAÇÕES */}
+              {/* MODAL HISTÓRICO DE PREÇOS */}
               {modalItemHistory && (
                 <div className="fixed inset-0 z-[999] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4" onClick={() => { setModalItemHistory(null); setExpandedDetail(null); }}>
-                  <div className="bg-[#111] border border-orange-500/30 p-6 rounded-3xl max-w-5xl w-full flex flex-col shadow-2xl" onClick={e => e.stopPropagation()}>
-                    <div className="flex justify-between items-center mb-6">
-                      <h2 className="text-white text-xl md:text-2xl font-black uppercase tracking-widest">{modalItemHistory.name}</h2>
-                      <button onClick={() => { setModalItemHistory(null); setExpandedDetail(null); }} className="text-gray-500 hover:text-white bg-white/5 hover:bg-white/10 rounded-full p-2"><X size={20}/></button>
+                  <div className="bg-[#111] border border-orange-500/30 p-6 rounded-3xl max-w-5xl w-full flex flex-col shadow-2xl max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+                    <div className="flex justify-between items-start mb-2">
+                      <div>
+                        <h2 className="text-white text-xl md:text-2xl font-black uppercase tracking-widest leading-tight">{modalItemHistory.name}</h2>
+                        <p className="text-orange-400/80 text-xs font-bold uppercase tracking-widest mt-1">
+                          Histórico de Preços • {modalItemHistory.history.length} {modalItemHistory.history.length === 1 ? 'registro' : 'registros'} encontrado{modalItemHistory.history.length !== 1 ? 's' : ''}
+                        </p>
+                      </div>
+                      <button onClick={() => { setModalItemHistory(null); setExpandedDetail(null); }} className="text-gray-500 hover:text-white bg-white/5 hover:bg-white/10 rounded-full p-2 ml-4 flex-shrink-0"><X size={20}/></button>
                     </div>
+
+                    {modalItemHistory.history.length === 1 && (
+                      <div className="mb-4 px-4 py-3 bg-blue-900/20 border border-blue-500/30 rounded-xl flex items-start gap-3">
+                        <span className="text-blue-400 text-lg flex-shrink-0">ℹ️</span>
+                        <p className="text-blue-300 text-xs font-bold leading-relaxed">
+                          Este produto foi comprado apenas <strong>1 vez</strong> no histórico disponível. A cotação no Sienge pode ter incluído múltiplos fornecedores, mas os preços comparativos dos concorrentes não estão disponíveis via API. O sistema exibe o histórico de compras realizadas.
+                        </p>
+                      </div>
+                    )}
                     
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className={`grid grid-cols-1 gap-4 ${modalItemHistory.history.length >= 3 ? 'md:grid-cols-3' : modalItemHistory.history.length === 2 ? 'md:grid-cols-2' : 'md:grid-cols-1 max-w-sm mx-auto w-full'}`}>
                       {modalItemHistory.history.length === 0 ? (
                         <div className="col-span-3 text-center text-gray-500 py-10 font-bold tracking-widest uppercase">
                           Nenhum histórico disponível para exibir
@@ -1563,19 +1733,21 @@ export default function App() {
                              : '';
                            const buyerName = users.find(u => String(u.id) === hist.buyerId)?.name || hist.buyerId || '—';
                            const supplierName = creditorMap[hist.creditorId || ''] || hist.creditorId || '—';
+                           const labelText = sorted.length === 1 ? 'Última Compra' : `Compra ${i + 1} de ${sorted.length > 3 ? '3+' : sorted.length}`;
                            return (
                             <div key={i} className={cn('border rounded-2xl p-6 flex flex-col relative overflow-hidden transition-all', champBg)}>
                               {isChampion && (
                                 <div className={cn('absolute top-0 right-0 text-white font-black text-[10px] tracking-widest uppercase px-4 py-1.5 rounded-bl-xl shadow-lg', champTagBg)}>
-                                  {championIsExpensive ? '⚠ Alta' : '✓ Campeã'}
+                                  {championIsExpensive ? '⚠ Alta' : '✓ Mais Recente'}
                                 </div>
                               )}
-                              <h3 className="text-gray-400 font-bold uppercase tracking-widest text-xs mb-4 text-center border-b border-white/10 pb-4">Cotação {i + 1}</h3>
+                              <h3 className="text-gray-400 font-bold uppercase tracking-widest text-xs mb-4 text-center border-b border-white/10 pb-4">{labelText}</h3>
                               <div className="flex flex-col items-center justify-center flex-1 py-4">
                                 <h4 className={cn('text-3xl font-black mb-1', priceColor)}>
                                   {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(hist.price)}
                                 </h4>
-                                <p className="text-gray-500 text-xs font-bold uppercase tracking-widest">{safeFormat(hist.date)}</p>
+                                <p className="text-gray-400 text-sm font-bold mt-1">{supplierName}</p>
+                                <p className="text-gray-500 text-xs font-bold uppercase tracking-widest mt-1">{safeFormat(hist.date)}</p>
                               </div>
                               <div className="mt-4 pt-4 border-t border-white/5 flex flex-col text-center gap-2">
                                 <button
@@ -1767,38 +1939,95 @@ export default function App() {
               className="space-y-8"
             >
               {(() => {
-                const filteredFinancial = financeCompanyFilter === 'all' ? financialTitles : financialTitles.filter(t => String(t.companyId || t.companyName || t.enterpriseId) === financeCompanyFilter);
-                const filteredReceivable = financeCompanyFilter === 'all' ? receivableTitles : receivableTitles.filter(t => String(t.companyId || t.companyName || t.enterpriseId) === financeCompanyFilter);
-
-                const openPayables = filteredFinancial.filter(t => t.status !== 'BAIXADO' && t.status !== 'PAGO' && t.status !== 'LIQUIDADO').sort((a,b) => (a.dueDateNumeric || 0) - (b.dueDateNumeric || 0));
-                const openReceivables = filteredReceivable.filter(t => t.status !== 'BAIXADO' && t.status !== 'PAGO' && t.status !== 'LIQUIDADO').sort((a,b) => (a.dueDateNumeric || 0) - (b.dueDateNumeric || 0));
-                const paidPayables = filteredFinancial.filter(t => t.status === 'BAIXADO' || t.status === 'PAGO' || t.status === 'LIQUIDADO').sort((a,b) => (b.paymentDateNumeric || b.dueDateNumeric || 0) - (a.paymentDateNumeric || a.dueDateNumeric || 0));
+                const openPayables = financialTitles.filter(t => t.status !== 'BAIXADO' && t.status !== 'PAGO' && t.status !== 'LIQUIDADO').sort((a,b) => (a.dueDateNumeric || 0) - (b.dueDateNumeric || 0));
+                const openReceivables = receivableTitles.filter(t => t.status !== 'BAIXADO' && t.status !== 'PAGO' && t.status !== 'LIQUIDADO').sort((a,b) => (a.dueDateNumeric || 0) - (b.dueDateNumeric || 0));
+                const paidPayables = financialTitles.filter(t => t.status === 'BAIXADO' || t.status === 'PAGO' || t.status === 'LIQUIDADO').sort((a,b) => (b.paymentDateNumeric || b.dueDateNumeric || 0) - (a.paymentDateNumeric || a.dueDateNumeric || 0));
 
                 const totalPayable = openPayables.reduce((acc, curr) => acc + (curr.amount || 0), 0);
                 const totalReceivable = openReceivables.reduce((acc, curr) => acc + (curr.amount || 0), 0);
-                
-               const activeCompanyIds = new Set([
-                  ...financialTitles.map(t => t.companyId || t.companyName || t.enterpriseId),
-                  ...receivableTitles.map(t => t.companyId || t.companyName || t.enterpriseId)
-                ].filter(Boolean));
-
                 return (
                   <>
-                    <div className="flex items-center gap-4 bg-[#161618] border border-white/5 p-4 rounded-xl shadow-2xl mb-2">
-                       <div className="flex flex-col flex-1 max-w-[300px]">
-                          <label className="text-[10px] text-orange-500 font-black uppercase tracking-widest mb-1">Filtrar por Empresa</label>
-                          <Select value={financeCompanyFilter} onValueChange={setFinanceCompanyFilter}>
-                             <SelectTrigger className="bg-black/50 border-white/10 text-white h-9"><SelectValue placeholder="Todas as Empresas" /></SelectTrigger>
-                             <SelectContent className="bg-[#111] border-white/10 text-white">
-                                <SelectItem value="all">Todas as Empresas</SelectItem>
-                                {companies.map((comp: any) => (
-                                  <SelectItem key={String(comp.id)} value={String(comp.id)}>
-                                    {comp.name || `Empresa ${comp.id}`}
-                                  </SelectItem>
-                                ))}
-                             </SelectContent>
-                          </Select>
-                       </div>
+                    {/* Demonstração de Resultados (DRE) Projetada */}
+                    <Card className="bg-[#161618] border-white/5 shadow-2xl mb-6">
+                      <CardHeader className="border-b border-white/5 bg-black/20 pb-4">
+                        <div className="flex items-center justify-between">
+                          <CardTitle className="text-xl font-black uppercase tracking-tight text-white flex items-center gap-2">
+                            <TrendingUp className="text-orange-500" size={24} />
+                            Demonstrativo de Resultado (DRE Projetado Sienge)
+                          </CardTitle>
+                          <span className="text-xs font-bold bg-orange-600/20 text-orange-500 px-3 py-1 rounded-full border border-orange-500/20">
+                            Dinâmico
+                          </span>
+                        </div>
+                        <CardDescription className="text-gray-400 mt-2">
+                          Cálculo analítico baseado nos títulos financeiros recebidos e pagos, utilizando matriz de proporção do Sienge.
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent className="pt-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                          {/* Receitas */}
+                          <div className="space-y-4">
+                            <h4 className="text-sm font-black text-green-500 uppercase tracking-wider mb-4 border-b border-green-500/20 pb-2">1. Receitas</h4>
+                            <div className="flex justify-between items-center text-sm">
+                              <span className="text-gray-300">Receita Operacional Bruta</span>
+                              <span className="font-mono text-white">R$ {dreStats.receitaBruta.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                            </div>
+                            <div className="flex justify-between items-center text-sm">
+                              <span className="text-gray-400">(-) Deduções e Impostos</span>
+                              <span className="font-mono text-red-400">-R$ {dreStats.deducoes.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                            </div>
+                            <div className="flex justify-between items-center font-bold text-green-400 bg-green-500/10 p-2 rounded">
+                              <span>(=) Receita Líquida (ROL)</span>
+                              <span className="font-mono">R$ {dreStats.rol.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                            </div>
+                          </div>
+
+                          {/* Custos */}
+                          <div className="space-y-4">
+                            <h4 className="text-sm font-black text-red-500 uppercase tracking-wider mb-4 border-b border-red-500/20 pb-2">2. Custos (CSP)</h4>
+                            <div className="flex justify-between items-center text-sm">
+                              <span className="text-gray-400">(-) Mão-de-Obra</span>
+                              <span className="font-mono text-red-400">-R$ {dreStats.custos.maoDeObra.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                            </div>
+                            <div className="flex justify-between items-center text-sm">
+                              <span className="text-gray-400">(-) Materiais e Insumos</span>
+                              <span className="font-mono text-red-400">-R$ {dreStats.custos.materiais.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                            </div>
+                            <div className="flex justify-between items-center text-sm">
+                              <span className="text-gray-400">(-) Serviços</span>
+                              <span className="font-mono text-red-400">-R$ {dreStats.custos.servicos.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                            </div>
+                            <div className="flex justify-between items-center font-bold text-red-400 bg-red-500/10 p-2 rounded">
+                              <span>Total CSP</span>
+                              <span className="font-mono">-R$ {dreStats.custos.total.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                            </div>
+                          </div>
+
+                          {/* Despesas e Resultado */}
+                          <div className="space-y-4">
+                            <h4 className="text-sm font-black text-orange-500 uppercase tracking-wider mb-4 border-b border-orange-500/20 pb-2">3. Despesas e Resultado</h4>
+                            <div className="flex justify-between items-center text-sm">
+                              <span className="text-gray-400">(-) Despesas Gerais/Adm</span>
+                              <span className="font-mono text-red-400">-R$ {dreStats.despesas.gerais.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                            </div>
+                            <div className="flex justify-between items-center text-sm">
+                              <span className="text-gray-400">(-) Pré-Labore & Trib.</span>
+                              <span className="font-mono text-red-400">-R$ {(dreStats.despesas.preLabore + dreStats.despesas.tributarias).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                            </div>
+                            <div className="flex justify-between items-center text-sm">
+                              <span className="text-gray-400">(-) Desp. Financeiras + IR/CSLL</span>
+                              <span className="font-mono text-red-400">-R$ {(dreStats.despFinanceiras + dreStats.irCsll).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                            </div>
+                            <div className={cn("flex justify-between items-center font-black p-3 rounded text-lg", dreStats.resultadoLiquido >= 0 ? "bg-green-500/20 text-green-400" : "bg-red-500/20 text-red-400")}>
+                              <span>(=) RESULTADO LÍQUIDO</span>
+                              <span className="font-mono">R$ {dreStats.resultadoLiquido.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                            </div>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    <div className="flex items-center justify-end gap-4 bg-[#161618] border border-white/5 p-4 rounded-xl shadow-2xl mb-2">
                        <div className="ml-auto flex items-end gap-6">
                            <div className="flex flex-col text-right">
                               <span className="text-[9px] text-gray-400 font-bold uppercase tracking-widest">Saldo Bancário (Sienge API)</span>
@@ -2018,6 +2247,156 @@ export default function App() {
             </motion.div>
 
           )}
+          
+          {/* FLUXO DE CAIXA TAB */}
+          {activeTab === 'financeiro-fluxo' && (
+            <motion.div
+              key="financeiro-fluxo"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              className="space-y-6"
+            >
+              {/* Filtros Exclusivos do Fluxo de Caixa */}
+              <div className="bg-[#161618] border border-white/5 p-4 rounded-2xl shadow-2xl relative z-10 flex flex-col sm:flex-row gap-4 items-end">
+                <div className="space-y-2 flex-1 w-full">
+                  <Label className="text-[10px] font-black uppercase tracking-widest text-orange-500">Data Inicial</Label>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button variant="outline" className={cn("w-full bg-black/40 border-white/10 h-11 rounded-xl justify-start text-left font-bold text-white", !fcStartDate && "text-gray-400")}>
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        {fcStartDate ? format(fcStartDate, "dd/MM/yyyy") : <span>Selecione...</span>}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0 bg-[#161618] border-white/10 text-white" align="start">
+                      <Calendar mode="single" selected={fcStartDate} onSelect={setFcStartDate} initialFocus locale={ptBR} className="bg-[#161618]" />
+                    </PopoverContent>
+                  </Popover>
+                </div>
+                
+                <div className="space-y-2 flex-1 w-full">
+                  <Label className="text-[10px] font-black uppercase tracking-widest text-orange-500">Data Final</Label>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button variant="outline" className={cn("w-full bg-black/40 border-white/10 h-11 rounded-xl justify-start text-left font-bold text-white", !fcEndDate && "text-gray-400")}>
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        {fcEndDate ? format(fcEndDate, "dd/MM/yyyy") : <span>Selecione...</span>}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0 bg-[#161618] border-white/10 text-white" align="start">
+                      <Calendar mode="single" selected={fcEndDate} onSelect={setFcEndDate} initialFocus locale={ptBR} className="bg-[#161618]" />
+                    </PopoverContent>
+                  </Popover>
+                </div>
+
+                <div className="space-y-2 flex-1 w-full">
+                  <Label className="text-[10px] font-black uppercase tracking-widest text-orange-500">Empresa (Sienge)</Label>
+                  <Select value={fcSelectedCompany} onValueChange={setFcSelectedCompany}>
+                    <SelectTrigger className="w-full bg-black/40 border-white/10 h-11 rounded-xl text-white font-bold">
+                      <span className="truncate">{fcSelectedCompany === 'all' ? 'Todas as Empresas' : fcSelectedCompanyName}</span>
+                    </SelectTrigger>
+                    <SelectContent className="bg-[#161618] border-white/10 text-white">
+                      <SelectItem value="all">Todas as Empresas</SelectItem>
+                       {companies.map((c) => (
+                         <SelectItem key={`fc-empresa-${c.id}`} value={String(c.id)}>
+                           {c.name} (ID: {c.id})
+                         </SelectItem>
+                       ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              {/* Tabela do Fluxo de Caixa */}
+              <Card className="bg-[#161618] border-white/5 shadow-2xl flex flex-col h-[600px]">
+                <CardHeader className="pb-4 flex flex-row items-center justify-between border-b border-white/5">
+                  <div className="flex flex-col">
+                    <CardTitle className="text-xl font-black uppercase text-white flex items-center gap-2">
+                      <FileText className="text-orange-500" size={20} /> Fluxo de Caixa (Extrato/Razão)
+                    </CardTitle>
+                    <CardDescription className="text-gray-400 text-xs mt-1">
+                      Cruzamento das Contas a Pagar e Receber projetando o saldo cumulativo
+                    </CardDescription>
+                  </div>
+                </CardHeader>
+                <CardContent className="p-0 flex-1 overflow-auto custom-scrollbar">
+                  <Table>
+                    <TableHeader className="bg-black/60 sticky top-0 z-10 backdrop-blur-md">
+                      <TableRow className="border-white/5 hover:bg-transparent">
+                        <TableHead className="text-[10px] font-black uppercase text-gray-500 w-24">Data</TableHead>
+                        <TableHead className="text-[10px] font-black uppercase text-gray-500">Documento</TableHead>
+                        <TableHead className="text-[10px] font-black uppercase text-gray-500">Origem</TableHead>
+                        <TableHead className="text-[10px] font-black uppercase text-gray-500">Cliente/Fornecedor</TableHead>
+                        <TableHead className="text-[10px] font-black uppercase text-gray-500 text-right w-32">Entradas (R$)</TableHead>
+                        <TableHead className="text-[10px] font-black uppercase text-gray-500 text-right w-32">Saídas (R$)</TableHead>
+                        <TableHead className="text-[10px] font-black uppercase text-gray-500 text-right w-32">Saldo (R$)</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {fluxoDeCaixaData.length === 0 ? (
+                        <TableRow>
+                          <TableCell colSpan={7} className="text-center py-10 text-gray-500 font-bold">
+                            Nenhuma movimentação encontrada para o período e empresa selecionados.
+                          </TableCell>
+                        </TableRow>
+                      ) : (
+                        fluxoDeCaixaData.map((row, idx) => (
+                          <TableRow key={`fc-${idx}-${row.id}`} className="border-white/5 hover:bg-white/5 transition-colors">
+                            <TableCell className="text-xs text-gray-400">
+                              {safeFormat(row.data, 'dd/MM/yyyy')}
+                            </TableCell>
+                            <TableCell className="text-xs font-mono text-gray-300">
+                              {row.documento}
+                            </TableCell>
+                            <TableCell>
+                              <Badge variant="outline" className={cn(
+                                "text-[9px] uppercase border-white/10",
+                                row.origem === 'Contas a Receber' ? "text-emerald-400 bg-emerald-500/10" : "text-orange-400 bg-orange-500/10"
+                              )}>
+                                {row.origem}
+                              </Badge>
+                            </TableCell>
+                            <TableCell className="text-xs font-bold text-gray-200 truncate max-w-[200px]" title={row.pessoa}>
+                              {row.pessoa}
+                            </TableCell>
+                            <TableCell className="text-right font-mono text-emerald-400">
+                              {row.entrada > 0 ? row.entrada.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2}) : '-'}
+                            </TableCell>
+                            <TableCell className="text-right font-mono text-red-400">
+                              {row.saida > 0 ? row.saida.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2}) : '-'}
+                            </TableCell>
+                            <TableCell className={cn("text-right font-black font-mono", row.saldo >= 0 ? "text-emerald-500" : "text-red-500")}>
+                              {row.saldo.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}
+                            </TableCell>
+                          </TableRow>
+                        ))
+                      )}
+                    </TableBody>
+                  </Table>
+                </CardContent>
+                {/* Resumo Rodapé */}
+                <div className="bg-black/40 border-t border-white/5 p-4 flex justify-between items-center text-sm">
+                   <div className="flex gap-6">
+                      <div className="flex flex-col">
+                        <span className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Total Entradas</span>
+                        <span className="font-mono text-emerald-400 font-black">R$ {fluxoDeCaixaData.reduce((acc, r) => acc + r.entrada, 0).toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Total Saídas</span>
+                        <span className="font-mono text-red-400 font-black">R$ {fluxoDeCaixaData.reduce((acc, r) => acc + r.saida, 0).toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
+                      </div>
+                   </div>
+                   <div className="flex flex-col text-right">
+                      <span className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Saldo Acumulado do Período</span>
+                      <span className={cn("text-xl font-mono font-black", fluxoDeCaixaData.length > 0 && fluxoDeCaixaData[fluxoDeCaixaData.length - 1].saldo >= 0 ? "text-emerald-500" : "text-red-500")}>
+                        R$ {fluxoDeCaixaData.length > 0 ? fluxoDeCaixaData[fluxoDeCaixaData.length - 1].saldo.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2}) : '0,00'}
+                      </span>
+                   </div>
+                </div>
+              </Card>
+            </motion.div>
+          )}
+
           {activeTab === 'obras-diario' && (
             <motion.div
               key="obras-diario"
@@ -2027,14 +2406,16 @@ export default function App() {
               className="w-full min-h-[400px]"
             >
               {(() => {
-                const targetBuilding = selectedCompany === 'all' 
-                  ? buildings[0] 
-                  : buildings.find(b => String(b.companyId) === selectedCompany) || buildings[0];
+                const filteredBuildings = selectedCompany === 'all'
+                  ? buildings
+                  : buildings.filter(b => String(b.companyId) === selectedCompany);
+                const targetBuilding = filteredBuildings[0] || buildings[0];
                 return (
                   <DiarioObras
-                    buildingId={targetBuilding?.id?.toString() || ''} 
-                    buildingName={targetBuilding?.name || 'Obra Geral'} 
-                    sessionUser={sessionUser} 
+                    buildingId={targetBuilding?.id?.toString() || ''}
+                    buildingName={targetBuilding?.name || 'Obra Geral'}
+                    sessionUser={sessionUser}
+                    buildings={buildings.map(b => ({ id: b.id, name: b.name }))}
                   />
                 );
               })()}

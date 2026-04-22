@@ -4,6 +4,10 @@ export const api = axios.create({
   baseURL: '/api/sienge',
 });
 
+export const kanbanApi = axios.create({
+  baseURL: '/api',
+});
+
 export const authApi = axios.create({
   baseURL: '/api/auth',
   timeout: 8000,

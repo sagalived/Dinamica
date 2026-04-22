@@ -10199,7 +10199,7 @@
     "taxClassification": "",
     "paymentTypeId": null,
     "creationDate": "2020-01-02",
-    "lastModificationDate": "2020-01-02",
+    "lastModificationDate": "2026-04-22",
     "address": {
       "cityId": 18,
       "cityName": "Fortaleza",
@@ -17990,7 +17990,7 @@
     "taxClassification": "",
     "paymentTypeId": null,
     "creationDate": "2020-06-05",
-    "lastModificationDate": "2020-06-05",
+    "lastModificationDate": "2026-04-22",
     "address": {
       "cityId": 807,
       "cityName": "Sobral",
@@ -160258,6 +160258,203 @@
       {
         "rel": "bank-informations",
         "href": "https://api.sienge.com.br/dinamicaempreendimentos/public/api/v1/creditors/3357/bank-informations"
+      }
+    ]
+  },
+  {
+    "id": 3358,
+    "name": "YASMIN MICHELLY BATISTA DA SILVA NUNES SIQUEIRA ",
+    "tradeName": "",
+    "cpf": "105.278.164-00",
+    "cnpj": null,
+    "supplier": "S",
+    "broker": "N",
+    "employee": "N",
+    "active": true,
+    "stateRegistrationNumber": "",
+    "stateRegistrationType": "I",
+    "taxClassificationId": null,
+    "taxClassification": "",
+    "paymentTypeId": null,
+    "creationDate": "2026-04-22",
+    "lastModificationDate": "2026-04-22",
+    "address": {
+      "cityId": 2809,
+      "cityName": "Campina Grande",
+      "streetName": "Campina Grande/PB",
+      "number": "",
+      "complement": "",
+      "neighborhood": "CAMPINA GRANDE",
+      "state": "PB",
+      "zipCode": ""
+    },
+    "phones": [],
+    "contacts": [],
+    "otherContactMethods": [],
+    "links": [
+      {
+        "rel": "bank-informations",
+        "href": "https://api.sienge.com.br/dinamicaempreendimentos/public/api/v1/creditors/3358/bank-informations"
+      }
+    ]
+  },
+  {
+    "id": 3359,
+    "name": "Dêbora Moura",
+    "tradeName": "",
+    "cpf": "856.578.163-15",
+    "cnpj": null,
+    "supplier": "S",
+    "broker": "S",
+    "employee": "N",
+    "active": true,
+    "stateRegistrationNumber": "",
+    "stateRegistrationType": " ",
+    "taxClassificationId": null,
+    "taxClassification": "",
+    "paymentTypeId": null,
+    "creationDate": "2026-04-22",
+    "lastModificationDate": "2026-04-22",
+    "address": {
+      "cityId": 18,
+      "cityName": "Fortaleza",
+      "streetName": "",
+      "number": "",
+      "complement": "",
+      "neighborhood": "",
+      "state": "CE",
+      "zipCode": ""
+    },
+    "phones": [
+      {
+        "ddd": "85",
+        "number": "98656-2974",
+        "main": true,
+        "type": 3,
+        "extension": "",
+        "observation": ""
+      }
+    ],
+    "contacts": [
+      {
+        "name": "Dêbora",
+        "ddd": null,
+        "number": "",
+        "extension": "",
+        "email": "deboramoura16@icloud.com",
+        "skype": "",
+        "msn": ""
+      }
+    ],
+    "otherContactMethods": [],
+    "links": [
+      {
+        "rel": "bank-informations",
+        "href": "https://api.sienge.com.br/dinamicaempreendimentos/public/api/v1/creditors/3359/bank-informations"
+      }
+    ]
+  },
+  {
+    "id": 3360,
+    "name": "MORAIS CONCRETO LTDA",
+    "tradeName": "MORAIS CONCRETO",
+    "cpf": null,
+    "cnpj": "40.381.599/0001-75",
+    "supplier": "S",
+    "broker": "N",
+    "employee": "N",
+    "active": true,
+    "stateRegistrationNumber": "",
+    "stateRegistrationType": "N",
+    "taxClassificationId": null,
+    "taxClassification": "",
+    "paymentTypeId": null,
+    "creationDate": "2026-04-22",
+    "lastModificationDate": "2026-04-22",
+    "address": {
+      "cityId": 682,
+      "cityName": "Cascavel",
+      "streetName": "RUA LUIS EVANGELISTA BRINDEIRO",
+      "number": "1947",
+      "complement": "",
+      "neighborhood": "SITIO BARBALHO",
+      "state": "CE",
+      "zipCode": "62850-000"
+    },
+    "phones": [
+      {
+        "ddd": "85",
+        "number": "3231-3281",
+        "main": true,
+        "type": 5,
+        "extension": null,
+        "observation": null
+      }
+    ],
+    "contacts": [],
+    "otherContactMethods": [
+      {
+        "type": 2,
+        "address": "FFJR007@OUTLOOK.COM",
+        "observation": null
+      }
+    ],
+    "links": [
+      {
+        "rel": "bank-informations",
+        "href": "https://api.sienge.com.br/dinamicaempreendimentos/public/api/v1/creditors/3360/bank-informations"
+      }
+    ]
+  },
+  {
+    "id": 3361,
+    "name": "RAISSA FERNANDES DE MORAIS",
+    "tradeName": "ECONTEINER",
+    "cpf": null,
+    "cnpj": "23.470.135/0001-16",
+    "supplier": "S",
+    "broker": "N",
+    "employee": "N",
+    "active": true,
+    "stateRegistrationNumber": "",
+    "stateRegistrationType": "N",
+    "taxClassificationId": null,
+    "taxClassification": "",
+    "paymentTypeId": null,
+    "creationDate": "2026-04-22",
+    "lastModificationDate": "2026-04-22",
+    "address": {
+      "cityId": 3756,
+      "cityName": "João Câmara",
+      "streetName": "RUA RAIMUNDA LAURA DA COSTA SOUZA",
+      "number": "22",
+      "complement": "",
+      "neighborhood": "CENTRO",
+      "state": "RN",
+      "zipCode": "59550-000"
+    },
+    "phones": [
+      {
+        "ddd": "85",
+        "number": "9149-8472",
+        "main": true,
+        "type": 5,
+        "extension": null,
+        "observation": null
+      }
+    ],
+    "contacts": [],
+    "otherContactMethods": [
+      {
+        "type": 2,
+        "address": "JOVELISON.TOPOGRAFO@HOTMAIL.COM",
+        "observation": null
+      }
+    ],
+    "links": [
+      {
+        "rel": "bank-informations",
+        "href": "https://api.sienge.com.br/dinamicaempreendimentos/public/api/v1/creditors/3361/bank-informations"
       }
     ]
   }
