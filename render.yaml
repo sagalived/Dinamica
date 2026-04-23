@@ -2,14 +2,21 @@ services:
   - type: web
     name: dinamica-dashboard-financeiro
     env: python
-    buildCommand: npm install && npm run build && pip install -r requirements.txt
+    buildCommand: pip install -r requirements.txt && npm ci && npm run build
     startCommand: python app.py
+    healthCheckPath: /
     envVars:
-      - key: PORT
-        value: 10000
+      - key: NODE_ENV
+        value: production
       - key: SIENGE_USERNAME
         sync: false
       - key: SIENGE_PASSWORD
         sync: false
       - key: SIENGE_INSTANCE
         sync: false
+      - key: GOOGLE_MAPS_API_KEY
+        sync: false
+      - key: AUTO_SYNC_ON_BOOT
+        value: "true"
+      - key: CORS_ALLOW_ORIGINS
+        value: "*"
