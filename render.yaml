@@ -1,0 +1,26 @@
+services:
+  - type: web
+    name: dinamica-dashboard-financeiro
+    env: python
+    buildCommand: pip install -r requirements.txt && npm ci && npm run build
+    startCommand: uvicorn app:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: SIENGE_BASE_URL
+        value: https://api.sienge.com.br/dinamicaempreendimentos
+      - key: SIENGE_INSTANCE
+        value: dinamicaempreendimentos
+      - key: SIENGE_ACCESS_NAME
+        sync: false
+      - key: SIENGE_TOKEN
+        sync: false
+      - key: SIENGE_USERNAME
+        sync: false
+      - key: SIENGE_PASSWORD
+        sync: false
+      - key: DATABASE_URL
+        sync: false
+      - key: JWT_SECRET
+        sync: false
