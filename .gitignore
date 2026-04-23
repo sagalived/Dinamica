@@ -17,3 +17,4 @@ data/cotacoes_pedidos.json
 data/consolidado.csv
 __pycache__/
 *.pyc
+.tmp/

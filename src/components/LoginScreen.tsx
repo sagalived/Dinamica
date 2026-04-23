@@ -1,43 +1,17 @@
 import { type FormEvent, useState } from 'react';
-import { Eye, EyeOff, LogIn, Plus, X } from 'lucide-react';
-import { authApi, type AuthUser } from '../lib/api';
+import { Eye, EyeOff, LogIn } from 'lucide-react';
+import { authApi, setAuthToken, setSessionUser, type AuthUser } from '../lib/api';
 
 type LoginScreenProps = {
   onLogin: (user: AuthUser) => void;
 };
 
 export function LoginScreen({ onLogin }: LoginScreenProps) {
-  const [email, setEmail] = useState('dev@admin.com');
+  const [email, setEmail] = useState('admin@dinamica.com');
   const [password, setPassword] = useState('admin');
   const [showPassword, setShowPassword] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
-  const [registerOpen, setRegisterOpen] = useState(false);
-  const [registerSubmitting, setRegisterSubmitting] = useState(false);
-  const [registerError, setRegisterError] = useState('');
-  const [registerSuccess, setRegisterSuccess] = useState('');
-  const [registerForm, setRegisterForm] = useState({
-    name: '',
-    email: '',
-    department: '',
-    role: 'user',
-  });
-
-  const loginWithFallback = () => {
-    if (email.trim().toLowerCase() !== 'dev@admin.com' || password !== 'admin') {
-      return false;
-    }
-
-    onLogin({
-      id: 1,
-      username: 'dev@admin.com',
-      email: 'dev@admin.com',
-      name: 'Administrador Dev',
-      role: 'developer',
-      department: 'Tecnologia',
-    });
-    return true;
-  };
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
@@ -47,35 +21,18 @@ export function LoginScreen({ onLogin }: LoginScreenProps) {
     try {
       const response = await authApi.post('/login', { email, password });
       const user = response.data?.user as AuthUser | undefined;
-      if (!user) {
+      const token = response.data?.access_token as string | undefined;
+      if (!user || !token) {
         throw new Error('Resposta de login inválida.');
       }
-      onLogin(user);
+      setAuthToken(token);
+      const enrichedUser: AuthUser = { ...user, name: (user as any).full_name || (user as any).name };
+      setSessionUser(enrichedUser);
+      onLogin(enrichedUser);
     } catch (err: any) {
-      if (loginWithFallback()) {
-        return;
-      }
-      setError(err?.response?.data?.error || err?.message || 'Não foi possível entrar.');
+      setError(err?.response?.data?.detail || err?.message || 'Não foi possível entrar.');
     } finally {
       setSubmitting(false);
-    }
-  };
-
-  const handleRegister = async (event: FormEvent) => {
-    event.preventDefault();
-    setRegisterSubmitting(true);
-    setRegisterError('');
-    setRegisterSuccess('');
-
-    try {
-      const response = await authApi.post('/register', registerForm);
-      const tempPassword = response.data?.tempPassword || '123456';
-      setRegisterSuccess(`Usuário cadastrado com sucesso. Senha temporária: ${tempPassword}`);
-      setRegisterForm({ name: '', email: '', department: '', role: 'user' });
-    } catch (err: any) {
-      setRegisterError(err?.response?.data?.error || err?.message || 'Não foi possível cadastrar.');
-    } finally {
-      setRegisterSubmitting(false);
     }
   };
 
@@ -97,7 +54,7 @@ export function LoginScreen({ onLogin }: LoginScreenProps) {
             <p className="mb-4 text-sm font-bold uppercase tracking-[0.24em] text-orange-500">Acesso Seguro</p>
             <h1 className="text-5xl font-black tracking-tight">Login</h1>
             <p className="mt-5 text-sm leading-6 text-gray-400">
-              Entre com seu usuário administrativo para acessar o painel financeiro, logística e gestão operacional.
+              Entre com seu usuário administrativo para acessar o painel web restaurado e integrado ao FastAPI.
             </p>
 
             <form onSubmit={handleSubmit} className="mt-12 space-y-7">
@@ -108,7 +65,7 @@ export function LoginScreen({ onLogin }: LoginScreenProps) {
                   value={email}
                   onChange={(event) => setEmail(event.target.value)}
                   className="w-full border-0 border-b border-white/30 bg-transparent px-0 py-3 text-lg outline-none transition placeholder:text-gray-600 focus:border-orange-500"
-                  placeholder="dev@admin.com"
+                  placeholder="admin@dinamica.com"
                   autoComplete="username"
                 />
               </label>
@@ -145,21 +102,12 @@ export function LoginScreen({ onLogin }: LoginScreenProps) {
                 <LogIn size={16} />
                 {submitting ? 'Entrando...' : 'Entrar'}
               </button>
-
-              <button
-                type="button"
-                onClick={() => setRegisterOpen(true)}
-                className="inline-flex w-full items-center justify-center gap-3 rounded-2xl border border-white/10 bg-white/5 px-5 py-4 text-sm font-black uppercase tracking-[0.24em] text-white transition hover:bg-white/10"
-              >
-                <Plus size={16} />
-                Cadastrar Usuario
-              </button>
             </form>
           </div>
 
           <div className="text-xs text-gray-500">
             Usuário padrão semeado no banco:
-            <span className="ml-2 font-bold text-gray-300">dev@admin.com</span>
+            <span className="ml-2 font-bold text-gray-300">admin@dinamica.com</span>
           </div>
         </section>
 
@@ -210,76 +158,6 @@ export function LoginScreen({ onLogin }: LoginScreenProps) {
           <div className="absolute bottom-24 left-10 right-10 h-px bg-orange-500/30" />
         </section>
       </div>
-
-      {registerOpen ? (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-4 backdrop-blur-sm">
-          <div className="w-full max-w-lg rounded-3xl border border-white/10 bg-[#161618] p-6 shadow-2xl">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs font-black uppercase tracking-[0.24em] text-orange-500">Novo Acesso</p>
-                <h2 className="mt-2 text-2xl font-black">Cadastrar Usuario</h2>
-              </div>
-              <button type="button" onClick={() => setRegisterOpen(false)} className="rounded-full border border-white/10 bg-white/5 p-2 text-white hover:bg-white/10">
-                <X size={18} />
-              </button>
-            </div>
-
-            <form onSubmit={handleRegister} className="mt-6 space-y-5">
-              <label className="block">
-                <span className="mb-2 block text-sm font-black text-orange-500">Nome completo</span>
-                <input
-                  value={registerForm.name}
-                  onChange={(event) => setRegisterForm((current) => ({ ...current, name: event.target.value }))}
-                  className="w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-white outline-none focus:border-orange-500"
-                />
-              </label>
-
-              <label className="block">
-                <span className="mb-2 block text-sm font-black text-orange-500">Email</span>
-                <input
-                  type="email"
-                  value={registerForm.email}
-                  onChange={(event) => setRegisterForm((current) => ({ ...current, email: event.target.value }))}
-                  className="w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-white outline-none focus:border-orange-500"
-                />
-              </label>
-
-              <label className="block">
-                <span className="mb-2 block text-sm font-black text-orange-500">Setor</span>
-                <input
-                  value={registerForm.department}
-                  onChange={(event) => setRegisterForm((current) => ({ ...current, department: event.target.value }))}
-                  className="w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-white outline-none focus:border-orange-500"
-                />
-              </label>
-
-              <label className="block">
-                <span className="mb-2 block text-sm font-black text-orange-500">Perfil</span>
-                <select
-                  value={registerForm.role}
-                  onChange={(event) => setRegisterForm((current) => ({ ...current, role: event.target.value }))}
-                  className="w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-white outline-none focus:border-orange-500"
-                >
-                  <option value="admin">Administrativo</option>
-                  <option value="developer">Desenvolvedor</option>
-                  <option value="user">Usuario</option>
-                </select>
-              </label>
-
-              {registerError ? <div className="rounded-2xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-300">{registerError}</div> : null}
-              {registerSuccess ? <div className="rounded-2xl border border-green-500/20 bg-green-500/10 px-4 py-3 text-sm text-green-300">{registerSuccess}</div> : null}
-
-              <button
-                type="submit"
-                disabled={registerSubmitting}
-                className="inline-flex w-full items-center justify-center gap-3 rounded-2xl bg-gradient-to-r from-orange-600 to-orange-500 px-5 py-4 text-sm font-black uppercase tracking-[0.24em] text-white transition hover:brightness-110 disabled:opacity-70"
-              >
-                {registerSubmitting ? 'Cadastrando...' : 'Cadastrar Usuario'}
-              </button>
-            </form>
-          </div>
-        </div>
-      ) : null}
     </div>
   );
 }

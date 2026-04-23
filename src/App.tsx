@@ -27,11 +27,19 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, 
   AreaChart, Area, Cell, PieChart, Pie, LineChart, Line, Legend
 } from 'recharts';
-import { api, Building, User, Creditor, PurchaseOrder, PriceAlert, type AuthUser } from './lib/api';
+import { sienge as api, kanbanApi, Building, User, Creditor, PurchaseOrder, PriceAlert, type AuthUser } from './lib/api';
 import { cn } from './lib/utils';
 import { fixText } from './lib/text';
 
 export default function App() {
+  type SyncInfo = {
+    status?: string;
+    started_at?: string;
+    finished_at?: string;
+    message?: string;
+    counts?: Record<string, number>;
+  } | null;
+
   const [sessionUser, setSessionUser] = useState<AuthUser | null>(null);
   const [authReady, setAuthReady] = useState(false);
   const [activeTab, setActiveTab] = useState<string>('dashboard');
@@ -40,6 +48,7 @@ export default function App() {
   const [apiStatus, setApiStatus] = useState<'online' | 'offline' | 'checking'>('checking');
   const [saldoBancario, setSaldoBancario] = useState<number | null>(null);
   const [lastUpdate, setLastUpdate] = useState<Date>(new Date());
+  const [syncInfo, setSyncInfo] = useState<SyncInfo>(null);
   const [startDate, setStartDate] = useState<Date | undefined>();
   const [endDate, setEndDate] = useState<Date | undefined>(new Date());
   const [fcStartDate, setFcStartDate] = useState<Date | undefined>();
@@ -214,11 +223,21 @@ export default function App() {
   const checkConnection = useCallback(async () => {
     try {
       const response = await api.get('/test');
-      const isLive = response.data?.live?.ok === true;
+      const isLive = response.data?.live?.ok === true || response.data?.ok === true;
       const hasCache = Boolean(
         response.data?.cache?.pedidos || response.data?.cache?.financeiro || response.data?.cache?.receber
       );
       const isConnected = Boolean(isLive || hasCache);
+      if (response.data?.latestSync) {
+        setSyncInfo(response.data.latestSync);
+        const syncDate = response.data.latestSync.finished_at || response.data.latestSync.started_at;
+        if (syncDate) {
+          const parsed = new Date(syncDate);
+          if (!Number.isNaN(parsed.getTime())) {
+            setLastUpdate(parsed);
+          }
+        }
+      }
       setApiStatus(isConnected ? 'online' : 'offline');
       return isConnected;
     } catch (error) {
@@ -382,7 +401,18 @@ export default function App() {
     setAllFinancialTitles(allFData);
     setAllReceivableTitles(allRData);
     setSaldoBancario(typeof payload?.saldoBancario === 'number' ? payload.saldoBancario : null);
-    setLastUpdate(new Date());
+    if (payload?.latestSync) {
+      setSyncInfo(payload.latestSync);
+      const syncDate = payload.latestSync.finished_at || payload.latestSync.started_at;
+      if (syncDate) {
+        const parsed = new Date(syncDate);
+        setLastUpdate(Number.isNaN(parsed.getTime()) ? new Date() : parsed);
+      } else {
+        setLastUpdate(new Date());
+      }
+    } else {
+      setLastUpdate(new Date());
+    }
     setApiStatus('online');
   }, []);
 
@@ -500,7 +530,17 @@ export default function App() {
     setSyncing(true);
     setApiStatus('checking');
     try {
-      await api.post('/sync');
+      const response = await api.post('/sync');
+      if (response.data?.latestSync) {
+        setSyncInfo(response.data.latestSync);
+        const syncDate = response.data.latestSync.finished_at || response.data.latestSync.started_at;
+        if (syncDate) {
+          const parsed = new Date(syncDate);
+          if (!Number.isNaN(parsed.getTime())) {
+            setLastUpdate(parsed);
+          }
+        }
+      }
       await refreshData();
       setApiStatus('online');
     } catch (e) {
@@ -2841,6 +2881,9 @@ export default function App() {
             <div className="text-right">
               <p className="text-[10px] font-black text-gray-600 uppercase mb-1">Última Sincronização</p>
               <p className="text-xs font-bold text-gray-400">{format(lastUpdate, "HH:mm:ss")}</p>
+              <p className="text-[10px] font-bold text-green-500 uppercase tracking-widest mt-1">
+                {syncInfo?.status === 'success' ? 'Sincronizado' : syncing ? 'Sincronizando' : 'Aguardando sync'}
+              </p>
             </div>
             <div className="h-10 w-px bg-white/5" />
             <div className="flex items-center gap-3">
@@ -3065,7 +3108,6 @@ export default function App() {
     </>
   );
 }
-
 
 
 

@@ -160457,5 +160457,310 @@
         "href": "https://api.sienge.com.br/dinamicaempreendimentos/public/api/v1/creditors/3361/bank-informations"
       }
     ]
+  },
+  {
+    "id": 3362,
+    "name": "CICERO DE OLIVEIRA GUALBERTO 02158789301",
+    "tradeName": "",
+    "cpf": null,
+    "cnpj": "37.522.889/0001-87",
+    "supplier": "S",
+    "broker": "N",
+    "employee": "N",
+    "active": true,
+    "stateRegistrationNumber": "",
+    "stateRegistrationType": "N",
+    "taxClassificationId": null,
+    "taxClassification": "",
+    "paymentTypeId": null,
+    "creationDate": "2026-04-23",
+    "lastModificationDate": "2026-04-23",
+    "address": {
+      "cityId": 18,
+      "cityName": "Fortaleza",
+      "streetName": "RUA CORONEL JOAO DE OLIVEIRA",
+      "number": "555",
+      "complement": "APT 202 BLOCO A",
+      "neighborhood": "MESSEJANA",
+      "state": "CE",
+      "zipCode": "60841-820"
+    },
+    "phones": [
+      {
+        "ddd": "85",
+        "number": "8811-0084",
+        "main": true,
+        "type": 5,
+        "extension": null,
+        "observation": null
+      }
+    ],
+    "contacts": [],
+    "otherContactMethods": [
+      {
+        "type": 2,
+        "address": "CICEROGUALBERTO@HOTMAIL.COM",
+        "observation": null
+      }
+    ],
+    "links": [
+      {
+        "rel": "bank-informations",
+        "href": "https://api.sienge.com.br/dinamicaempreendimentos/public/api/v1/creditors/3362/bank-informations"
+      }
+    ]
+  },
+  {
+    "id": 3363,
+    "name": "64.512.167 ELTON EMANUEL PEIXOTO DE ABREU",
+    "tradeName": "",
+    "cpf": null,
+    "cnpj": "64.512.167/0001-14",
+    "supplier": "S",
+    "broker": "N",
+    "employee": "N",
+    "active": true,
+    "stateRegistrationNumber": "",
+    "stateRegistrationType": "N",
+    "taxClassificationId": null,
+    "taxClassification": "",
+    "paymentTypeId": null,
+    "creationDate": "2026-04-23",
+    "lastModificationDate": "2026-04-23",
+    "address": {
+      "cityId": 18,
+      "cityName": "Fortaleza",
+      "streetName": "RUA JOAO BARBOSA LIMA",
+      "number": "186",
+      "complement": "",
+      "neighborhood": "CIDADE DOS FUNCIONARIOS",
+      "state": "CE",
+      "zipCode": "60822-760"
+    },
+    "phones": [
+      {
+        "ddd": "85",
+        "number": "8411-8442",
+        "main": true,
+        "type": 5,
+        "extension": null,
+        "observation": null
+      }
+    ],
+    "contacts": [],
+    "otherContactMethods": [
+      {
+        "type": 2,
+        "address": "ELTONEMANUEL@HOTMAIL.COM",
+        "observation": null
+      }
+    ],
+    "links": [
+      {
+        "rel": "bank-informations",
+        "href": "https://api.sienge.com.br/dinamicaempreendimentos/public/api/v1/creditors/3363/bank-informations"
+      }
+    ]
+  },
+  {
+    "id": 3364,
+    "name": "EWERTON COSME DE ALMEIDA GURGEL",
+    "tradeName": "",
+    "cpf": "016.777.684-36",
+    "cnpj": null,
+    "supplier": "S",
+    "broker": "N",
+    "employee": "N",
+    "active": true,
+    "stateRegistrationNumber": "",
+    "stateRegistrationType": " ",
+    "taxClassificationId": null,
+    "taxClassification": "",
+    "paymentTypeId": null,
+    "creationDate": "2026-04-23",
+    "lastModificationDate": "2026-04-23",
+    "address": {
+      "cityId": 3780,
+      "cityName": "Mossoró",
+      "streetName": "Rua Tibério Burlamaqui",
+      "number": "117 ",
+      "complement": "A",
+      "neighborhood": "",
+      "state": "RN",
+      "zipCode": ""
+    },
+    "phones": [],
+    "contacts": [],
+    "otherContactMethods": [],
+    "links": [
+      {
+        "rel": "bank-informations",
+        "href": "https://api.sienge.com.br/dinamicaempreendimentos/public/api/v1/creditors/3364/bank-informations"
+      }
+    ]
+  },
+  {
+    "id": 3365,
+    "name": "FRANCISCO JUNIOR SOUSA DE MORAIS 00818076356",
+    "tradeName": "",
+    "cpf": null,
+    "cnpj": "41.440.523/0001-36",
+    "supplier": "S",
+    "broker": "N",
+    "employee": "N",
+    "active": true,
+    "stateRegistrationNumber": "",
+    "stateRegistrationType": "N",
+    "taxClassificationId": null,
+    "taxClassification": "",
+    "paymentTypeId": null,
+    "creationDate": "2026-04-23",
+    "lastModificationDate": "2026-04-23",
+    "address": {
+      "cityId": 18,
+      "cityName": "Fortaleza",
+      "streetName": "RUA DO CAMPO",
+      "number": "256",
+      "complement": "APT A",
+      "neighborhood": "PICI",
+      "state": "CE",
+      "zipCode": "60510-461"
+    },
+    "phones": [
+      {
+        "ddd": "85",
+        "number": "9907-9005",
+        "main": true,
+        "type": 5,
+        "extension": null,
+        "observation": null
+      }
+    ],
+    "contacts": [],
+    "otherContactMethods": [
+      {
+        "type": 2,
+        "address": "SAGALIVED@GMAIL.COM",
+        "observation": null
+      }
+    ],
+    "links": [
+      {
+        "rel": "bank-informations",
+        "href": "https://api.sienge.com.br/dinamicaempreendimentos/public/api/v1/creditors/3365/bank-informations"
+      }
+    ]
+  },
+  {
+    "id": 3366,
+    "name": "64.688.095 NARA INGRID LOBAO GOMES",
+    "tradeName": "",
+    "cpf": null,
+    "cnpj": "64.688.095/0001-60",
+    "supplier": "S",
+    "broker": "N",
+    "employee": "N",
+    "active": true,
+    "stateRegistrationNumber": "",
+    "stateRegistrationType": "N",
+    "taxClassificationId": null,
+    "taxClassification": "",
+    "paymentTypeId": null,
+    "creationDate": "2026-04-23",
+    "lastModificationDate": "2026-04-23",
+    "address": {
+      "cityId": 744,
+      "cityName": "Maracanaú",
+      "streetName": "RUA 112",
+      "number": "100",
+      "complement": "LETRA A",
+      "neighborhood": "ACARACUZINHO",
+      "state": "CE",
+      "zipCode": "61920-460"
+    },
+    "phones": [
+      {
+        "ddd": "85",
+        "number": "9602-4239",
+        "main": true,
+        "type": 5,
+        "extension": null,
+        "observation": null
+      }
+    ],
+    "contacts": [],
+    "otherContactMethods": [
+      {
+        "type": 2,
+        "address": "NARAIINGRID123@GMAIL.COM",
+        "observation": null
+      }
+    ],
+    "links": [
+      {
+        "rel": "bank-informations",
+        "href": "https://api.sienge.com.br/dinamicaempreendimentos/public/api/v1/creditors/3366/bank-informations"
+      }
+    ]
+  },
+  {
+    "id": 3367,
+    "name": "R PEREIRA VITAL ENGENHARIA LTDA",
+    "tradeName": "VITAL ENGENHARIA",
+    "cpf": null,
+    "cnpj": "57.143.777/0001-22",
+    "supplier": "S",
+    "broker": "N",
+    "employee": "N",
+    "active": true,
+    "stateRegistrationNumber": "",
+    "stateRegistrationType": "N",
+    "taxClassificationId": null,
+    "taxClassification": "",
+    "paymentTypeId": null,
+    "creationDate": "2026-04-23",
+    "lastModificationDate": "2026-04-23",
+    "address": {
+      "cityId": 674,
+      "cityName": "Campos Sales",
+      "streetName": "RUA FERNANDES DINIZ",
+      "number": "321",
+      "complement": "",
+      "neighborhood": "EXPANSAO",
+      "state": "CE",
+      "zipCode": "63150-000"
+    },
+    "phones": [
+      {
+        "ddd": "88",
+        "number": "9934-0331",
+        "main": true,
+        "type": 5,
+        "extension": null,
+        "observation": null
+      },
+      {
+        "ddd": "0000",
+        "number": "0000-0000",
+        "main": false,
+        "type": 6,
+        "extension": null,
+        "observation": null
+      }
+    ],
+    "contacts": [],
+    "otherContactMethods": [
+      {
+        "type": 2,
+        "address": "RAMON2014VITAL@HOTMAIL.COM",
+        "observation": null
+      }
+    ],
+    "links": [
+      {
+        "rel": "bank-informations",
+        "href": "https://api.sienge.com.br/dinamicaempreendimentos/public/api/v1/creditors/3367/bank-informations"
+      }
+    ]
   }
 ]

@@ -1,0 +1,16 @@
+{
+  "status": "success",
+  "started_at": "2026-04-23T21:07:36.290036+00:00",
+  "finished_at": "2026-04-23T21:25:48.974161+00:00",
+  "message": "Sincronizado com sucesso no Sienge",
+  "counts": {
+    "obras": 348,
+    "usuarios": 182,
+    "empresas": 10,
+    "credores": 3346,
+    "pedidos": 13422,
+    "financeiro": 50739,
+    "receber": 121325,
+    "itensPedidos": 50
+  }
+}

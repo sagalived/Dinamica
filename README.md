@@ -1,46 +1,45 @@
-Este projeto roda 100% em Python.
+# Dinamica
 
-O frontend ja esta compilado na pasta `dist` e e servido diretamente pelo FastAPI.
+Projeto migrado para a stack:
+
+- `FastAPI` para a API
+- `Pandas` para analytics e resumos
+- `Flet` para interface mobile/web
+- `JWT + Bcrypt` para autenticacao
+- `PostgreSQL` para persistencia
+
+Os JSONs existentes em `data/` sao usados como carga inicial do banco na primeira subida.
 
 ## Rodar localmente
 
 Pre-requisitos:
+
 - Python 3.11+
+- PostgreSQL ativo em `localhost`
 
-1. Instale dependencias do backend:
+Passos:
+
+1. Instale as dependencias:
    `pip install -r requirements.txt`
-2. Configure variaveis de ambiente com base no arquivo `.env.example`.
-3. Inicie a aplicacao:
+2. Crie um `.env` a partir de `.env.example`
+3. Ajuste `DATABASE_URL` para sua instancia Postgres local
+4. Inicie o projeto:
    `python app.py`
 
-Aplicacao (frontend + backend): `http://localhost:8000`
+Endpoints locais:
 
-## Build de producao
+- API FastAPI: `http://127.0.0.1:8000`
+- App Flet: `http://127.0.0.1:8550`
 
-1. Instale dependencias Python:
-   `pip install -r requirements.txt`
-2. Suba o backend Python:
-   `python app.py`
+Credencial inicial:
 
-## Deploy no Render
+- Email: `admin@dinamica.com`
+- Senha: `admin`
 
-O arquivo `render.yaml` ja esta preparado para publicar como Web Service.
-Ele monta um disco persistente em `/var/data` para manter cache, banco SQLite e arquivos sincronizados entre reinicios/deploys.
+## Principais arquivos
 
-Variaveis obrigatorias para integrar com o Sienge:
-- `SIENGE_USERNAME`
-- `SIENGE_PASSWORD`
-- `SIENGE_INSTANCE`
-
-Variaveis opcionais:
-- `GOOGLE_MAPS_API_KEY`
-- `AUTO_SYNC_ON_BOOT` (padrao configurado: `true`)
-- `AUTO_SYNC_INTERVAL` (padrao configurado: `true`)
-- `CORS_ALLOW_ORIGINS` (padrao configurado: `*`)
-- `APP_DATA_DIR` (padrao no Render: `/var/data`)
-
-Observacoes:
-- Nao precisa cadastrar `PORT` manualmente no Render; ele injeta essa variavel automaticamente.
-- O app usa `python app.py` e le a porta pelo ambiente, entao sobe normalmente no Render.
-- O frontend e compilado no deploy com `npm ci && npm run build`.
-- O backend passa a gravar em disco persistente no Render e usa SQLite em modo WAL com timeout maior, melhor para varios acessos simultaneos.
+- [app.py](/c:/Users/dinam/OneDrive/Documentos/GitHub/Dinamica/app.py)
+- [backend/main.py](/c:/Users/dinam/OneDrive/Documentos/GitHub/Dinamica/backend/main.py)
+- [backend/services/bootstrap.py](/c:/Users/dinam/OneDrive/Documentos/GitHub/Dinamica/backend/services/bootstrap.py)
+- [backend/services/analytics.py](/c:/Users/dinam/OneDrive/Documentos/GitHub/Dinamica/backend/services/analytics.py)
+- [flet_app.py](/c:/Users/dinam/OneDrive/Documentos/GitHub/Dinamica/flet_app.py)

@@ -1,0 +1,902 @@
+[
+  {
+    "id": 1,
+    "symbol": "%",
+    "description": "Porcentagem",
+    "magnitude": null,
+    "numberOfHours": 0,
+    "status": "ACTIVE",
+    "unitOfTime": false
+  },
+  {
+    "id": 2,
+    "symbol": "apt",
+    "description": "Apartamento",
+    "magnitude": null,
+    "numberOfHours": 0,
+    "status": "ACTIVE",
+    "unitOfTime": false
+  },
+  {
+    "id": 3,
+    "symbol": "cam",
+    "description": "Camada",
+    "magnitude": null,
+    "numberOfHours": 0,
+    "status": "ACTIVE",
+    "unitOfTime": false
+  },
+  {
+    "id": 4,
+    "symbol": "cj",
+    "description": "Conjunto",
+    "magnitude": null,
+    "numberOfHours": 0,
+    "status": "ACTIVE",
+    "unitOfTime": false
+  },
+  {
+    "id": 5,
+    "symbol": "cm",
+    "description": "Centímetro",
+    "magnitude": "Comprimento",
+    "numberOfHours": 0,
+    "status": "ACTIVE",
+    "unitOfTime": false
+  },
+  {
+    "id": 6,
+    "symbol": "con",
+    "description": "Concha",
+    "magnitude": null,
+    "numberOfHours": 0,
+    "status": "ACTIVE",
+    "unitOfTime": false
+  },
+  {
+    "id": 7,
+    "symbol": "cx",
+    "description": "Caixa",
+    "magnitude": null,
+    "numberOfHours": 0,
+    "status": "ACTIVE",
+    "unitOfTime": false
+  },
+  {
+    "id": 8,
+    "symbol": "dia",
+    "description": "Dia",
+    "magnitude": "Tempo",
+    "numberOfHours": 8,
+    "status": "ACTIVE",
+    "unitOfTime": true
+  },
+  {
+    "id": 9,
+    "symbol": "dm3",
+    "description": "Decímetro cúbico",
+    "magnitude": null,
+    "numberOfHours": 0,
+    "status": "ACTIVE",
+    "unitOfTime": false
+  },
+  {
+    "id": 10,
+    "symbol": "fl",
+    "description": "Folha",
+    "magnitude": null,
+    "numberOfHours": 0,
+    "status": "ACTIVE",
+    "unitOfTime": false
+  },
+  {
+    "id": 11,
+    "symbol": "gr",
+    "description": "Grama",
+    "magnitude": "Massa",
+    "numberOfHours": 0,
+    "status": "ACTIVE",
+    "unitOfTime": false
+  },
+  {
+    "id": 12,
+    "symbol": "gra",
+    "description": "Grau",
+    "magnitude": null,
+    "numberOfHours": 0,
+    "status": "ACTIVE",
+    "unitOfTime": false
+  },
+  {
+    "id": 13,
+    "symbol": "h",
+    "description": "Hora",
+    "magnitude": "Tempo",
+    "numberOfHours": 1,
+    "status": "ACTIVE",
+    "unitOfTime": true
+  },
+  {
+    "id": 14,
+    "symbol": "kg",
+    "description": "Quilograma",
+    "magnitude": "Massa",
+    "numberOfHours": 0,
+    "status": "ACTIVE",
+    "unitOfTime": false
+  },
+  {
+    "id": 15,
+    "symbol": "l",
+    "description": "Litro",
+    "magnitude": "Volume",
+    "numberOfHours": 0,
+    "status": "ACTIVE",
+    "unitOfTime": false
+  },
+  {
+    "id": 16,
+    "symbol": "m",
+    "description": "Metro",
+    "magnitude": "Comprimento",
+    "numberOfHours": 0,
+    "status": "ACTIVE",
+    "unitOfTime": false
+  },
+  {
+    "id": 17,
+    "symbol": "m2",
+    "description": "Metro quadrado",
+    "magnitude": "Área",
+    "numberOfHours": 0,
+    "status": "ACTIVE",
+    "unitOfTime": false
+  },
+  {
+    "id": 18,
+    "symbol": "m3",
+    "description": "Metro cúbico",
+    "magnitude": "Volume",
+    "numberOfHours": 0,
+    "status": "ACTIVE",
+    "unitOfTime": false
+  },
+  {
+    "id": 19,
+    "symbol": "mes",
+    "description": "Mês",
+    "magnitude": "Tempo",
+    "numberOfHours": 220,
+    "status": "ACTIVE",
+    "unitOfTime": true
+  },
+  {
+    "id": 20,
+    "symbol": "min",
+    "description": "Minuto",
+    "magnitude": "Tempo",
+    "numberOfHours": 0,
+    "status": "ACTIVE",
+    "unitOfTime": true
+  },
+  {
+    "id": 21,
+    "symbol": "ml",
+    "description": "Mililitro",
+    "magnitude": null,
+    "numberOfHours": 0,
+    "status": "ACTIVE",
+    "unitOfTime": false
+  },
+  {
+    "id": 22,
+    "symbol": "mlh",
+    "description": "Milheiro",
+    "magnitude": null,
+    "numberOfHours": 0,
+    "status": "ACTIVE",
+    "unitOfTime": false
+  },
+  {
+    "id": 23,
+    "symbol": "mm",
+    "description": "Milímetro",
+    "magnitude": null,
+    "numberOfHours": 0,
+    "status": "ACTIVE",
+    "unitOfTime": false
+  },
+  {
+    "id": 24,
+    "symbol": "par",
+    "description": "Par",
+    "magnitude": null,
+    "numberOfHours": 0,
+    "status": "ACTIVE",
+    "unitOfTime": false
+  },
+  {
+    "id": 25,
+    "symbol": "pc",
+    "description": "Peça",
+    "magnitude": null,
+    "numberOfHours": 0,
+    "status": "ACTIVE",
+    "unitOfTime": false
+  },
+  {
+    "id": 26,
+    "symbol": "pct",
+    "description": "Pacote",
+    "magnitude": "",
+    "numberOfHours": 0,
+    "status": "ACTIVE",
+    "unitOfTime": false
+  },
+  {
+    "id": 27,
+    "symbol": "pil",
+    "description": "PIL",
+    "magnitude": null,
+    "numberOfHours": 0,
+    "status": "ACTIVE",
+    "unitOfTime": false
+  },
+  {
+    "id": 28,
+    "symbol": "pto",
+    "description": "Ponto",
+    "magnitude": null,
+    "numberOfHours": 0,
+    "status": "ACTIVE",
+    "unitOfTime": false
+  },
+  {
+    "id": 29,
+    "symbol": "rol",
+    "description": "Rolo",
+    "magnitude": null,
+    "numberOfHours": 0,
+    "status": "ACTIVE",
+    "unitOfTime": false
+  },
+  {
+    "id": 30,
+    "symbol": "sc",
+    "description": "Saco",
+    "magnitude": null,
+    "numberOfHours": 0,
+    "status": "ACTIVE",
+    "unitOfTime": false
+  },
+  {
+    "id": 31,
+    "symbol": "sem",
+    "description": "Semana",
+    "magnitude": "Tempo",
+    "numberOfHours": 44,
+    "status": "ACTIVE",
+    "unitOfTime": true
+  },
+  {
+    "id": 32,
+    "symbol": "tb",
+    "description": "Tubo",
+    "magnitude": null,
+    "numberOfHours": 0,
+    "status": "ACTIVE",
+    "unitOfTime": false
+  },
+  {
+    "id": 33,
+    "symbol": "t",
+    "description": "Tonelada",
+    "magnitude": "Massa",
+    "numberOfHours": 0,
+    "status": "ACTIVE",
+    "unitOfTime": false
+  },
+  {
+    "id": 34,
+    "symbol": "un",
+    "description": "Unidade",
+    "magnitude": null,
+    "numberOfHours": 0,
+    "status": "ACTIVE",
+    "unitOfTime": false
+  },
+  {
+    "id": 35,
+    "symbol": "vb",
+    "description": "Verba",
+    "magnitude": null,
+    "numberOfHours": 0,
+    "status": "ACTIVE",
+    "unitOfTime": false
+  },
+  {
+    "id": 36,
+    "symbol": "l/m3",
+    "description": "Litro/metro cúbico",
+    "magnitude": null,
+    "numberOfHours": 0,
+    "status": "ACTIVE",
+    "unitOfTime": false
+  },
+  {
+    "id": 37,
+    "symbol": "m/min",
+    "description": "Metro/minuto",
+    "magnitude": "Velocidade",
+    "numberOfHours": 0,
+    "status": "ACTIVE",
+    "unitOfTime": false
+  },
+  {
+    "id": 38,
+    "symbol": "km",
+    "description": "Quilometro",
+    "magnitude": "Comprimento",
+    "numberOfHours": 0,
+    "status": "ACTIVE",
+    "unitOfTime": false
+  },
+  {
+    "id": 39,
+    "symbol": "a",
+    "description": "Ampere",
+    "magnitude": "Corrente elétrica",
+    "numberOfHours": 0,
+    "status": "ACTIVE",
+    "unitOfTime": false
+  },
+  {
+    "id": 40,
+    "symbol": "w",
+    "description": "Watt",
+    "magnitude": "Potência",
+    "numberOfHours": 0,
+    "status": "ACTIVE",
+    "unitOfTime": false
+  },
+  {
+    "id": 41,
+    "symbol": "50",
+    "description": "50",
+    "magnitude": null,
+    "numberOfHours": 0,
+    "status": "ACTIVE",
+    "unitOfTime": false
+  },
+  {
+    "id": 42,
+    "symbol": "m/mes",
+    "description": "M/MES",
+    "magnitude": null,
+    "numberOfHours": 0,
+    "status": "ACTIVE",
+    "unitOfTime": false
+  },
+  {
+    "id": 43,
+    "symbol": "gl",
+    "description": "GL",
+    "magnitude": null,
+    "numberOfHours": 0,
+    "status": "ACTIVE",
+    "unitOfTime": false
+  },
+  {
+    "id": 44,
+    "symbol": "18",
+    "description": "18",
+    "magnitude": null,
+    "numberOfHours": 0,
+    "status": "ACTIVE",
+    "unitOfTime": false
+  },
+  {
+    "id": 45,
+    "symbol": "jg",
+    "description": "JG",
+    "magnitude": null,
+    "numberOfHours": 0,
+    "status": "ACTIVE",
+    "unitOfTime": false
+  },
+  {
+    "id": 46,
+    "symbol": "200",
+    "description": "200",
+    "magnitude": null,
+    "numberOfHours": 0,
+    "status": "ACTIVE",
+    "unitOfTime": false
+  },
+  {
+    "id": 47,
+    "symbol": "cento",
+    "description": "CENTO",
+    "magnitude": null,
+    "numberOfHours": 0,
+    "status": "ACTIVE",
+    "unitOfTime": false
+  },
+  {
+    "id": 48,
+    "symbol": "310",
+    "description": "310",
+    "magnitude": null,
+    "numberOfHours": 0,
+    "status": "ACTIVE",
+    "unitOfTime": false
+  },
+  {
+    "id": 49,
+    "symbol": "kw/h",
+    "description": "KW/H",
+    "magnitude": null,
+    "numberOfHours": 0,
+    "status": "ACTIVE",
+    "unitOfTime": false
+  },
+  {
+    "id": 50,
+    "symbol": "m2/mes",
+    "description": "M2/MES",
+    "magnitude": null,
+    "numberOfHours": 0,
+    "status": "ACTIVE",
+    "unitOfTime": false
+  },
+  {
+    "id": 51,
+    "symbol": "sc25kg",
+    "description": "SC25KG",
+    "magnitude": null,
+    "numberOfHours": 0,
+    "status": "ACTIVE",
+    "unitOfTime": false
+  },
+  {
+    "id": 52,
+    "symbol": "100",
+    "description": "100",
+    "magnitude": null,
+    "numberOfHours": 0,
+    "status": "ACTIVE",
+    "unitOfTime": false
+  },
+  {
+    "id": 53,
+    "symbol": "mil",
+    "description": "MIL",
+    "magnitude": null,
+    "numberOfHours": 0,
+    "status": "ACTIVE",
+    "unitOfTime": false
+  },
+  {
+    "id": 54,
+    "symbol": "tr",
+    "description": "TR",
+    "magnitude": null,
+    "numberOfHours": 0,
+    "status": "ACTIVE",
+    "unitOfTime": false
+  },
+  {
+    "id": 55,
+    "symbol": "txkm",
+    "description": "TxKM",
+    "magnitude": null,
+    "numberOfHours": 0,
+    "status": "ACTIVE",
+    "unitOfTime": false
+  },
+  {
+    "id": 56,
+    "symbol": "unxmês",
+    "description": "UNxMÊS",
+    "magnitude": null,
+    "numberOfHours": 0,
+    "status": "ACTIVE",
+    "unitOfTime": false
+  },
+  {
+    "id": 57,
+    "symbol": "ut",
+    "description": "UT",
+    "magnitude": null,
+    "numberOfHours": 0,
+    "status": "ACTIVE",
+    "unitOfTime": false
+  },
+  {
+    "id": 58,
+    "symbol": "hxmês",
+    "description": "HxMÊS",
+    "magnitude": null,
+    "numberOfHours": 0,
+    "status": "ACTIVE",
+    "unitOfTime": false
+  },
+  {
+    "id": 59,
+    "symbol": "mês",
+    "description": "MÊS",
+    "magnitude": null,
+    "numberOfHours": 0,
+    "status": "ACTIVE",
+    "unitOfTime": false
+  },
+  {
+    "id": 60,
+    "symbol": "m3xmês",
+    "description": "M3xMÊS",
+    "magnitude": null,
+    "numberOfHours": 0,
+    "status": "ACTIVE",
+    "unitOfTime": false
+  },
+  {
+    "id": 61,
+    "symbol": "ha",
+    "description": "HA",
+    "magnitude": null,
+    "numberOfHours": 0,
+    "status": "ACTIVE",
+    "unitOfTime": false
+  },
+  {
+    "id": 62,
+    "symbol": "kwh",
+    "description": "KWH",
+    "magnitude": null,
+    "numberOfHours": 0,
+    "status": "ACTIVE",
+    "unitOfTime": false
+  },
+  {
+    "id": 63,
+    "symbol": "pç",
+    "description": "PÇ",
+    "magnitude": "",
+    "numberOfHours": 0,
+    "status": "ACTIVE",
+    "unitOfTime": false
+  },
+  {
+    "id": 64,
+    "symbol": "rl",
+    "description": "RL",
+    "magnitude": null,
+    "numberOfHours": 0,
+    "status": "ACTIVE",
+    "unitOfTime": false
+  },
+  {
+    "id": 65,
+    "symbol": "m/l",
+    "description": "M/L",
+    "magnitude": null,
+    "numberOfHours": 0,
+    "status": "ACTIVE",
+    "unitOfTime": false
+  },
+  {
+    "id": 66,
+    "symbol": "m2xmês",
+    "description": "M2XMÊS",
+    "magnitude": null,
+    "numberOfHours": 0,
+    "status": "ACTIVE",
+    "unitOfTime": false
+  },
+  {
+    "id": 67,
+    "symbol": "imóvel",
+    "description": "IMÓVEL",
+    "magnitude": null,
+    "numberOfHours": 0,
+    "status": "ACTIVE",
+    "unitOfTime": false
+  },
+  {
+    "id": 68,
+    "symbol": "quadra",
+    "description": "QUADRA",
+    "magnitude": null,
+    "numberOfHours": 0,
+    "status": "ACTIVE",
+    "unitOfTime": false
+  },
+  {
+    "id": 69,
+    "symbol": "m2xarf",
+    "description": "M2xARF",
+    "magnitude": null,
+    "numberOfHours": 0,
+    "status": "ACTIVE",
+    "unitOfTime": false
+  },
+  {
+    "id": 70,
+    "symbol": "m3xkm",
+    "description": "M3xKM",
+    "magnitude": null,
+    "numberOfHours": 0,
+    "status": "ACTIVE",
+    "unitOfTime": false
+  },
+  {
+    "id": 71,
+    "symbol": "ciclo",
+    "description": "CICLO",
+    "magnitude": null,
+    "numberOfHours": 0,
+    "status": "ACTIVE",
+    "unitOfTime": false
+  },
+  {
+    "id": 72,
+    "symbol": "ptxdia",
+    "description": "PTxDIA",
+    "magnitude": null,
+    "numberOfHours": 0,
+    "status": "ACTIVE",
+    "unitOfTime": false
+  },
+  {
+    "id": 73,
+    "symbol": "ban",
+    "description": "BAN",
+    "magnitude": null,
+    "numberOfHours": 0,
+    "status": "ACTIVE",
+    "unitOfTime": false
+  },
+  {
+    "id": 74,
+    "symbol": "amv",
+    "description": "AMV",
+    "magnitude": null,
+    "numberOfHours": 0,
+    "status": "ACTIVE",
+    "unitOfTime": false
+  },
+  {
+    "id": 75,
+    "symbol": "pt",
+    "description": "PT",
+    "magnitude": null,
+    "numberOfHours": 0,
+    "status": "ACTIVE",
+    "unitOfTime": false
+  },
+  {
+    "id": 76,
+    "symbol": "50kg",
+    "description": "50KG",
+    "magnitude": null,
+    "numberOfHours": 0,
+    "status": "ACTIVE",
+    "unitOfTime": false
+  },
+  {
+    "id": 77,
+    "symbol": "mxmes",
+    "description": "MXMES",
+    "magnitude": null,
+    "numberOfHours": 0,
+    "status": "ACTIVE",
+    "unitOfTime": false
+  },
+  {
+    "id": 78,
+    "symbol": "18l",
+    "description": "18L",
+    "magnitude": null,
+    "numberOfHours": 0,
+    "status": "ACTIVE",
+    "unitOfTime": false
+  },
+  {
+    "id": 79,
+    "symbol": "200kg",
+    "description": "200KG",
+    "magnitude": null,
+    "numberOfHours": 0,
+    "status": "ACTIVE",
+    "unitOfTime": false
+  },
+  {
+    "id": 80,
+    "symbol": "310ml",
+    "description": "310ML",
+    "magnitude": null,
+    "numberOfHours": 0,
+    "status": "ACTIVE",
+    "unitOfTime": false
+  },
+  {
+    "id": 81,
+    "symbol": "m2xmes",
+    "description": "M2XMES",
+    "magnitude": null,
+    "numberOfHours": 0,
+    "status": "ACTIVE",
+    "unitOfTime": false
+  },
+  {
+    "id": 82,
+    "symbol": "100m",
+    "description": "100M",
+    "magnitude": null,
+    "numberOfHours": 0,
+    "status": "ACTIVE",
+    "unitOfTime": false
+  },
+  {
+    "id": 83,
+    "symbol": "chp",
+    "description": "CHP",
+    "magnitude": null,
+    "numberOfHours": 0,
+    "status": "ACTIVE",
+    "unitOfTime": false
+  },
+  {
+    "id": 84,
+    "symbol": "chi",
+    "description": "CHI",
+    "magnitude": null,
+    "numberOfHours": 0,
+    "status": "ACTIVE",
+    "unitOfTime": false
+  },
+  {
+    "id": 86,
+    "symbol": "und",
+    "description": "und",
+    "magnitude": "",
+    "numberOfHours": 0,
+    "status": "ACTIVE",
+    "unitOfTime": false
+  },
+  {
+    "id": 87,
+    "symbol": "sv",
+    "description": "sv",
+    "magnitude": null,
+    "numberOfHours": 0,
+    "status": "ACTIVE",
+    "unitOfTime": false
+  },
+  {
+    "id": 88,
+    "symbol": "h/mes",
+    "description": "h/mes",
+    "magnitude": null,
+    "numberOfHours": 0,
+    "status": "ACTIVE",
+    "unitOfTime": false
+  },
+  {
+    "id": 89,
+    "symbol": "m²",
+    "description": "m²",
+    "magnitude": null,
+    "numberOfHours": 0,
+    "status": "ACTIVE",
+    "unitOfTime": false
+  },
+  {
+    "id": 91,
+    "symbol": "kç",
+    "description": "kç",
+    "magnitude": null,
+    "numberOfHours": 0,
+    "status": "ACTIVE",
+    "unitOfTime": false
+  },
+  {
+    "id": 92,
+    "symbol": "m³",
+    "description": "m³",
+    "magnitude": null,
+    "numberOfHours": 0,
+    "status": "ACTIVE",
+    "unitOfTime": false
+  },
+  {
+    "id": 93,
+    "symbol": "rs",
+    "description": "Resma",
+    "magnitude": "",
+    "numberOfHours": null,
+    "status": "ACTIVE",
+    "unitOfTime": false
+  },
+  {
+    "id": 95,
+    "symbol": "kilogr",
+    "description": "kilogr",
+    "magnitude": null,
+    "numberOfHours": 0,
+    "status": "ACTIVE",
+    "unitOfTime": false
+  },
+  {
+    "id": 96,
+    "symbol": "metro",
+    "description": "metro",
+    "magnitude": null,
+    "numberOfHours": 0,
+    "status": "ACTIVE",
+    "unitOfTime": false
+  },
+  {
+    "id": 98,
+    "symbol": "descri",
+    "description": "descri",
+    "magnitude": null,
+    "numberOfHours": 0,
+    "status": "ACTIVE",
+    "unitOfTime": false
+  },
+  {
+    "id": 99,
+    "symbol": "seinfr",
+    "description": "seinfr",
+    "magnitude": null,
+    "numberOfHours": 0,
+    "status": "ACTIVE",
+    "unitOfTime": false
+  },
+  {
+    "id": 100,
+    "symbol": "sinapi",
+    "description": "sinapi",
+    "magnitude": null,
+    "numberOfHours": 0,
+    "status": "ACTIVE",
+    "unitOfTime": false
+  },
+  {
+    "id": 101,
+    "symbol": "br",
+    "description": "Barra",
+    "magnitude": "",
+    "numberOfHours": null,
+    "status": "ACTIVE",
+    "unitOfTime": false
+  },
+  {
+    "id": 102,
+    "symbol": "há",
+    "description": "há",
+    "magnitude": null,
+    "numberOfHours": 0,
+    "status": "ACTIVE",
+    "unitOfTime": false
+  },
+  {
+    "id": 103,
+    "symbol": "m3/km",
+    "description": "m3/km",
+    "magnitude": null,
+    "numberOfHours": 0,
+    "status": "ACTIVE",
+    "unitOfTime": false
+  },
+  {
+    "id": 104,
+    "symbol": "municí",
+    "description": "municí",
+    "magnitude": null,
+    "numberOfHours": 0,
+    "status": "ACTIVE",
+    "unitOfTime": false
+  }
+]
