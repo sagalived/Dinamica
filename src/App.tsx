@@ -228,6 +228,13 @@ export default function App() {
     }
   }, []);
 
+  const bootstrapHasCoreData = useCallback((payload: any) => {
+    const pedidos = Array.isArray(payload?.pedidos) ? payload.pedidos.length : 0;
+    const financeiro = Array.isArray(payload?.financeiro) ? payload.financeiro.length : 0;
+    const receber = Array.isArray(payload?.receber) ? payload.receber.length : 0;
+    return pedidos > 0 || financeiro > 0 || receber > 0;
+  }, []);
+
   const applyBootstrapData = useCallback((payload: any) => {
     const bDataRaw = Array.isArray(payload?.obras) ? payload.obras : [];
     const uDataRaw = Array.isArray(payload?.usuarios) ? payload.usuarios : [];
@@ -391,7 +398,22 @@ export default function App() {
 
     try {
       const response = await api.get('/bootstrap');
-      applyBootstrapData(response.data);
+      let payload = response.data;
+
+      if (!bootstrapHasCoreData(payload)) {
+        setSyncing(true);
+        try {
+          await api.post('/sync');
+          const refreshed = await api.get('/bootstrap');
+          payload = refreshed.data;
+        } catch (syncError) {
+          console.error('Initial sync on empty Render cache failed:', syncError);
+        } finally {
+          setSyncing(false);
+        }
+      }
+
+      applyBootstrapData(payload);
     } catch (error) {
       console.error('Error fetching initial data:', error);
       setApiStatus('offline');
@@ -404,7 +426,7 @@ export default function App() {
     } finally {
       setLoading(false);
     }
-  }, [applyBootstrapData, checkConnection]);
+  }, [applyBootstrapData, bootstrapHasCoreData, checkConnection]);
 
   const handleLogin = useCallback((user: AuthUser) => {
     localStorage.setItem('dinamica_session', JSON.stringify(user));
@@ -499,7 +521,22 @@ export default function App() {
 
     try {
       const response = await api.get('/bootstrap');
-      applyBootstrapData(response.data);
+      let payload = response.data;
+
+      if (!bootstrapHasCoreData(payload)) {
+        setSyncing(true);
+        try {
+          await api.post('/sync');
+          const refreshed = await api.get('/bootstrap');
+          payload = refreshed.data;
+        } catch (syncError) {
+          console.error('Refresh sync on empty Render cache failed:', syncError);
+        } finally {
+          setSyncing(false);
+        }
+      }
+
+      applyBootstrapData(payload);
     } catch (error) {
       console.error('Error refreshing data:', error);
       setOrders([]);
@@ -3028,7 +3065,6 @@ export default function App() {
     </>
   );
 }
-
 
 
 

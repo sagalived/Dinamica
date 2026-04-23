@@ -3,12 +3,14 @@ import csv
 import gzip
 import hashlib
 import json
+import tempfile
 import mimetypes
 import os
 import re
 import sqlite3
 import threading
 import time
+import shutil
 from contextlib import asynccontextmanager
 from datetime import datetime
 from email.utils import formatdate
@@ -26,7 +28,11 @@ from starlette.datastructures import Headers
 load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent
-DATA_DIR = BASE_DIR / "data"
+DATA_ROOT_ENV = (
+    os.getenv("APP_DATA_DIR", "").strip()
+    or os.getenv("RENDER_DISK_PATH", "").strip()
+)
+DATA_DIR = Path(DATA_ROOT_ENV) / "data" if DATA_ROOT_ENV else BASE_DIR / "data"
 DATA_DIR.mkdir(parents=True, exist_ok=True)
 DB_PATH = DATA_DIR / "dinamica.db"
 
@@ -77,6 +83,9 @@ _sync_lock = threading.Lock()
 _is_syncing = False
 _etag_cache_lock = threading.Lock()
 _etag_cache: dict[tuple[str, int, int], str] = {}
+_file_lock = threading.RLock()
+BACKUP_DIR = DATA_DIR / "backups"
+BACKUP_DIR.mkdir(parents=True, exist_ok=True)
 
 COMPRESSIBLE_EXTENSIONS = {
     ".html",
@@ -270,8 +279,13 @@ def now_iso() -> str:
 
 
 def get_db() -> sqlite3.Connection:
-    conn = sqlite3.connect(DB_PATH, check_same_thread=False)
+    conn = sqlite3.connect(DB_PATH, check_same_thread=False, timeout=30)
     conn.row_factory = sqlite3.Row
+    conn.execute("PRAGMA journal_mode=WAL;")
+    conn.execute("PRAGMA synchronous=NORMAL;")
+    conn.execute("PRAGMA busy_timeout=30000;")
+    conn.execute("PRAGMA foreign_keys=ON;")
+    conn.execute("PRAGMA temp_store=MEMORY;")
     return conn
 
 
@@ -381,6 +395,15 @@ def init_db() -> None:
     cur.execute(
         "CREATE UNIQUE INDEX IF NOT EXISTS idx_app_users_email ON app_users(email) WHERE email <> ''"
     )
+    cur.execute(
+        "CREATE INDEX IF NOT EXISTS idx_sync_runs_started_at ON sync_runs(started_at DESC)"
+    )
+    cur.execute(
+        "CREATE INDEX IF NOT EXISTS idx_kanban_sprints_building_id ON kanban_sprints(building_id)"
+    )
+    cur.execute(
+        "CREATE INDEX IF NOT EXISTS idx_kanban_cards_sprint_id ON kanban_cards(sprint_id)"
+    )
     conn.commit()
     conn.close()
 
@@ -423,33 +446,52 @@ def seed_default_admin_user() -> None:
 
 
 def save_dataset_cache(key: str, payload: Any) -> None:
-    conn = get_db()
-    cur = conn.cursor()
-    cur.execute(
-        """
-        INSERT INTO dataset_cache (key, payload, updated_at)
-        VALUES (?, ?, ?)
-        ON CONFLICT(key) DO UPDATE SET
-          payload = excluded.payload,
-          updated_at = excluded.updated_at
-        """,
-        (key, json.dumps(payload, ensure_ascii=False), now_iso()),
-    )
-    conn.commit()
-    conn.close()
+    with _db_lock:
+        conn = get_db()
+        cur = conn.cursor()
+        cur.execute(
+            """
+            INSERT INTO dataset_cache (key, payload, updated_at)
+            VALUES (?, ?, ?)
+            ON CONFLICT(key) DO UPDATE SET
+              payload = excluded.payload,
+              updated_at = excluded.updated_at
+            """,
+            (key, json.dumps(payload, ensure_ascii=False), now_iso()),
+        )
+        conn.commit()
+        conn.close()
 
 
 def read_dataset_cache(key: str) -> Any:
-    conn = get_db()
-    cur = conn.cursor()
-    row = cur.execute("SELECT payload FROM dataset_cache WHERE key = ?", (key,)).fetchone()
-    conn.close()
+    with _db_lock:
+        conn = get_db()
+        cur = conn.cursor()
+        row = cur.execute("SELECT payload FROM dataset_cache WHERE key = ?", (key,)).fetchone()
+        conn.close()
     if not row or not row[0]:
         return None
     try:
         return json.loads(row[0])
     except Exception:
         return None
+
+
+def read_cached_payload(cache_key: str, filename: str | None = None, default: Any = None) -> Any:
+    payload = read_dataset_cache(cache_key)
+    if payload is not None:
+        return payload
+    if filename:
+        payload = read_from_file(filename)
+        if payload is not None:
+            return payload
+    return default
+
+
+def write_cached_payload(cache_key: str, payload: Any, filename: str | None = None) -> None:
+    save_dataset_cache(cache_key, payload)
+    if filename:
+        save_to_file(filename, payload)
 
 
 def save_building_meta_to_db(building_id: str, engineer: str) -> None:
@@ -482,10 +524,20 @@ def read_building_meta_from_db() -> dict[str, dict[str, str]]:
 
 def save_to_file(filename: str, data: Any) -> None:
     file_path = DATA_DIR / filename
-    if isinstance(data, str):
-        file_path.write_text(data, encoding="utf-8")
-    else:
-        file_path.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
+    file_path.parent.mkdir(parents=True, exist_ok=True)
+    with _file_lock:
+        with tempfile.NamedTemporaryFile(
+            mode="w",
+            encoding="utf-8",
+            dir=file_path.parent,
+            delete=False,
+        ) as tmp_file:
+            if isinstance(data, str):
+                tmp_file.write(data)
+            else:
+                json.dump(data, tmp_file, ensure_ascii=False, indent=2)
+            temp_name = tmp_file.name
+        os.replace(temp_name, file_path)
 
 
 def read_from_file(filename: str) -> Any:
@@ -493,7 +545,8 @@ def read_from_file(filename: str) -> Any:
     if not file_path.exists():
         return None
     try:
-        content = file_path.read_text(encoding="utf-8")
+        with _file_lock:
+            content = file_path.read_text(encoding="utf-8")
         if filename.endswith(".csv"):
             return content
         return json.loads(content)
@@ -512,6 +565,43 @@ def save_obras_meta(meta: dict[str, Any]) -> None:
     for building_id, item in meta.items():
         engineer = str((item or {}).get("engineer", ""))
         save_building_meta_to_db(str(building_id), engineer)
+
+
+def create_resilient_backup() -> None:
+    timestamp = datetime.utcnow().strftime("%Y%m%dT%H%M%SZ")
+    backup_path = BACKUP_DIR / timestamp
+    backup_path.mkdir(parents=True, exist_ok=True)
+
+    files_to_copy = [
+        "dinamica.db",
+        "obras.json",
+        "obras_by_code.json",
+        "usuarios.json",
+        "credores.json",
+        "empresas.json",
+        "clientes.json",
+        "pedidos.json",
+        "financeiro.json",
+        "receber.json",
+        "itens_pedidos.json",
+        "cotacoes_pedidos.json",
+        "solicitantes-cache.json",
+        "consolidado.csv",
+    ]
+
+    with _file_lock:
+        for name in files_to_copy:
+            src = DATA_DIR / name
+            if src.exists():
+                shutil.copy2(src, backup_path / name)
+
+    existing_backups = sorted(
+        [p for p in BACKUP_DIR.iterdir() if p.is_dir()],
+        key=lambda p: p.name,
+        reverse=True,
+    )
+    for stale in existing_backups[5:]:
+        shutil.rmtree(stale, ignore_errors=True)
 
 
 def to_array(payload: Any) -> list[Any]:
@@ -1043,7 +1133,7 @@ def sync_all_data() -> bool:
         empresas = (empresas_res or {}).get("data", {}).get("results", []) if empresas_res else []
         clientes = clientes_payload.get("results", clientes_payload) if isinstance(clientes_payload, dict) else clientes_payload
 
-        solicitantes_cache = read_from_file("solicitantes-cache.json") or {}
+        solicitantes_cache = read_cached_payload("solicitantes_cache", "solicitantes-cache.json", {}) or {}
         po_map = {po.get("id"): po for po in po_rest if isinstance(po, dict) and po.get("id") is not None}
         missing_reqs: set[str] = set()
 
@@ -1083,7 +1173,7 @@ def sync_all_data() -> bool:
                                 solicitantes_cache[req_id] = requester_name
                     except Exception:
                         continue
-            save_to_file("solicitantes-cache.json", solicitantes_cache)
+            write_cached_payload("solicitantes_cache", solicitantes_cache, "solicitantes-cache.json")
 
         for p in pedidos:
             req_origin = p.get("reqIdOrigin")
@@ -1134,7 +1224,7 @@ def sync_all_data() -> bool:
                 }
             credores = list(grouped_c.values())
 
-        obras_by_code = read_from_file("obras_by_code.json") or {}
+        obras_by_code = read_cached_payload("obras_by_code", "obras_by_code.json", {}) or {}
         unique_building_ids = sorted(
             {
                 str(p.get("codigoVisivelObra") or p.get("idObra") or p.get("buildingId"))
@@ -1192,20 +1282,13 @@ def sync_all_data() -> bool:
                 }
 
         if obras_by_code:
-            save_to_file("obras_by_code.json", obras_by_code)
-            save_dataset_cache("obras_by_code", obras_by_code)
+            write_cached_payload("obras_by_code", obras_by_code, "obras_by_code.json")
 
-        save_to_file("obras.json", obras)
-        save_to_file("usuarios.json", usuarios)
-        save_to_file("credores.json", credores)
-        save_to_file("empresas.json", empresas)
-        save_to_file("clientes.json", clientes)
-
-        save_dataset_cache("obras", obras)
-        save_dataset_cache("usuarios", usuarios)
-        save_dataset_cache("credores", credores)
-        save_dataset_cache("empresas", empresas)
-        save_dataset_cache("clientes", clientes)
+        write_cached_payload("obras", obras, "obras.json")
+        write_cached_payload("usuarios", usuarios, "usuarios.json")
+        write_cached_payload("credores", credores, "credores.json")
+        write_cached_payload("empresas", empresas, "empresas.json")
+        write_cached_payload("clientes", clientes, "clientes.json")
 
         conn = get_db()
         cur = conn.cursor()
@@ -1270,7 +1353,7 @@ def sync_all_data() -> bool:
         conn.commit()
         conn.close()
 
-        items_map = read_from_file("itens_pedidos.json") or {}
+        items_map = read_cached_payload("itens_pedidos", "itens_pedidos.json", {}) or {}
         if isinstance(pedidos, list):
             for order in pedidos[:50]:
                 order_id = order.get("id") or order.get("numero")
@@ -1288,16 +1371,11 @@ def sync_all_data() -> bool:
                 except Exception:
                     continue
 
-        save_to_file("itens_pedidos.json", items_map)
-        save_dataset_cache("itens_pedidos", items_map)
+        write_cached_payload("itens_pedidos", items_map, "itens_pedidos.json")
 
-        save_to_file("pedidos.json", pedidos_res.get("data", {}))
-        save_to_file("financeiro.json", financeiro_res.get("data", {}))
-        save_to_file("receber.json", receber_res.get("data", {}))
-
-        save_dataset_cache("pedidos", pedidos_res.get("data", {}))
-        save_dataset_cache("financeiro", financeiro_res.get("data", {}))
-        save_dataset_cache("receber", receber_res.get("data", {}))
+        write_cached_payload("pedidos", pedidos_res.get("data", {}), "pedidos.json")
+        write_cached_payload("financeiro", financeiro_res.get("data", {}), "financeiro.json")
+        write_cached_payload("receber", receber_res.get("data", {}), "receber.json")
 
         csv_headers = [
             "Tipo",
@@ -1471,6 +1549,7 @@ def sync_all_data() -> bool:
             writer.writerows(rows)
 
         save_dataset_cache("consolidado_csv", csv_path.read_text(encoding="utf-8-sig"))
+        create_resilient_backup()
 
         conn = get_db()
         cur = conn.cursor()
@@ -1514,12 +1593,12 @@ def api_download_csv() -> Any:
 
 @app.get("/api/sienge/test")
 def api_test() -> Any:
-    pedidos = to_array(read_dataset_cache("pedidos") or read_from_file("pedidos.json"))
-    financeiro = to_array(read_dataset_cache("financeiro") or read_from_file("financeiro.json"))
-    receber = to_array(read_dataset_cache("receber") or read_from_file("receber.json"))
-    obras = to_array(read_dataset_cache("obras") or read_from_file("obras.json"))
-    credores = to_array(read_dataset_cache("credores") or read_from_file("credores.json"))
-    usuarios = to_array(read_dataset_cache("usuarios") or read_from_file("usuarios.json"))
+    pedidos = to_array(read_cached_payload("pedidos", "pedidos.json"))
+    financeiro = to_array(read_cached_payload("financeiro", "financeiro.json"))
+    receber = to_array(read_cached_payload("receber", "receber.json"))
+    obras = to_array(read_cached_payload("obras", "obras.json"))
+    credores = to_array(read_cached_payload("credores", "credores.json"))
+    usuarios = to_array(read_cached_payload("usuarios", "usuarios.json"))
     live = sienge_healthcheck()
     return {
         "ok": live["ok"] or len(pedidos) > 0 or len(financeiro) > 0 or len(receber) > 0,
@@ -1587,16 +1666,16 @@ def api_recent_purchase_alerts(request: Request) -> Any:
 @app.get("/api/sienge/bootstrap")
 def api_bootstrap() -> Any:
     try:
-        obras_payload = read_from_file("obras.json") or read_dataset_cache("obras")
-        obras_by_code_payload = read_from_file("obras_by_code.json") or read_dataset_cache("obras_by_code")
-        usuarios_payload = read_from_file("usuarios.json") or read_dataset_cache("usuarios")
-        credores_payload = read_from_file("credores.json") or read_dataset_cache("credores")
-        companies_payload = read_from_file("empresas.json") or read_dataset_cache("empresas")
-        pedidos_payload = read_from_file("pedidos.json") or read_dataset_cache("pedidos")
-        financeiro_payload = read_from_file("financeiro.json") or read_dataset_cache("financeiro")
-        receber_payload = read_from_file("receber.json") or read_dataset_cache("receber")
-        itens_payload = read_from_file("itens_pedidos.json") or read_dataset_cache("itens_pedidos") or {}
-        solicitantes_cache = read_from_file("solicitantes-cache.json") or {}
+        obras_payload = read_cached_payload("obras", "obras.json")
+        obras_by_code_payload = read_cached_payload("obras_by_code", "obras_by_code.json")
+        usuarios_payload = read_cached_payload("usuarios", "usuarios.json")
+        credores_payload = read_cached_payload("credores", "credores.json")
+        companies_payload = read_cached_payload("empresas", "empresas.json")
+        pedidos_payload = read_cached_payload("pedidos", "pedidos.json")
+        financeiro_payload = read_cached_payload("financeiro", "financeiro.json")
+        receber_payload = read_cached_payload("receber", "receber.json")
+        itens_payload = read_cached_payload("itens_pedidos", "itens_pedidos.json", {}) or {}
+        solicitantes_cache = read_cached_payload("solicitantes_cache", "solicitantes-cache.json", {}) or {}
         meta = read_obras_meta()
 
         obras_base = to_array(obras_payload)
@@ -1912,7 +1991,7 @@ def api_bootstrap() -> Any:
 
 @app.get("/api/sienge/itens-pedidos")
 def api_itens_pedidos() -> Any:
-    cached = read_dataset_cache("itens_pedidos") or read_from_file("itens_pedidos.json")
+    cached = read_cached_payload("itens_pedidos", "itens_pedidos.json")
     return cached or {}
 
 
@@ -1923,7 +2002,7 @@ async def api_fetch_items(request: Request) -> Any:
     if not isinstance(ids, list):
         return {}
 
-    items_map = read_from_file("itens_pedidos.json") or {}
+    items_map = read_cached_payload("itens_pedidos", "itens_pedidos.json", {}) or {}
     changed = False
     for order_id in ids:
         key = str(order_id)
@@ -1939,7 +2018,7 @@ async def api_fetch_items(request: Request) -> Any:
             continue
 
     if changed:
-        save_to_file("itens_pedidos.json", items_map)
+        write_cached_payload("itens_pedidos", items_map, "itens_pedidos.json")
     return items_map
 
 
@@ -1958,12 +2037,12 @@ async def api_fetch_quotations(request: Request) -> Any:
     if not isinstance(ids, list):
         return {}
 
-    quotations_map = read_from_file("cotacoes_pedidos.json") or {}
-    items_map = read_from_file("itens_pedidos.json") or {}
+    quotations_map = read_cached_payload("cotacoes_pedidos", "cotacoes_pedidos.json", {}) or {}
+    items_map = read_cached_payload("itens_pedidos", "itens_pedidos.json", {}) or {}
     changed = False
 
     # Load all pedidos from cache to find orders sharing the same quotation
-    pedidos_cache = read_dataset_cache("pedidos") or read_from_file("pedidos.json") or {}
+    pedidos_cache = read_cached_payload("pedidos", "pedidos.json", {}) or {}
     all_pedidos = to_array(pedidos_cache)
 
     # Build a lookup: orderId -> pedido info
@@ -2122,8 +2201,8 @@ async def api_fetch_quotations(request: Request) -> Any:
             continue
 
     if changed:
-        save_to_file("itens_pedidos.json", items_map)
-        save_to_file("cotacoes_pedidos.json", quotations_map)
+        write_cached_payload("itens_pedidos", items_map, "itens_pedidos.json")
+        write_cached_payload("cotacoes_pedidos", quotations_map, "cotacoes_pedidos.json")
     return quotations_map
 
 

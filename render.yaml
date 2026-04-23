@@ -3,11 +3,17 @@ services:
     name: dinamica-dashboard-financeiro
     env: python
     buildCommand: pip install -r requirements.txt && npm ci && npm run build
-    startCommand: python app.py
+    startCommand: uvicorn app:app --host 0.0.0.0 --port $PORT
     healthCheckPath: /
+    disk:
+      name: dinamica-data
+      mountPath: /var/data
+      sizeGB: 10
     envVars:
       - key: NODE_ENV
         value: production
+      - key: APP_DATA_DIR
+        value: /var/data
       - key: SIENGE_USERNAME
         sync: false
       - key: SIENGE_PASSWORD
@@ -17,6 +23,8 @@ services:
       - key: GOOGLE_MAPS_API_KEY
         sync: false
       - key: AUTO_SYNC_ON_BOOT
+        value: "true"
+      - key: AUTO_SYNC_INTERVAL
         value: "true"
       - key: CORS_ALLOW_ORIGINS
         value: "*"
