@@ -9,6 +9,7 @@ coverage/
 
 # Large data files - use local sync only
 data/dinamica.db
+dinamica.db
 data/financeiro.json
 data/receber.json
 data/pedidos.json
