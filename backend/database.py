@@ -14,7 +14,6 @@ engine = create_engine(
     DATABASE_URL,
     future=True,
     pool_pre_ping=True,
-    connect_args={"connect_timeout": 3},
 )
 SessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False, future=True)
 
