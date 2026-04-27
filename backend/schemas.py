@@ -158,10 +158,10 @@ class BootstrapResponse(BaseModel):
     usuarios: list[dict]
     credores: list[dict]
     companies: list[dict]
-    pedidos: list[dict]
-    financeiro: list[dict]
-    receber: list[dict]
-    itensPedidos: dict
+    pedidos: list[dict] = []
+    financeiro: list[dict] = []
+    receber: list[dict] = []
+    itensPedidos: dict = {}
     saldoBancario: float | None = None
     latestSync: dict | None = None
 

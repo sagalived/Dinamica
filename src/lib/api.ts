@@ -18,7 +18,7 @@ export const kanbanApi = axios.create({
 
 export const sienge = axios.create({
   baseURL: '/api/sienge',
-  timeout: 15000,
+  timeout: 120000, // 2 min — filtered sem data pode retornar muitos registros
 });
 
 // Token management

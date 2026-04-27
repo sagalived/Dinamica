@@ -178,15 +178,21 @@ def _date_end_exclusive_ms(value: str | None) -> int | None:
     return base + 24 * 60 * 60 * 1000
 
 
-def _legacy_bootstrap_payload(db: Session) -> dict[str, Any]:
+def _legacy_bootstrap_payload(db: Session, include_transactions: bool = True) -> dict[str, Any]:
     obras = _to_array(_read_cached_dataset(db, "obras.json", []))
     usuarios = _to_array(_read_cached_dataset(db, "usuarios.json", []))
     credores = _to_array(_read_cached_dataset(db, "credores.json", []))
     companies = _to_array(_read_cached_dataset(db, "empresas.json", []))
-    pedidos = _to_array(_read_cached_dataset(db, "pedidos.json", []))
-    financeiro = _to_array(_read_cached_dataset(db, "financeiro.json", []))
-    receber = _to_array(_read_cached_dataset(db, "receber.json", []))
-    itens_pedidos = _read_cached_dataset(db, "itens_pedidos.json", {}) or {}
+    if include_transactions:
+        pedidos = _to_array(_read_cached_dataset(db, "pedidos.json", []))
+        financeiro = _to_array(_read_cached_dataset(db, "financeiro.json", []))
+        receber = _to_array(_read_cached_dataset(db, "receber.json", []))
+        itens_pedidos = _read_cached_dataset(db, "itens_pedidos.json", {}) or {}
+    else:
+        pedidos = []
+        financeiro = []
+        receber = []
+        itens_pedidos = {}
 
     if not obras:
         obras = [
@@ -386,8 +392,8 @@ def _legacy_bootstrap_payload(db: Session) -> dict[str, Any]:
     }
 
 
-def _normalize_response_payload(payload: dict[str, Any], db: Session) -> BootstrapResponse:
-    normalized = _legacy_bootstrap_payload(db)
+def _normalize_response_payload(payload: dict[str, Any], db: Session, include_transactions: bool = False) -> BootstrapResponse:
+    normalized = _legacy_bootstrap_payload(db, include_transactions=include_transactions)
     if payload.get("latestSync"):
         normalized["latestSync"] = payload["latestSync"]
     if payload.get("itensPedidos"):

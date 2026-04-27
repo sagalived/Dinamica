@@ -68,6 +68,7 @@ export default function App() {
   const [activeTab, setActiveTab] = useState<string>('dashboard');
   const [loading, setLoading] = useState(false);
   const [syncing, setSyncing] = useState(false);
+  const [bootstrapLoaded, setBootstrapLoaded] = useState(false);
   const [apiStatus, setApiStatus] = useState<'online' | 'offline' | 'checking'>('checking');
   const [saldoBancario, setSaldoBancario] = useState<number | null>(null);
   const [lastUpdate, setLastUpdate] = useState<Date>(new Date());
@@ -474,6 +475,7 @@ export default function App() {
       setLastUpdate(new Date());
     }
     setApiStatus('online');
+    setBootstrapLoaded(true);
   }, []);
 
   const fetchInitialData = useCallback(async () => {
@@ -985,8 +987,7 @@ export default function App() {
   }, [buildingOptions, selectedMapBuilding]);
 
   useEffect(() => {
-    if (!sessionUser) return;
-    if (allOrders.length === 0 && allFinancialTitles.length === 0 && allReceivableTitles.length === 0) return;
+    if (!sessionUser || !bootstrapLoaded) return;
 
     let cancelled = false;
 
@@ -1049,6 +1050,7 @@ export default function App() {
     allOrders,
     allReceivableTitles,
     applyServerFilteredData,
+    bootstrapLoaded,
     defaultWindow.end,
     defaultWindow.start,
     endDate,
