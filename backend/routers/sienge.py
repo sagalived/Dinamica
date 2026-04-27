@@ -558,8 +558,13 @@ async def bootstrap(
     current_user: AppUser = Depends(get_current_user),
     db: Session = Depends(get_db),
 ) -> BootstrapResponse:
-    # Bootstrap precisa ser leve e sempre servir do cache compartilhado.
-    return _normalize_response_payload({}, db)
+    # Bootstrap leve: retorna apenas metadados (obras/usuarios/credores).
+    # Pedidos/financeiro/receber chegam via /filtered (filtrado, pequeno).
+    result = _normalize_response_payload({}, db)
+    counts = _cache_counts(db)
+    result.cacheReady = counts.get("pedidos", 0) > 0 or counts.get("financeiro", 0) > 0
+    result.cacheCounts = counts
+    return result
 
 
 @router.post("/sync")

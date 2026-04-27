@@ -68,7 +68,7 @@ export default function App() {
   const [activeTab, setActiveTab] = useState<string>('dashboard');
   const [loading, setLoading] = useState(false);
   const [syncing, setSyncing] = useState(false);
-  const [bootstrapLoaded, setBootstrapLoaded] = useState(false);
+  const [dataRevision, setDataRevision] = useState(0);
   const [apiStatus, setApiStatus] = useState<'online' | 'offline' | 'checking'>('checking');
   const [saldoBancario, setSaldoBancario] = useState<number | null>(null);
   const [lastUpdate, setLastUpdate] = useState<Date>(new Date());
@@ -298,6 +298,9 @@ export default function App() {
   }, []);
 
   const bootstrapHasCoreData = useCallback((payload: any) => {
+    // Verifica flag cacheReady do bootstrap leve (backend indica se DB cache tem dados)
+    if (payload?.cacheReady === true) return true;
+    // Fallback legado: verifica arrays de transações (quando bootstrap retornava tudo)
     const pedidos = Array.isArray(payload?.pedidos) ? payload.pedidos.length : 0;
     const financeiro = Array.isArray(payload?.financeiro) ? payload.financeiro.length : 0;
     const receber = Array.isArray(payload?.receber) ? payload.receber.length : 0;
@@ -475,7 +478,7 @@ export default function App() {
       setLastUpdate(new Date());
     }
     setApiStatus('online');
-    setBootstrapLoaded(true);
+    setDataRevision(r => r + 1);
   }, []);
 
   const fetchInitialData = useCallback(async () => {
@@ -613,6 +616,7 @@ export default function App() {
       if (response.data?.in_progress) {
         const sharedPayload = await waitForSharedCache();
         if (sharedPayload) {
+          setDataRevision(0);
           applyBootstrapData(sharedPayload);
         } else {
           await refreshData();
@@ -661,6 +665,7 @@ export default function App() {
         }
       }
 
+      setDataRevision(0);
       applyBootstrapData(payload);
     } catch (error) {
       console.error('Error refreshing data:', error);
@@ -987,7 +992,7 @@ export default function App() {
   }, [buildingOptions, selectedMapBuilding]);
 
   useEffect(() => {
-    if (!sessionUser || !bootstrapLoaded) return;
+    if (!sessionUser || dataRevision === 0) return;
 
     let cancelled = false;
 
@@ -1050,7 +1055,7 @@ export default function App() {
     allOrders,
     allReceivableTitles,
     applyServerFilteredData,
-    bootstrapLoaded,
+    dataRevision,
     defaultWindow.end,
     defaultWindow.start,
     endDate,

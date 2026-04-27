@@ -164,6 +164,8 @@ class BootstrapResponse(BaseModel):
     itensPedidos: dict = {}
     saldoBancario: float | None = None
     latestSync: dict | None = None
+    cacheReady: bool = False
+    cacheCounts: dict = {}
 
 
 class FetchItemsRequest(BaseModel):
