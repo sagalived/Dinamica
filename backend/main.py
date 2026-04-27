@@ -4,6 +4,8 @@ import threading
 
 from fastapi import Depends, FastAPI, Header, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -12,7 +14,7 @@ from dotenv import load_dotenv
 # Load environment variables from .env
 load_dotenv()
 
-from backend.config import APP_NAME, SIENGE_SYNC_INTERVAL_MINUTES
+from backend.config import APP_NAME, BASE_DIR, SIENGE_SYNC_INTERVAL_MINUTES
 from backend.database import Base, engine, get_db, SessionLocal
 from backend.models import AppUser, Building, Client, Company, Creditor, DirectoryUser
 from backend.schemas import AuthResponse, DashboardSummary, LoginRequest, RegisterRequest, UserResponse
@@ -289,3 +291,13 @@ def backup_to_google_drive(
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Backup failed: {str(e)}")
+
+
+# Servir frontend React (dist/) — deve ficar por último
+_DIST_DIR = BASE_DIR / "dist"
+if _DIST_DIR.exists():
+    app.mount("/assets", StaticFiles(directory=str(_DIST_DIR / "assets")), name="assets")
+
+    @app.get("/{full_path:path}", include_in_schema=False)
+    def serve_spa(full_path: str) -> FileResponse:
+        return FileResponse(str(_DIST_DIR / "index.html"))
