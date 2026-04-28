@@ -363,7 +363,16 @@ def _legacy_bootstrap_payload(db: Session, include_transactions: bool = True) ->
                 "statementType": item.get("statementType") or "",
                 "billId": item.get("billId"),
                 "type": item.get("type") or "Income",
-                "bankAccountCode": item.get("bankAccountCode") or "",
+                # bankAccountCode extraído do link rel="bank-account" (ex: ...bank-account/SANTANDER)
+                "bankAccountCode": (
+                    item.get("bankAccountCode")
+                    or next(
+                        (lnk["href"].rstrip("/").split("/")[-1]
+                         for lnk in links
+                         if lnk.get("rel") == "bank-account" and lnk.get("href")),
+                        "",
+                    )
+                ),
                 "links": links,
             }
         )

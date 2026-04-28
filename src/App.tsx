@@ -30,6 +30,7 @@ import {
 import { sienge as api, kanbanApi, Building, User, Creditor, PurchaseOrder, PriceAlert, type AuthUser } from './lib/api';
 import { cn } from './lib/utils';
 import { fixText } from './lib/text';
+import { calcularFluxoCaixa } from './tabs/fluxoCaixa/logic';
 import logoWordmark from './assets/dinamica-wordmark.svg';
 import logoWordmarkDark from './assets/dinamica-wordmark-dark.svg';
 
@@ -91,6 +92,10 @@ export default function App() {
   const [kanbanOverview, setKanbanOverview] = useState<SprintOverview[]>([]);
   const [kanbanOverviewLoading, setKanbanOverviewLoading] = useState(false);
   const knownOrderIdsRef = useRef<Set<number>>(new Set());
+  // Refs para acesso ao all* no fallback do filtro (sem adicionar nos deps do useEffect → evita loop)
+  const allOrdersRef = useRef<PurchaseOrder[]>([]);
+  const allFinancialTitlesRef = useRef<any[]>([]);
+  const allReceivableTitlesRef = useRef<any[]>([]);
 
   type ReportType = 'pagar' | 'receber' | 'abertos' | null;
   const [reportType, setReportType] = useState<ReportType>(null);
@@ -456,11 +461,19 @@ export default function App() {
         documentNumber: r.documentNumber || '',
         installmentNumber: r.installmentNumber ?? null,
         billId: r.billId ?? null,
-        bankAccountCode: r.bankAccountCode || '',
+        // bankAccountCode extraído do links[rel=bank-account] quando não vem como campo direto
+        bankAccountCode: r.bankAccountCode || (() => {
+          if (!Array.isArray(r.links)) return '';
+          const baLink = r.links.find((l: any) => l?.rel === 'bank-account');
+          return baLink?.href ? baLink.href.trim().replace(/\/$/, '').split('/').pop() ?? '' : '';
+        })(),
       };
     });
 
     setItemsDetailsMap(payload?.itensPedidos || {});
+    allOrdersRef.current = allOData;
+    allFinancialTitlesRef.current = allFData;
+    allReceivableTitlesRef.current = allRData;
     setAllOrders(allOData);
     setAllFinancialTitles(allFData);
     setAllReceivableTitles(allRData);
@@ -945,19 +958,32 @@ export default function App() {
         documentNumber: r.documentNumber || '',
         installmentNumber: r.installmentNumber ?? null,
         billId: r.billId ?? null,
-        bankAccountCode: r.bankAccountCode || '',
+        // bankAccountCode extraído do links[rel=bank-account] quando não vem como campo direto
+        bankAccountCode: r.bankAccountCode || (() => {
+          if (!Array.isArray(r.links)) return '';
+          const baLink = r.links.find((l: any) => l?.rel === 'bank-account');
+          return baLink?.href ? baLink.href.trim().replace(/\/$/, '').split('/').pop() ?? '' : '';
+        })(),
       };
     });
 
     setOrders(filteredOrdersData);
     setFinancialTitles(filteredFinancialData);
     setReceivableTitles(filteredReceivableData);
-
-    // Bootstrap leve não carrega transações → populamos all* na primeira carga para
-    // que buildingOptions, fluxoDeCaixaData e outros consumidores funcionem.
-    setAllOrders(prev => prev.length === 0 ? filteredOrdersData : prev);
-    setAllFinancialTitles(prev => prev.length === 0 ? filteredFinancialData : prev);
-    setAllReceivableTitles(prev => prev.length === 0 ? filteredReceivableData : prev);
+    // Popula all* apenas na primeira carga (bootstrap leve não carrega transações).
+    // Usa refs para não adicionar nos deps do useEffect de filtro → evita loop.
+    if (allOrdersRef.current.length === 0) {
+      allOrdersRef.current = filteredOrdersData;
+      setAllOrders(filteredOrdersData);
+    }
+    if (allFinancialTitlesRef.current.length === 0) {
+      allFinancialTitlesRef.current = filteredFinancialData;
+      setAllFinancialTitles(filteredFinancialData);
+    }
+    if (allReceivableTitlesRef.current.length === 0) {
+      allReceivableTitlesRef.current = filteredReceivableData;
+      setAllReceivableTitles(filteredReceivableData);
+    }
   }, []);
 
   // Re-resolve creditor names whenever the creditor list loads (fixes the race with refreshData)
@@ -1029,8 +1055,9 @@ export default function App() {
         }
       } catch (error) {
         if (cancelled) return;
-        // Fallback local if filtered endpoint is unavailable.
-        const filteredOrders = allOrders.filter((o) => {
+        // Fallback local se endpoint /filtered estiver indisponível.
+        // Usa refs (não estado) para não re-disparar o effect → evita loop.
+        const filteredOrders = allOrdersRef.current.filter((o) => {
           const inDate = matchesDateRange(o.dateNumeric);
           const inBuilding = matchesCompanyFilter(o.buildingId, (o as any).companyId);
           const inUser = selectedUser === 'all' || String(o.buyerId) === selectedUser;
@@ -1038,13 +1065,13 @@ export default function App() {
           return inDate && inBuilding && inUser && inRequester;
         }).sort((a, b) => (b.dateNumeric || 0) - (a.dateNumeric || 0));
 
-        const filteredFinancial = allFinancialTitles.filter((f) => {
+        const filteredFinancial = allFinancialTitlesRef.current.filter((f) => {
           const inDate = matchesDateRange(f.dueDateNumeric);
           const inBuilding = matchesCompanyFilter(f.buildingId, f.companyId);
           return inDate && inBuilding;
         });
 
-        const filteredReceivable = allReceivableTitles.filter((r) => {
+        const filteredReceivable = allReceivableTitlesRef.current.filter((r) => {
           const inDate = matchesDateRange(r.dueDateNumeric);
           const inBuilding = matchesCompanyFilter(r.buildingId, r.companyId);
           return inDate && inBuilding;
@@ -1062,9 +1089,6 @@ export default function App() {
       cancelled = true;
     };
   }, [
-    allFinancialTitles,
-    allOrders,
-    allReceivableTitles,
     applyServerFilteredData,
     dataRevision,
     defaultWindow.end,
@@ -1337,8 +1361,12 @@ export default function App() {
     return { totalPurchases, totalPaid };
   }, [allFinancialTitles, allOrders, isSettledFinancialStatus, matchesCompanyFilter, selectedCompany]);
 
+  // ──────────────────────────────────────────────────────────────────────────
+  // FLUXO DE CAIXA — lógica isolada em src/tabs/fluxoCaixa/logic.ts
+  // Não misturar com lógica de outras abas. Para corrigir cálculos, edite
+  // apenas esse arquivo.
+  // ──────────────────────────────────────────────────────────────────────────
   const fluxoDeCaixaData = useMemo(() => {
-    // Quando nao ha data manual, o modo selecionado define se usa 6 meses ou periodo total.
     const fcHasManualDate = Boolean(fcStartDate || fcEndDate);
     const fcEffectiveStart = fcHasManualDate
       ? (fcStartDate || null)
@@ -1347,133 +1375,17 @@ export default function App() {
       ? (fcEndDate || fcStartDate || null)
       : (fcPeriodMode === 'last6m' ? defaultWindow.end : null);
 
-    // Computa as datas limite APENAS UMA VEZ por re-render (evita chamar format em loop)
-    const fStartDateNumeric = fcEffectiveStart ? parseInt(format(fcEffectiveStart, 'yyyyMMdd')) : null;
-    const fEndDateNumeric = fcEffectiveEnd ? parseInt(format(fcEffectiveEnd, 'yyyyMMdd')) : null;
-
-    // Helper: filtro de data exclusivo do Fluxo de Caixa altamente otimizado
-    const matchesFcDate = (dateNum: number | undefined) => {
-      if (!dateNum) return false;
-      // Usando math nativo puro (100x mais rápido que `format()` string parsing para dezenas de milhares de registros)
-      const d = new Date(dateNum);
-      const itemDateNumeric = d.getFullYear() * 10000 + (d.getMonth() + 1) * 100 + d.getDate();
-      
-      if (fStartDateNumeric && itemDateNumeric < fStartDateNumeric) return false;
-      if (fEndDateNumeric && itemDateNumeric > fEndDateNumeric) return false;
-      return true;
-    };
-
-    const matchesFcCompany = (bId?: number, cId?: number) => {
-      if (fcSelectedCompany === 'all') return true;
-      if (String(cId) === fcSelectedCompany) return true;
-      const building = buildings.find(b => b.id === bId);
-      return building ? String(building.companyId) === fcSelectedCompany : false;
-    };
-
-    // Helper: Filtro de Contas Internas/Gerenciais
-    // O PDF do Sienge (Fluxo de Caixa) exclui essas contas (transferências entre contas/empresas e gerenciais)
-    const matchesAccount = (bankAccCode: string, origin: string) => {
-      if (!fcHideInternal) return true;
-      const internalAccounts = ['MUTUODINAM', 'REAPROPFIN', 'ITAUPJ']; // ITAUPJ estava sendo usado para transferências
-      return !internalAccounts.includes(bankAccCode) && origin !== 'GE';
-    };
-
-    // Utiliza allReceivableTitles (Extrato Financeiro do Sienge) — dados realizados
-    const extratoFiltrado = (Array.isArray(allReceivableTitles) ? allReceivableTitles : [])
-      .filter(t => 
-        matchesFcDate(t.dueDateNumeric) && 
-        matchesFcCompany(t.buildingId, (t as any).companyId) &&
-        matchesAccount((t as any).bankAccountCode || '', (t as any).statementOrigin || '')
-      );
-
-    let merged = extratoFiltrado.map(t => {
-      // rawValue: valor com sinal original da API Sienge
-      // Income positivo → entrada de dinheiro
-      // Income negativo → estorno/devolução de entrada (reduz entradas)
-      // Expense negativo → saída de dinheiro (valor já vem negativo na API)
-      // Expense positivo (raro) → estorno de saída (reduz saídas)
-      const rv: number = (t as any).rawValue ?? (((t as any).type === 'Income' ? 1 : -1) * Math.abs(toMoney(t.amount)));
-      const isIncome = (t as any).type === 'Income';
-
-      // Entradas: coluna Income do extrato (com sinal — negativo = estorno)
-      // Saídas: coluna Expense do extrato, valor absoluto (o sinal é invertido na coluna Saída)
-      const entrada = isIncome ? rv : 0;          // pode ser negativo (estorno)
-      const saida = !isIncome ? Math.abs(rv) : 0; // sempre positivo na coluna Saída
-
-      // Monta campo Tit/Parc: documentId + '.' + documentNumber  (ex: REC.1, DEBC.18001)
-      const docId: string = (t as any).documentId || '';
-      const docNum: string = (t as any).documentNumber || '';
-      const installment: string | number | null = (t as any).installmentNumber ?? null;
-      let titParc = '';
-      if (docId && docNum) {
-        titParc = installment != null ? `${docId}.${docNum}/${installment}` : `${docId}.${docNum}`;
-      } else if (docId) {
-        titParc = docId;
-      } else if (docNum) {
-        titParc = installment != null ? `${docNum}/${installment}` : docNum;
-      } else {
-        titParc = String(t.id || '');
-      }
-
-      return {
-        id: t.id,
-        data: t.dueDate,
-        dataNumeric: t.dueDateNumeric,
-        titParc,
-        documento: docId || docNum || `EXT-${t.id}`,
-        origem: (t as any).statementOrigin || '',
-        statementType: translateStatementType((t as any).statementType || (isIncome ? 'Recebimento' : 'Pagamento')),
-        bankAccount: (t as any).bankAccountCode || '',
-        pessoa: t.clientName || t.description || 'Extrato Diversos',
-        entrada,   // pode ser negativo (estorno de entrada)
-        saida,     // sempre positivo (saída real)
-      };
-    }).sort((a, b) => (a.dataNumeric || 0) - (b.dataNumeric || 0));
-
-    // Fallback: quando extrato não existir, monta fluxo mínimo com contas a pagar/receber filtradas.
-    if (merged.length === 0) {
-      const receberFallback = (Array.isArray(allReceivableTitles) ? allReceivableTitles : [])
-        .filter((t) => matchesFcDate(t.dueDateNumeric) && matchesFcCompany(t.buildingId, (t as any).companyId))
-        .map((t) => ({
-          id: t.id,
-          data: t.dueDate,
-          dataNumeric: t.dueDateNumeric,
-          titParc: String(t.documentNumber || t.id || ''),
-          documento: String(t.documentNumber || t.id || ''),
-          origem: 'RC',
-          statementType: 'Recebimento',
-          bankAccount: '',
-          pessoa: t.clientName || t.description || 'Cliente',
-          entrada: Math.abs(toMoney(t.amount)),
-          saida: 0,
-        }));
-
-      const pagarFallback = (Array.isArray(allFinancialTitles) ? allFinancialTitles : [])
-        .filter((t) => matchesFcDate(t.dueDateNumeric) && matchesFcCompany(t.buildingId, (t as any).companyId))
-        .map((t) => ({
-          id: t.id,
-          data: t.dueDate,
-          dataNumeric: t.dueDateNumeric,
-          titParc: String(t.id || ''),
-          documento: String(t.id || ''),
-          origem: 'PG',
-          statementType: 'Pagamento',
-          bankAccount: '',
-          pessoa: t.creditorName || t.description || 'Credor',
-          entrada: 0,
-          saida: Math.abs(toMoney(t.amount)),
-        }));
-
-      merged = [...receberFallback, ...pagarFallback].sort((a, b) => (a.dataNumeric || 0) - (b.dataNumeric || 0));
-    }
-
-    // Calcular Saldo Acumulado: entrada adiciona (mesmo se negativo), saída subtrai
-    let saldoAtual = 0;
-    return merged.map(row => {
-      saldoAtual = saldoAtual + row.entrada - row.saida;
-      return { ...row, saldo: saldoAtual };
+    // Delega toda a lógica para o módulo isolado src/tabs/fluxoCaixa/logic.ts
+    return calcularFluxoCaixa({
+      allReceivableTitles,
+      allFinancialTitles,
+      buildings,
+      fcSelectedCompany,
+      fcHideInternal,
+      startNumeric: fcEffectiveStart ? parseInt(format(fcEffectiveStart, 'yyyyMMdd')) : null,
+      endNumeric: fcEffectiveEnd ? parseInt(format(fcEffectiveEnd, 'yyyyMMdd')) : null,
     });
-  }, [allFinancialTitles, allReceivableTitles, defaultWindow.end, defaultWindow.start, fcEndDate, fcHideInternal, fcPeriodMode, fcSelectedCompany, fcStartDate, buildings, translateStatementType]);
+  }, [allFinancialTitles, allReceivableTitles, defaultWindow.end, defaultWindow.start, fcEndDate, fcHideInternal, fcPeriodMode, fcSelectedCompany, fcStartDate, buildings]);
 
 
   const chartData = useMemo(() => {
