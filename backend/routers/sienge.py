@@ -245,9 +245,12 @@ def _legacy_bootstrap_payload(db: Session, include_transactions: bool = True) ->
     building_map: dict[str, dict[str, Any]] = {}
     for obra in obras:
         normalized = _normalize_building(obra)
-        bid = str(normalized.get("code") or normalized.get("id") or "")
-        if bid:
-            building_map[bid] = normalized
+        for bid in {
+            str(normalized.get("code") or ""),
+            str(normalized.get("id") or ""),
+        }:
+            if bid and bid not in {"None", "undefined"}:
+                building_map[bid] = normalized
 
     creditor_map: dict[str, str] = {}
     for credor in credores:
@@ -307,7 +310,18 @@ def _legacy_bootstrap_payload(db: Session, include_transactions: bool = True) ->
         creditor_id = str(item.get("creditorId") or item.get("idCredor") or item.get("codigoFornecedor") or item.get("debtorId") or "")
         building_id = str(item.get("idObra") or item.get("codigoObra") or item.get("enterpriseId") or item.get("buildingId") or "")
         building_info = building_map.get(building_id, {})
-        company_id = item.get("companyId") or item.get("debtorId") or building_info.get("companyId")
+        company_id = (
+            item.get("companyId")
+            or next(
+                (
+                    lnk["href"].rstrip("/").split("/")[-1]
+                    for lnk in (item.get("links") or [])
+                    if lnk.get("rel") == "company" and lnk.get("href")
+                ),
+                None,
+            )
+            or building_info.get("companyId")
+        )
         name = item.get("nomeCredor") or item.get("creditorName") or item.get("nomeFantasiaCredor") or item.get("fornecedor") or item.get("credor") or creditor_map.get(creditor_id) or "Credor sem nome"
         normalized_financial.append(
             {
@@ -316,6 +330,7 @@ def _legacy_bootstrap_payload(db: Session, include_transactions: bool = True) ->
                 "creditorId": creditor_id,
                 "buildingId": int(building_id) if building_id.isdigit() else 0,
                 "idObra": int(building_id) if building_id.isdigit() else 0,
+                "codigoObra": building_id,
                 "dataVencimento": item.get("dataVencimento") or item.get("issueDate") or item.get("dueDate") or item.get("dataVencimentoProjetado") or item.get("dataEmissao") or item.get("dataContabil") or "",
                 "descricao": item.get("descricao") or item.get("historico") or item.get("tipoDocumento") or item.get("notes") or item.get("observacao") or "Título a Pagar",
                 "valor": _safe_float(item.get("totalInvoiceAmount") or item.get("valor") or item.get("amount") or item.get("valorTotal") or item.get("valorLiquido") or item.get("valorBruto")),
@@ -323,6 +338,7 @@ def _legacy_bootstrap_payload(db: Session, include_transactions: bool = True) ->
                 "creditorName": name,
                 "nomeCredor": name,
                 "nomeObra": item.get("nomeObra") or building_info.get("name") or (f"Obra {building_id}" if building_id else "Obra sem nome"),
+                "documentNumber": item.get("documentNumber") or item.get("numeroDocumento") or item.get("numero") or item.get("codigoTitulo") or "",
                 "links": item.get("links") or [],
             }
         )
@@ -349,6 +365,7 @@ def _legacy_bootstrap_payload(db: Session, include_transactions: bool = True) ->
                 "companyId": int(company_id) if str(company_id).isdigit() else company_id,
                 "buildingId": int(building_id) if building_id.isdigit() else 0,
                 "idObra": int(building_id) if building_id.isdigit() else 0,
+                "codigoObra": building_id,
                 "dataVencimento": item.get("data") or item.get("date") or item.get("dataVencimento") or item.get("dataEmissao") or item.get("issueDate") or item.get("dataVencimentoProjetado") or "",
                 "descricao": item.get("descricao") or item.get("historico") or item.get("observacao") or item.get("notes") or item.get("description") or "Título a Receber",
                 "nomeCliente": item.get("nomeCliente") or item.get("nomeFantasiaCliente") or item.get("cliente") or item.get("clientName") or "Extrato/Cliente",
@@ -621,10 +638,17 @@ async def filtered_data(
 
     building_company_map: dict[str, str] = {}
     for obra in obras:
-        bid = str(obra.get("id") or obra.get("code") or obra.get("codigoVisivel") or "")
         cid = str(obra.get("companyId") or obra.get("idCompany") or "")
-        if bid and cid:
-            building_company_map[bid] = cid
+        if not cid:
+            continue
+        id_candidates = {
+            str(obra.get("id") or ""),
+            str(obra.get("code") or ""),
+            str(obra.get("codigoVisivel") or ""),
+        }
+        for bid in id_candidates:
+            if bid and bid not in {"None", "undefined"}:
+                building_company_map[bid] = cid
 
     start_ms = _date_start_ms(start_date)
     end_exclusive_ms = _date_end_exclusive_ms(end_date)

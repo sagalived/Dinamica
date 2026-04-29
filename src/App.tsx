@@ -3,15 +3,16 @@ import {
   LayoutDashboard, Bell, Filter, Download, TrendingUp, TrendingDown, 
   DollarSign, Package, Calendar as CalendarIcon, RefreshCw, 
   User as UserIcon, Building2, ChevronRight, Search, Map as MapIcon,
-  Wifi, WifiOff, CheckCircle2, AlertCircle, FileText, Printer, X,
+  Wifi, WifiOff, CheckCircle2, AlertCircle, AlertTriangle, FileText, Printer, X,
   Menu, ChevronDown, SlidersHorizontal, Truck, LogOut, Moon, Sun
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { LogisticsTab } from './components/LogisticsTab';
 import { AccessControlTab } from './components/AccessControl';
 import { LoginScreen } from './components/LoginScreen';
-import { DiarioObras } from './components/DiarioObras';
 import { NavigationMenu } from './components/NavigationMenu';
+import { FluxoProjection } from './components/FluxoProjection';
+import { LeandroTab } from './tabs/fluxoCaixa/Leandro';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -31,6 +32,13 @@ import { sienge as api, kanbanApi, Building, User, Creditor, PurchaseOrder, Pric
 import { cn } from './lib/utils';
 import { fixText } from './lib/text';
 import { calcularFluxoCaixa } from './tabs/fluxoCaixa/logic';
+import { safeFormat } from './tabs/dashboard/logic';
+import {
+  isSettledFinancialStatus,
+  toMoney,
+  translateStatementType,
+  translateStatusLabel,
+} from './tabs/financeiro/logic';
 import logoWordmark from './assets/dinamica-wordmark.svg';
 import logoWordmarkDark from './assets/dinamica-wordmark-dark.svg';
 
@@ -80,6 +88,7 @@ export default function App() {
   const [fcEndDate, setFcEndDate] = useState<Date | undefined>();
   const [fcPeriodMode, setFcPeriodMode] = useState<'last6m' | 'all'>('last6m');
   const [fcSelectedCompany, setFcSelectedCompany] = useState<string>('all');
+  const [fcSelectedBuilding, setFcSelectedBuilding] = useState<string>('all');
   const [fcHideInternal, setFcHideInternal] = useState<boolean>(true);
   const [isPrinting, setIsPrinting] = useState(false);
   const [newOrderAlert, setNewOrderAlert] = useState<PurchaseOrder | null>(null);
@@ -264,17 +273,6 @@ export default function App() {
     }
   }, [endDate, selectedCompany, selectedRequester, selectedUser, startDate]);
 
-  const safeFormat = (dateStr: string | undefined, formatStr: string = 'dd/MM/yyyy') => {
-    if (!dateStr || dateStr === '---') return '---';
-    try {
-      const d = parseISO(dateStr);
-      if (isNaN(d.getTime())) return '---';
-      return format(d, formatStr);
-    } catch {
-      return '---';
-    }
-  };
-
   const checkConnection = useCallback(async () => {
     try {
       const response = await api.get('/test');
@@ -411,12 +409,13 @@ export default function App() {
       return {
         id: f.id || f.numero || f.codigoTitulo || f.documentNumber || 0,
         buildingId: f.idObra || f.codigoObra || f.enterpriseId || f.buildingId || 0,
+        buildingCode: f.codigoObra || f.idObra || f.enterpriseId || f.buildingId || '',
+        buildingName: fixText(f.nomeObra || f.buildingName || f.enterpriseName || ''),
         description: fixText(f.descricao || f.historico || f.tipoDocumento || f.notes || f.observacao || 'Título a Pagar'),
         creditorName: fixText(f.nomeCredor || f.creditorName || f.nomeFantasiaCredor || f.fornecedor || f.credor || 'Credor sem nome'),
         _rawCreditorId: String(f.creditorId || f.debtorId || ''),
         companyId: (() => {
           if (f.companyId != null) return String(f.companyId);
-          if (f.debtorId != null) return String(f.debtorId);
           if (Array.isArray(f.links)) {
             const cLink = f.links.find((l: any) => l.rel === 'company');
             if (cLink && cLink.href) return cLink.href.split('/').pop();
@@ -427,6 +426,7 @@ export default function App() {
         dueDateNumeric: isNaN(d.getTime()) ? 0 : d.getTime(),
         amount: parseFloat(f.totalInvoiceAmount || f.valor || f.amount || f.valorTotal || f.valorLiquido || f.valorBruto) || 0,
         status: f.situacao || f.status || 'Pendente',
+        documentNumber: String(f.documentNumber || f.numeroDocumento || f.numero || f.codigoTitulo || ''),
       };
     });
 
@@ -438,6 +438,8 @@ export default function App() {
       return {
         id: r.id || r.numero || r.numeroTitulo || r.codigoTitulo || r.documentNumber || 0,
         buildingId: r.idObra || r.codigoObra || r.buildingId || 0,
+        buildingCode: r.codigoObra || r.idObra || r.buildingId || '',
+        buildingName: fixText(r.nomeObra || r.buildingName || r.enterpriseName || ''),
         companyId: (() => {
           if (r.companyId != null) return String(r.companyId);
           if (Array.isArray(r.links)) {
@@ -863,6 +865,11 @@ export default function App() {
   );
   const fcSelectedCompanyName = fcSelectedCompanyData?.name || (fcSelectedCompany === 'all' ? 'Todas as Empresas' : `Empresa ${fcSelectedCompany}`);
 
+  const fcBuildingOptions = useMemo(() => {
+    if (fcSelectedCompany === 'all') return buildings;
+    return buildings.filter((b) => String(b.companyId) === fcSelectedCompany);
+  }, [buildings, fcSelectedCompany]);
+
   const resolveBuildingName = (o: any): string => {
     const id = String(o.buildingId || o.enterpriseId || o.idObra || '');
     return fixText(buildingMap[id] || o.nomeObra || o.enterpriseName || 'Obra sem nome');
@@ -910,12 +917,13 @@ export default function App() {
       return {
         id: f.id || f.numero || f.codigoTitulo || f.documentNumber || 0,
         buildingId: f.idObra || f.codigoObra || f.enterpriseId || f.buildingId || 0,
+        buildingCode: f.codigoObra || f.idObra || f.enterpriseId || f.buildingId || '',
+        buildingName: fixText(f.nomeObra || f.buildingName || f.enterpriseName || ''),
         description: fixText(f.descricao || f.historico || f.tipoDocumento || f.notes || f.observacao || 'Título a Pagar'),
         creditorName: fixText(f.nomeCredor || f.creditorName || f.nomeFantasiaCredor || f.fornecedor || f.credor || 'Credor sem nome'),
         _rawCreditorId: String(f.creditorId || f.debtorId || ''),
         companyId: (() => {
           if (f.companyId != null) return String(f.companyId);
-          if (f.debtorId != null) return String(f.debtorId);
           if (Array.isArray(f.links)) {
             const cLink = f.links.find((l: any) => l.rel === 'company');
             if (cLink && cLink.href) return cLink.href.split('/').pop();
@@ -926,6 +934,7 @@ export default function App() {
         dueDateNumeric: isNaN(d.getTime()) ? 0 : d.getTime(),
         amount: parseFloat(f.totalInvoiceAmount || f.valor || f.amount || f.valorTotal || f.valorLiquido || f.valorBruto) || 0,
         status: f.situacao || f.status || 'Pendente',
+        documentNumber: String(f.documentNumber || f.numeroDocumento || f.numero || f.codigoTitulo || ''),
       };
     });
 
@@ -936,6 +945,8 @@ export default function App() {
       return {
         id: r.id || r.numero || r.numeroTitulo || r.codigoTitulo || r.documentNumber || 0,
         buildingId: r.idObra || r.codigoObra || r.buildingId || 0,
+        buildingCode: r.codigoObra || r.idObra || r.buildingId || '',
+        buildingName: fixText(r.nomeObra || r.buildingName || r.enterpriseName || ''),
         companyId: (() => {
           if (r.companyId != null) return String(r.companyId);
           if (Array.isArray(r.links)) {
@@ -970,17 +981,16 @@ export default function App() {
     setOrders(filteredOrdersData);
     setFinancialTitles(filteredFinancialData);
     setReceivableTitles(filteredReceivableData);
-    // Popula all* apenas na primeira carga (bootstrap leve não carrega transações).
-    // Usa refs para não adicionar nos deps do useEffect de filtro → evita loop.
-    if (allOrdersRef.current.length === 0) {
+    // Mantem all* com o maior conjunto ja carregado (evita travar em janelas antigas).
+    if (allOrdersRef.current.length === 0 || filteredOrdersData.length > allOrdersRef.current.length) {
       allOrdersRef.current = filteredOrdersData;
       setAllOrders(filteredOrdersData);
     }
-    if (allFinancialTitlesRef.current.length === 0) {
+    if (allFinancialTitlesRef.current.length === 0 || filteredFinancialData.length > allFinancialTitlesRef.current.length) {
       allFinancialTitlesRef.current = filteredFinancialData;
       setAllFinancialTitles(filteredFinancialData);
     }
-    if (allReceivableTitlesRef.current.length === 0) {
+    if (allReceivableTitlesRef.current.length === 0 || filteredReceivableData.length > allReceivableTitlesRef.current.length) {
       allReceivableTitlesRef.current = filteredReceivableData;
       setAllReceivableTitles(filteredReceivableData);
     }
@@ -1035,17 +1045,22 @@ export default function App() {
 
     const runServerSideFiltering = async () => {
       try {
+        const isLeandroTab = activeTab === 'financeiro-leandro';
         const params: Record<string, string> = {
           company_id: selectedCompany,
           user_id: selectedUser,
           requester_id: selectedRequester,
         };
-        const effectiveStart = hasManualDateFilter
-          ? (startDate || null)
-          : (globalPeriodMode === 'last6m' ? defaultWindow.start : null);
-        const effectiveEnd = hasManualDateFilter
-          ? (endDate || startDate || null)
-          : (globalPeriodMode === 'last6m' ? defaultWindow.end : null);
+        const effectiveStart = isLeandroTab
+          ? null
+          : (hasManualDateFilter
+              ? (startDate || null)
+              : (globalPeriodMode === 'last6m' ? defaultWindow.start : null));
+        const effectiveEnd = isLeandroTab
+          ? null
+          : (hasManualDateFilter
+              ? (endDate || startDate || null)
+              : (globalPeriodMode === 'last6m' ? defaultWindow.end : null));
         if (effectiveStart) params.start_date = format(effectiveStart, 'yyyy-MM-dd');
         if (effectiveEnd) params.end_date = format(effectiveEnd, 'yyyy-MM-dd');
 
@@ -1089,6 +1104,7 @@ export default function App() {
       cancelled = true;
     };
   }, [
+    activeTab,
     applyServerFilteredData,
     dataRevision,
     defaultWindow.end,
@@ -1196,61 +1212,6 @@ export default function App() {
       window.print();
     }, 500); // 500ms window para renderizar 100% dos dados na VDOM
   };
-
-  const toMoney = (value: unknown) => {
-    const numeric = Number(value);
-    return Number.isFinite(numeric) ? numeric : 0;
-  };
-
-  const normalizeStatus = useCallback((value: unknown) => (
-    fixText(String(value || ''))
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .trim()
-      .toUpperCase()
-  ), []);
-
-  const translateStatusLabel = useCallback((value: unknown) => {
-    const raw = fixText(String(value || 'N/D')).trim();
-    const normalized = normalizeStatus(value);
-    const map: Record<string, string> = {
-      CANCELED: 'CANCELADO',
-      CANCELLED: 'CANCELADO',
-      FULLY_DELIVERED: 'ENTREGUE TOTAL',
-      PARTIALLY_DELIVERED: 'ENTREGUE PARCIAL',
-      PENDING: 'PENDENTE',
-      APPROVED: 'APROVADO',
-      REJECTED: 'REPROVADO',
-      OPEN: 'ABERTO',
-      CLOSED: 'FECHADO',
-      IN_PROGRESS: 'EM ANDAMENTO',
-      WAITING: 'AGUARDANDO',
-      SUCCESS: 'SUCESSO',
-      ERROR: 'ERRO',
-      DRAFT: 'RASCUNHO',
-      ON_HOLD: 'EM ESPERA',
-      N_A: 'N/D',
-    };
-    return map[normalized] || raw || 'N/D';
-  }, [normalizeStatus]);
-
-  const translateStatementType = useCallback((value: unknown) => {
-    const normalized = normalizeStatus(value);
-    const map: Record<string, string> = {
-      INCOME: 'RECEBIMENTO',
-      EXPENSE: 'PAGAMENTO',
-      PAYMENT: 'PAGAMENTO',
-      RECEIPT: 'RECEBIMENTO',
-      TRANSFER: 'TRANSFERÊNCIA',
-      ADJUSTMENT: 'AJUSTE',
-    };
-    return map[normalized] || fixText(String(value || 'Lançamento'));
-  }, [normalizeStatus]);
-
-  const isSettledFinancialStatus = useCallback((value: unknown) => {
-    const status = normalizeStatus(value);
-    return ['S', 'BAIXADO', 'BAIXADA', 'PAGO', 'PAGA', 'LIQUIDADO', 'LIQUIDADA', 'QUITADO', 'QUITADA'].includes(status);
-  }, [normalizeStatus]);
 
   const pagamentosHoje = useMemo(() => {
     const isToday = (dStr: string) => {
@@ -1382,11 +1343,12 @@ export default function App() {
       allFinancialTitles,
       buildings,
       fcSelectedCompany,
+      fcSelectedBuilding,
       fcHideInternal,
       startNumeric: fcEffectiveStart ? parseInt(format(fcEffectiveStart, 'yyyyMMdd')) : null,
       endNumeric: fcEffectiveEnd ? parseInt(format(fcEffectiveEnd, 'yyyyMMdd')) : null,
     });
-  }, [allFinancialTitles, allReceivableTitles, defaultWindow.end, defaultWindow.start, fcEndDate, fcHideInternal, fcPeriodMode, fcSelectedCompany, fcStartDate, buildings]);
+  }, [allFinancialTitles, allReceivableTitles, defaultWindow.end, defaultWindow.start, fcEndDate, fcHideInternal, fcPeriodMode, fcSelectedBuilding, fcSelectedCompany, fcStartDate, buildings]);
 
 
   const chartData = useMemo(() => {
@@ -1762,7 +1724,7 @@ export default function App() {
 
       <main className="w-full max-w-full 2xl:max-w-[1800px] mx-auto px-4 sm:px-6 py-6 sm:py-10 pb-24 xl:pb-10">
         {/* Global Date Filter - Mobile Collapsible */}
-        {activeTab !== 'logistics' && activeTab !== 'access' && activeTab !== 'obras-diario' && activeTab !== 'financeiro-fluxo' && (
+        {activeTab !== 'logistics' && activeTab !== 'access' && activeTab !== 'obras-diario' && activeTab !== 'financeiro-fluxo' && activeTab !== 'financeiro-leandro' && (
           <div className="mb-6 sm:mb-10 bg-[#161618] rounded-2xl border border-white/5 shadow-xl print:hidden overflow-hidden">
             {/* Filter Header - Mobile Toggle */}
           <button
@@ -2977,7 +2939,10 @@ export default function App() {
 
                 <div className="space-y-2 flex-1 min-w-[200px]">
                   <Label className="text-[10px] font-black uppercase tracking-widest text-orange-500">Empresa (Sienge)</Label>
-                  <Select value={fcSelectedCompany} onValueChange={setFcSelectedCompany}>
+                  <Select value={fcSelectedCompany} onValueChange={(value) => {
+                    setFcSelectedCompany(value);
+                    setFcSelectedBuilding('all');
+                  }}>
                     <SelectTrigger className="w-full bg-black/40 border-white/10 h-11 rounded-xl text-white font-bold">
                       <span className="truncate">{fcSelectedCompany === 'all' ? 'Todas as Empresas' : fcSelectedCompanyName}</span>
                     </SelectTrigger>
@@ -2988,6 +2953,23 @@ export default function App() {
                            {c.name} (ID: {c.id})
                          </SelectItem>
                        ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2 flex-1 min-w-[200px]">
+                  <Label className="text-[10px] font-black uppercase tracking-widest text-orange-500">Obras</Label>
+                  <Select value={fcSelectedBuilding} onValueChange={setFcSelectedBuilding}>
+                    <SelectTrigger className="w-full bg-black/40 border-white/10 h-11 rounded-xl text-white font-bold">
+                      <span className="truncate">{fcSelectedBuilding === 'all' ? 'Todas as Obras' : (buildingMap[fcSelectedBuilding] || `Obra ${fcSelectedBuilding}`)}</span>
+                    </SelectTrigger>
+                    <SelectContent className="bg-[#161618] border-white/10 text-white">
+                      <SelectItem value="all">Todas as Obras</SelectItem>
+                      {fcBuildingOptions.map((b) => (
+                        <SelectItem key={`fc-obra-${b.id}`} value={String(b.id)}>
+                          {b.name} (ID: {b.id})
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </div>
@@ -3020,6 +3002,7 @@ export default function App() {
                       setFcStartDate(undefined);
                       setFcEndDate(undefined);
                       setFcSelectedCompany('all');
+                      setFcSelectedBuilding('all');
                       setFcHideInternal(false);
                     }}
                     className="h-11 rounded-xl border-white/10 bg-black/30 text-gray-300 hover:bg-white/10 hover:text-white"
@@ -3027,15 +3010,15 @@ export default function App() {
                     Limpar Filtros
                   </Button>
                   <Button
-                    onClick={syncSienge}
-                    disabled={syncing}
+                    onClick={() => setDataRevision((prev) => prev + 1)}
+                    disabled={loading}
                     className={cn(
                       "h-11 rounded-xl font-bold",
                       isDark ? "bg-[#1B3C58] hover:bg-[#234b6e]" : "bg-[#102A40] hover:bg-[#173A57]"
                     )}
                   >
-                    <RefreshCw size={15} className={cn("mr-2", syncing && "animate-spin")} />
-                    {syncing ? 'Atualizando...' : 'Atualizar Dados'}
+                    <Filter size={15} className="mr-2" />
+                    {loading ? 'Filtrando...' : 'Filtrar'}
                   </Button>
                 </div>
               </div>
@@ -3176,6 +3159,20 @@ export default function App() {
             </motion.div>
           )}
 
+          {/* LEANDRO TAB */}
+          {activeTab === 'financeiro-leandro' && (
+            <LeandroTab
+              isDark={isDark}
+              allFinancialTitles={allFinancialTitles}
+              allReceivableTitles={allReceivableTitles}
+              orders={orders}
+              buildings={buildings}
+              companies={companies}
+              syncing={syncing}
+              syncSienge={syncSienge}
+            />
+          )}
+
           {activeTab === 'obras-diario' && (
             <motion.div
               key="obras-diario"
@@ -3184,20 +3181,14 @@ export default function App() {
               exit={{ opacity: 0 }}
               className="w-full min-h-[400px]"
             >
-              {(() => {
-                const filteredBuildings = selectedCompany === 'all'
-                  ? buildings
-                  : buildings.filter(b => String(b.companyId) === selectedCompany);
-                const targetBuilding = filteredBuildings[0] || buildings[0];
-                return (
-                  <DiarioObras
-                    buildingId={targetBuilding?.id?.toString() || ''}
-                    buildingName={targetBuilding?.name || 'Obra Geral'}
-                    sessionUser={sessionUser}
-                    buildings={buildings.map(b => ({ id: b.id, name: b.name }))}
-                  />
-                );
-              })()}
+              <FluxoProjection
+                allFinancialTitles={allFinancialTitles}
+                allReceivableTitles={allReceivableTitles}
+                buildings={buildings}
+                companies={companies}
+                syncing={syncing}
+                syncSienge={syncSienge}
+              />
             </motion.div>
           )}
 

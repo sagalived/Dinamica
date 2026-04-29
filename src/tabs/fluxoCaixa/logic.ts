@@ -117,8 +117,23 @@ function filterByCompany(
     return cId === fcSelectedCompany
   }
   // fallback via building
-  const building = buildings.find((b: any) => String(b.id) === String(item.buildingId))
+  const building = buildings.find((b: any) =>
+    String(b.id) === String(item.buildingId) || String(b.code ?? '') === String(item.buildingId)
+  )
   return building ? String(building.companyId) === fcSelectedCompany : false
+}
+
+function filterByBuilding(
+  item: any,
+  fcSelectedBuilding: string,
+  buildings: any[],
+): boolean {
+  if (fcSelectedBuilding === 'all') return true
+  const current = String(item.buildingId ?? '')
+  if (current === fcSelectedBuilding) return true
+  const selected = buildings.find((b: any) => String(b.id) === fcSelectedBuilding)
+  if (!selected) return false
+  return String(selected.code ?? '') === current
 }
 
 function filterByAccount(
@@ -160,6 +175,7 @@ export interface FluxoCaixaInput {
   allFinancialTitles: any[]
   buildings: any[]
   fcSelectedCompany: string
+  fcSelectedBuilding: string
   fcHideInternal: boolean
   startNumeric: number | null   // yyyymmdd ou null
   endNumeric: number | null     // yyyymmdd ou null
@@ -184,6 +200,7 @@ export function calcularFluxoCaixa(input: FluxoCaixaInput): FluxoCaixaResult {
     allFinancialTitles,
     buildings,
     fcSelectedCompany,
+    fcSelectedBuilding,
     fcHideInternal,
     startNumeric,
     endNumeric,
@@ -199,6 +216,7 @@ export function calcularFluxoCaixa(input: FluxoCaixaInput): FluxoCaixaResult {
       if (!dn) return acc
       if (dateToNumeric(dn) >= startNumeric) return acc  // só ANTES do período
       if (!filterByCompany(t, fcSelectedCompany, buildings)) return acc
+      if (!filterByBuilding(t, fcSelectedBuilding, buildings)) return acc
       if (!filterByAccount(t, fcHideInternal)) return acc
       const rv: number = t.rawValue ?? ((t.type === 'Income' ? 1 : -1) * Math.abs(toMoney(t.amount)))
       return acc + (t.type === 'Income' ? rv : -Math.abs(rv))
@@ -209,6 +227,7 @@ export function calcularFluxoCaixa(input: FluxoCaixaInput): FluxoCaixaResult {
   const extrato = allReceivableTitles.filter((t: any) =>
     filterByDate(t, startNumeric, endNumeric) &&
     filterByCompany(t, fcSelectedCompany, buildings) &&
+    filterByBuilding(t, fcSelectedBuilding, buildings) &&
     filterByAccount(t, fcHideInternal),
   )
 
@@ -253,7 +272,8 @@ export function calcularFluxoCaixa(input: FluxoCaixaInput): FluxoCaixaResult {
     const receberFallback: FluxoCaixaRow[] = allReceivableTitles
       .filter((t: any) =>
         filterByDate(t, startNumeric, endNumeric) &&
-        filterByCompany(t, fcSelectedCompany, buildings),
+        filterByCompany(t, fcSelectedCompany, buildings) &&
+        filterByBuilding(t, fcSelectedBuilding, buildings),
       )
       .map((t: any): FluxoCaixaRow => ({
         id: t.id,
@@ -273,7 +293,8 @@ export function calcularFluxoCaixa(input: FluxoCaixaInput): FluxoCaixaResult {
     const pagarFallback: FluxoCaixaRow[] = allFinancialTitles
       .filter((t: any) =>
         filterByDate(t, startNumeric, endNumeric) &&
-        filterByCompany(t, fcSelectedCompany, buildings),
+        filterByCompany(t, fcSelectedCompany, buildings) &&
+        filterByBuilding(t, fcSelectedBuilding, buildings),
       )
       .map((t: any): FluxoCaixaRow => ({
         id: t.id,

@@ -1,6 +1,7 @@
 import os
 import logging
 import asyncio
+from datetime import datetime, timedelta
 from typing import Any
 
 import httpx
@@ -194,11 +195,63 @@ class SiengeClient:
         return await self._fetch_all_pages("/purchase-orders")
 
     async def fetch_financeiro(self) -> list[dict]:
-        params = {
-            "startDate": "1900-01-01",
-            "endDate": "2030-12-31",
-        }
-        return await self._fetch_all_pages("/bills", params)
+        """
+        Busca parcelas (installments) de faturas (bills) emitidas nos ultimos 3 anos.
+        Cada parcela representa uma conta a pagar com data de vencimento propria.
+        Usa semaphore para limitar concorrencia e nao sobrecarregar a API.
+        """
+        three_years_ago = (datetime.now() - timedelta(days=365 * 3)).strftime("%Y-%m-%d")
+        one_year_ahead  = (datetime.now() + timedelta(days=365)).strftime("%Y-%m-%d")
+        params = {"startDate": three_years_ago, "endDate": one_year_ahead}
+
+        bills = await self._fetch_all_pages("/bills", params)
+        if not bills:
+            return []
+
+        semaphore = asyncio.Semaphore(10)  # max 10 requests concurrentes
+
+        async def fetch_bill_installments(bill: dict) -> list[dict]:
+            bill_id = bill.get("id")
+            if not bill_id:
+                return [bill]
+            async with semaphore:
+                raw_inst = await self._get_json(f"/bills/{bill_id}/installments")
+            insts = self._extract_collection(raw_inst) if raw_inst else []
+            if not insts:
+                return [bill]  # fallback: usa o cabecalho sem parcela
+            result = []
+            for inst in insts:
+                merged = dict(bill)
+                merged.update(inst)
+                due = (
+                    inst.get("dueDate")
+                    or inst.get("dataVencimento")
+                    or inst.get("paymentForecast")
+                    or inst.get("anticipatedPaymentDate")
+                    or bill.get("dueDate")
+                    or bill.get("dataVencimento")
+                )
+                merged["dataVencimento"] = due or ""
+                result.append(merged)
+            return result
+
+        tasks = [fetch_bill_installments(b) for b in bills]
+        results = await asyncio.gather(*tasks, return_exceptions=True)
+
+        installments_flat: list[dict] = []
+        for idx, res in enumerate(results):
+            if isinstance(res, list):
+                installments_flat.extend(res)
+            elif isinstance(res, dict):
+                installments_flat.append(res)
+            else:
+                # Fallback de resiliencia: se a chamada de installments falhar,
+                # preserva ao menos o bill base para nao "sumir" da tabela.
+                fallback_bill = bills[idx] if idx < len(bills) else None
+                if isinstance(fallback_bill, dict):
+                    installments_flat.append(fallback_bill)
+
+        return installments_flat
 
     async def fetch_receber(self) -> list[dict]:
         params = {

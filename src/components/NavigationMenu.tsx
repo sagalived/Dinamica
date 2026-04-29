@@ -40,6 +40,7 @@ export function NavigationMenu({ activeTab, setActiveTab, isRestrictedUser }: Na
       options: [
         { id: 'finance', label: 'VALORES' },
         { id: 'financeiro-fluxo', label: 'FLUXO DE CAIXA' },
+        { id: 'financeiro-leandro', label: 'LEANDRO' },
         { id: 'alerts', label: 'ALERTA' }
       ]
     },
