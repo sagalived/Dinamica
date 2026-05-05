@@ -81,6 +81,8 @@ class SiengeClient:
                 self.base_url = raw_base_url.rstrip("/")
             elif instance:
                 self.base_url = f"https://api.sienge.com.br/{instance}"
+            elif raw_base_url:
+                self.base_url = raw_base_url.rstrip("/")
 
             self.username = _v("SIENGE_USERNAME") or self.username
             self.password = _v("SIENGE_PASSWORD") or self.password

@@ -1,0 +1,435 @@
+VERSAO 1 - PROMPT BASE (GENERICA)
+
+Voce e um Arquiteto de Dados + Engenheiro Backend Senior.
+
+Quero que voce projete e implemente um modulo completo de indicadores financeiros para dashboard, cobrindo:
+1) Coleta via API externa
+2) Persistencia em JSON/cache
+3) Tratamento e normalizacao dos dados
+4) Calculos mensais e anuais
+5) Exposicao via endpoints HTTP
+6) Resposta pronta para frontend
+
+Contexto funcional:
+- O dashboard precisa mostrar:
+  - Receita Operacional
+  - Custo Variavel
+  - Margem de Contribuicao
+  - % MC Geral
+  - Melhor mes
+  - Serie mensal jan-dez
+- Os dados vem de fontes como:
+  - Contas a receber
+  - Contas a pagar
+  - Pedidos/ordens
+  - Empresas e obras
+- O periodo e filtravel por start_date e end_date.
+- Pode haver falhas de paginacao em APIs grandes. Quero estrategia robusta para isso.
+
+Entregue em formato didatico, ensinando o passo a passo com estes blocos:
+
+Bloco A - Modelo de dados (JSON)
+- Defina esquema de entrada esperado para:
+  - receber
+  - financeiro
+  - pedidos
+- Defina esquema de saida para o frontend:
+  - monthly: lista com 12 meses e campos receita, custoVariavel, margem, mcPercent
+  - totals: receita, margem, mcPercent
+  - buildingMargins (opcional)
+- Mostre exemplos reais de JSON de entrada e saida.
+
+Bloco B - Regras de tratamento
+- Normalizacao de campos:
+  - dataVencimento, issueDate, date
+  - valor, rawValue, amount, value
+  - companyId, buildingId, idObra
+- Conversao de tipos:
+  - string para numero
+  - datas invalidas
+  - valores nulos
+- Regras de filtro:
+  - por periodo
+  - por empresa
+  - por obra
+- Regras de deduplicacao e merge de cache.
+
+Bloco C - Formulas dos calculos
+Explique e implemente:
+- Receita Operacional do mes = soma dos recebimentos validos do mes
+- Custo Variavel do mes = soma dos pagamentos operacionais do mes
+- Margem de Contribuicao do mes = receita - custoVariavel
+- % MC do mes = (margem / receita) * 100, com protecao para divisao por zero
+- Totais anuais:
+  - receita total
+  - margem total
+  - %MC geral
+- Melhor mes por indicador.
+
+Bloco D - Estrategia de sincronizacao
+- Explique por que paginacao longa quebra.
+- Implemente sincronizacao por fatias:
+  - mensal (preferencial) ou trimestral
+- Mostre algoritmo:
+  - gerar intervalos
+  - buscar cada fatia
+  - mesclar no cache existente
+  - registrar progresso por etapa
+- Defina logs obrigatorios:
+  - inicio/fim do sync
+  - dataset atual
+  - faixa de datas
+  - numero de registros
+  - erro da ultima chamada externa
+
+Bloco E - Endpoints HTTP
+Defina endpoints com contrato completo:
+- GET /api/sienge/bootstrap
+- GET /api/sienge/filtered?start_date=...&end_date=...&company_id=...
+- POST /api/sienge/sync
+- POST /api/sienge/sync?datasets=receber&start_date=...&end_date=...
+- GET /api/sienge/test
+
+Para cada endpoint, entregue:
+- objetivo
+- parametros
+- exemplo de request
+- exemplo de response
+- codigos de status
+- mensagens de erro
+
+Bloco F - Expor os calculos para o frontend
+- Explique como devolver dados ja calculados para reduzir logica no frontend.
+- Defina payload final recomendado:
+  - monthly
+  - totals
+  - meta (latestSync, counts, filtros aplicados)
+- Inclua contrato estavel para o grafico jan-dez.
+
+Bloco G - Qualidade e validacao
+- Crie checklist de validacao:
+  - janeiro a dezembro presentes
+  - dados de 2025 e 2026 consistentes
+  - receita nao zerada quando houver receber
+  - sem NaN/undefined
+- Escreva testes de unidade para:
+  - parse de datas
+  - calculo mensal
+  - calculo total
+  - filtragem
+  - merge de cache
+
+Bloco H - Entrega final
+- Me de:
+  1. Arquitetura resumida
+  2. Codigo completo do backend
+  3. Exemplos de JSON
+  4. Guia de operacao
+  5. Guia de troubleshooting
+- Use linguagem clara, objetiva e com foco pratico.
+
+Restricoes:
+- Nao use suposicoes ocultas.
+- Sempre explique decisoes de regra de negocio.
+- Se faltar dado, proponha fallback explicito.
+- Priorize robustez em producao e observabilidade.
+
+
+VERSAO 2 - PROMPT ESPECIALIZADA SIENGE (CENARIO REAL DO PROJETO)
+
+Voce e um Arquiteto de Dados + Engenheiro Backend Senior, especializado em FastAPI + integracao Sienge.
+
+Implemente um modulo de sincronizacao, tratamento e calculo financeiro com base nestes endpoints e campos reais:
+
+Endpoints internos (backend local):
+- GET /api/sienge/test
+- GET /api/sienge/bootstrap
+- GET /api/sienge/filtered
+- POST /api/sienge/sync
+
+Parametros aceitos em /api/sienge/sync:
+- datasets (csv): obras,usuarios,empresas,credores,pedidos,financeiro,receber
+- start_date (YYYY-MM-DD)
+- end_date (YYYY-MM-DD)
+
+Parametros aceitos em /api/sienge/filtered:
+- start_date, end_date
+- company_id (default all)
+- user_id (default all)
+- requester_id (default all)
+
+Campos reais do dataset receber (normalizado):
+- id
+- companyId
+- buildingId
+- idObra
+- codigoObra
+- dataVencimento
+- descricao
+- nomeCliente
+- valor
+- rawValue
+- situacao
+- nomeObra
+- documentId
+- documentNumber
+- installmentNumber
+- statementOrigin
+- statementType
+- billId
+- type
+- bankAccountCode
+- links
+
+Campos reais do dataset financeiro (normalizado):
+- id
+- companyId
+- creditorId
+- buildingId
+- idObra
+- codigoObra
+- dataVencimento
+- descricao
+- valor
+- situacao
+- creditorName
+- nomeCredor
+- nomeObra
+- documentNumber
+- links
+
+Campos reais do dataset pedidos (normalizado):
+- id
+- buildingId
+- idObra
+- codigoVisivelObra
+- companyId
+- buyerId
+- idComprador
+- codigoComprador
+- supplierId
+- codigoFornecedor
+- date
+- dataEmissao
+- totalAmount
+- valorTotal
+- status
+- situacao
+- nomeObra
+- nomeFornecedor
+- nomeComprador
+- solicitante
+- requesterId
+- createdBy
+
+Regras de negocio obrigatorias:
+1) Receita Operacional mensal:
+- usar principalmente dataset receber
+- somar valores absolutos validos por mes de dataVencimento
+- aplicar filtros company_id e obra
+
+2) Custo Variavel mensal:
+- usar dataset financeiro
+- somar valores absolutos validos por mes de dataVencimento
+- aplicar filtros company_id e obra
+
+3) Margem de Contribuicao:
+- margem = receita - custoVariavel
+- mcPercent = (margem / receita) * 100, com protecao para receita 0
+
+4) Serie mensal fixa:
+- gerar sempre jan-dez, mesmo sem dados
+- cada mes deve ter: receita, custoVariavel, margem, mcPercent
+
+5) Melhor mes:
+- por receita
+- por margem
+- por mcPercent
+
+Tratamento de dados:
+- normalizar datas: dataVencimento/date/issueDate/dueDate
+- normalizar valores: valor/rawValue/amount/value
+- ignorar datas invalidas
+- ignorar valores nao numericos
+- manter parse robusto para strings e nulos
+
+Sincronizacao robusta (importante):
+- Implementar sync do dataset receber em FATIAS MENSAIS automaticamente (comportamento padrao)
+- Para cada fatia mensal:
+  - chamar API externa com startDate/endDate da fatia
+  - paginar com limit/offset
+  - registrar logs da fatia (inicio/fim, quantidade, erro)
+- Mesclar resultado no cache local sem perder itens antigos validos
+- Em falha parcial, manter dados ja coletados e gravar latestSync com metadados claros
+
+Logs obrigatorios por etapa:
+- source do sync (startup/manual/scheduler)
+- dataset atual
+- current_step e last_completed_step
+- intervalo start_date/end_date
+- registros coletados
+- duracao por etapa
+- last_error da API externa
+
+Contrato de resposta esperado para frontend:
+- monthly: [{ month, monthIndex, receita, custoVariavel, margem, mcPercent }]
+- totals: { receita, margem, mcPercent }
+- buildingMargins: [{ buildingId, buildingName, receita, custoVariavel, margem, mcPercent }]
+- latestSync
+- counts
+- filters
+
+Checklist de validacao obrigatoria:
+- 2025 deve mostrar jan-dez no receber e financeiro
+- 2026 nao pode ficar com Receita Operacional zerada quando houver receber
+- endpoint /api/sienge/filtered deve retornar contagens coerentes
+- syncState nao pode ficar preso indefinidamente
+- sem NaN/undefined no payload final
+
+Entregue:
+1) Arquitetura final (fluxo completo)
+2) Codigo completo dos endpoints e servicos
+3) Pseudocodigo dos calculos
+4) Exemplos reais de request/response JSON
+5) Plano de testes unitarios e integracao
+6) Plano de observabilidade e troubleshooting
+
+Restricoes:
+- Nao inventar campos fora dos listados sem justificar.
+- Manter compatibilidade retroativa dos endpoints.
+- Priorizar resiliencia em caso de timeout, pagina quebrada e indisponibilidade parcial.
+- Explicar claramente como os calculos sao expostos para o frontend.
+
+
+VERSAO 3 - PROMPT EXECUTOR (IMPLEMENTACAO DIRETA FASTAPI + SIENGE)
+
+Voce e um Engenheiro Staff focado em entrega. Quero que voce implemente, de ponta a ponta, um modulo de sincronizacao e calculo financeiro para dashboard, com codigo pronto para producao.
+
+Objetivo principal:
+- Garantir que Receita Operacional, Custo Variavel, Margem de Contribuicao e % MC funcionem com dados reais do Sienge.
+- Evitar travamento de sincronizacao por paginacao longa.
+- Expor endpoints consistentes para o frontend.
+
+Stack alvo:
+- Python 3.11+
+- FastAPI
+- SQLAlchemy (cache/snapshot)
+- HTTPX para API externa
+
+Arquitetura obrigatoria:
+1) services/sienge_client.py
+2) services/sienge_storage.py
+3) routers/sienge.py
+4) modelos de payload normalizado
+5) logs estruturados por etapa
+
+Implementar os seguintes endpoints:
+1) GET /api/sienge/test
+2) GET /api/sienge/bootstrap
+3) GET /api/sienge/filtered
+4) POST /api/sienge/sync
+
+Contrato de /api/sienge/sync:
+- Query params:
+  - datasets=obras,usuarios,empresas,credores,pedidos,financeiro,receber
+  - start_date=YYYY-MM-DD (opcional)
+  - end_date=YYYY-MM-DD (opcional)
+- Comportamento:
+  - sem datasets: sincroniza todos
+  - com datasets=receber: sincroniza somente receber
+  - com start/end: faz backfill parcial no intervalo
+
+Regras de sincronizacao (nao-negociavel):
+1) Para dataset receber, usar FATIAS MENSAIS automaticamente (comportamento padrao), mesmo sem start/end informados.
+2) Cada fatia deve:
+  - chamar API externa com startDate/endDate da fatia
+  - paginar via limit/offset
+  - registrar quantidade, duracao e erro
+3) Em falha de uma fatia:
+  - manter dados das fatias ja coletadas
+  - gravar latestSync com metadados de falha parcial
+4) Para sync parcial com start/end:
+  - mesclar no cache existente sem apagar registros validos de outros periodos
+
+Campos reais esperados no payload normalizado:
+
+receber:
+- id, companyId, buildingId, idObra, codigoObra, dataVencimento, descricao
+- nomeCliente, valor, rawValue, situacao, nomeObra
+- documentId, documentNumber, installmentNumber
+- statementOrigin, statementType, billId, type, bankAccountCode, links
+
+financeiro:
+- id, companyId, creditorId, buildingId, idObra, codigoObra
+- dataVencimento, descricao, valor, situacao
+- creditorName, nomeCredor, nomeObra, documentNumber, links
+
+pedidos:
+- id, buildingId, idObra, codigoVisivelObra, companyId
+- buyerId, idComprador, codigoComprador
+- supplierId, codigoFornecedor
+- date, dataEmissao, totalAmount, valorTotal
+- status, situacao, nomeObra, nomeFornecedor, nomeComprador
+- solicitante, requesterId, createdBy
+
+Regras de calculo para exposicao no frontend:
+1) Receita Operacional mensal:
+  - soma de receber por mes (dataVencimento), valores absolutos validos
+2) Custo Variavel mensal:
+  - soma de financeiro por mes (dataVencimento), valores absolutos validos
+3) Margem mensal:
+  - receita - custoVariavel
+4) %MC mensal:
+  - (margem / receita) * 100, com guard para receita = 0
+5) Totais anuais:
+  - receita total, margem total, mcPercent geral
+6) Serie mensal fixa:
+  - sempre jan-dez, mesmo sem movimento
+
+Contrato de resposta do frontend (payload final):
+- monthly: [{ month, monthIndex, receita, custoVariavel, margem, mcPercent }]
+- totals: { receita, margem, mcPercent }
+- buildingMargins: [{ buildingId, buildingName, receita, custoVariavel, margem, mcPercent }]
+- latestSync, counts, filters
+
+Regras de filtragem no /api/sienge/filtered:
+- start_date e end_date obrigam filtro por data
+- company_id filtra por empresa
+- user_id/requester_id aplicam somente em pedidos
+- retorno deve incluir:
+  - pedidos
+  - financeiro
+  - receber
+  - latestSync
+  - filters
+  - counts
+
+Observabilidade obrigatoria:
+- syncState em memoria com:
+  - running, source, started_at, datasets, current_step, last_completed_step
+- logs por etapa contendo:
+  - dataset
+  - intervalo de data
+  - tempo de execucao
+  - quantidade coletada
+  - last_error da API externa
+
+Entrega esperada:
+1) Codigo completo dos arquivos alterados
+2) Explicacao rapida de cada decisao tecnica
+3) Exemplos de request/response reais
+4) Testes minimos (unitarios e integracao)
+5) Checklist de aceite
+
+Checklist de aceite (deve passar):
+1) /api/sienge/sync?datasets=receber conclui sem travar indefinidamente
+2) /api/sienge/filtered?start_date=2025-01-01&end_date=2025-12-31 retorna receber com jan-dez
+3) /api/sienge/filtered?start_date=2026-01-01&end_date=2026-12-31 nao retorna receita zerada quando houver receber
+4) payload nao contem NaN/undefined
+5) latestSync e counts coerentes com o que foi sincronizado
+
+Restricoes finais:
+- Nao quebrar compatibilidade dos endpoints existentes.
+- Nao remover campos ja consumidos pelo frontend.
+- Em qualquer erro externo, responder com fallback claro e metadado util de diagnostico.
+- Preferir clareza e robustez a otimizaçoes prematuras.

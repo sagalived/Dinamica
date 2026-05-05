@@ -25,6 +25,7 @@ export function LayoutPrincipal() {
 
   const {
     syncSienge, syncing, syncProgress, apiStatus,
+    applyFilters,
     globalPeriodMode, setGlobalPeriodMode,
     startDate, setStartDate, endDate, setEndDate,
     selectedCompany, setSelectedCompany,
@@ -264,7 +265,7 @@ export function LayoutPrincipal() {
                           : "text-gray-300 hover:text-white hover:bg-white/10"
                       )}
                     >
-                      Últimos 6 meses
+                      Últimos 12 meses
                     </button>
                     <button
                       onClick={() => {
@@ -397,7 +398,10 @@ export function LayoutPrincipal() {
                 )}
 
                 <Button 
-                  onClick={() => setMobileFiltersOpen(false)} 
+                  onClick={() => {
+                    applyFilters();
+                    setMobileFiltersOpen(false);
+                  }} 
                   className="h-11 px-6 bg-orange-600 hover:bg-orange-700 text-white font-black rounded-xl shadow-lg shadow-orange-600/20 w-full sm:w-auto"
                 >
                   Confirmar Filtro

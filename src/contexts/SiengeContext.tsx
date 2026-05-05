@@ -737,7 +737,7 @@ export function SiengeProvider({ children }: { children: React.ReactNode }) {
         return;
       }
 
-      // Fase 2: carregar dados filtrados para a UI (máx. 6 meses)
+      // Fase 2: carregar dados filtrados para a UI (janela padrão de 12 meses)
       startLinearProgress(80, 95, 25_000);
       try {
         const effectiveStart = hasManualDateFilter
@@ -822,6 +822,11 @@ export function SiengeProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const applyFilters = useCallback(() => {
+    // Forca a reexecucao do filtro server-side/local com os parametros atuais.
+    setDataRevision((r) => r + 1);
+  }, []);
+
   // Memoized lookup maps - rebuilt whenever master lists change
   const buildingMap = useMemo(() => {
     const m: Record<string, string> = {};
@@ -864,8 +869,8 @@ export function SiengeProvider({ children }: { children: React.ReactNode }) {
   const defaultWindow = useMemo(() => {
     const today = new Date();
     const end = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-    const sixMonthsAgo = addMonths(end, -6);
-    const start = new Date(sixMonthsAgo.getFullYear(), sixMonthsAgo.getMonth(), sixMonthsAgo.getDate());
+    const twelveMonthsAgo = addMonths(end, -12);
+    const start = new Date(twelveMonthsAgo.getFullYear(), twelveMonthsAgo.getMonth(), twelveMonthsAgo.getDate());
     return { start, end };
   }, []);
 
@@ -1226,7 +1231,7 @@ export function SiengeProvider({ children }: { children: React.ReactNode }) {
         : defaultWindow.end;
 
       // O endpoint de NF-e exige startDate/endDate. Mesmo que o modo global seja
-      // “total”, usamos a janela padrão (últimos 6 meses) quando o usuário não
+      // “total”, usamos a janela padrão (últimos 12 meses) quando o usuário não
       // escolheu datas manualmente.
       const nfeStart = effectiveStart || defaultWindow.start;
       const nfeEnd = effectiveEnd || defaultWindow.end;
@@ -1799,6 +1804,7 @@ export function SiengeProvider({ children }: { children: React.ReactNode }) {
     selectedCompany, setSelectedCompany, selectedUser, setSelectedUser, selectedRequester, setSelectedRequester,
     globalPeriodMode, setGlobalPeriodMode,
     activeBuildingCount,
+    applyFilters,
     syncSienge
   };
 
