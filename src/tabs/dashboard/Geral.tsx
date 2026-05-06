@@ -4,7 +4,7 @@ import { TrendingUp, DollarSign, Building2, Percent } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../../components/ui/card';
 import { Table, TableBody, TableCell, TableFooter, TableHead, TableHeader, TableRow } from '../../components/ui/table';
 import { cn } from '../../lib/utils';
-import { sienge as siengeApi } from '../../lib/api';
+import { api } from '../../lib/api';
 import {
   ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, Legend,
   PieChart, Pie, Cell
@@ -13,7 +13,37 @@ import { useSienge } from '../../contexts/SiengeContext';
 import { addMonths, format, parseISO } from 'date-fns';
 import { toMoney, translateStatusLabel } from '../financeiro/logic';
 
-import type { McByBuildingResponse } from './types';
+type OperationalSeriesRow = {
+  month: string; // YYYY-MM
+  receita_operacional: number;
+  custo_variavel: number;
+  mc: number;
+  mc_percent: number;
+};
+
+type OperationalSeriesResponse = {
+  range: { start: string; end: string };
+  rows: OperationalSeriesRow[];
+  total: {
+    receita_operacional: number;
+    custo_variavel: number;
+    mc: number;
+    mc_percent: number;
+  };
+};
+
+type McByBuildingRow = {
+  id: string;
+  name: string;
+  receita: number;
+  mc: number;
+  pct: number;
+};
+
+type McByBuildingAllTimeResponse = {
+  rows: McByBuildingRow[];
+  total: { receita: number; mc: number; pct: number };
+};
 
 export function DashboardGeral() {
   const ROWS_PER_PAGE = 10;
@@ -22,6 +52,7 @@ export function DashboardGeral() {
     financialTitles,
     receivableTitles,
     nfeDocuments,
+    activeBuildings,
     fcSelectedBuilding,
     selectedCompany,
     selectedUser,
@@ -33,6 +64,8 @@ export function DashboardGeral() {
     startDate,
     endDate,
   } = useSienge();
+
+  const [activeBuildingsModalOpen, setActiveBuildingsModalOpen] = useState(false);
 
   const toNumberSafe = (value: any): number => {
     if (typeof value === 'number') return Number.isFinite(value) ? value : NaN;
@@ -147,16 +180,26 @@ export function DashboardGeral() {
     return `${month}/${year}`;
   };
 
-  const [mcByBuildingResp, setMcByBuildingResp] = useState<McByBuildingResponse>({
+  const fmtBRL = (n: number) => new Intl.NumberFormat('pt-BR', {
+    style: 'currency',
+    currency: 'BRL',
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(Number.isFinite(n) ? n : 0);
+
+  const [operationalSeries, setOperationalSeries] = useState<OperationalSeriesResponse>({
+    range: { start: '', end: '' },
     rows: [],
-    total: { receita_operacional: 0, mc: 0, mc_percent: 0 },
+    total: { receita_operacional: 0, custo_variavel: 0, mc: 0, mc_percent: 0 },
   });
-  const [mcByBuildingLoading, setMcByBuildingLoading] = useState(false);
+  const [operationalSeriesLoading, setOperationalSeriesLoading] = useState(false);
+
   const [obraPage, setObraPage] = useState(1);
 
-  // Dados históricos completos (sem filtro de data) para a tabela MC por Obra.
-  const [historicalReceivables, setHistoricalReceivables] = useState<any[]>([]);
-  const [historicalFinancials, setHistoricalFinancials] = useState<any[]>([]);
+  const [mcByBuildingAllTime, setMcByBuildingAllTime] = useState<McByBuildingAllTimeResponse>({
+    rows: [],
+    total: { receita: 0, mc: 0, pct: 0 },
+  });
   const [historicalLoading, setHistoricalLoading] = useState(false);
 
   useEffect(() => {
@@ -166,16 +209,14 @@ export function DashboardGeral() {
       try {
         const params: any = {};
         if (selectedCompany !== 'all') params.company_id = selectedCompany;
-        const resp = await siengeApi.get('/filtered', { params });
+        const { data } = await api.get('/operational/mc-by-building', { params });
         if (cancelled) return;
-        const data = resp.data ?? {};
-        setHistoricalReceivables(Array.isArray(data.receber) ? data.receber : []);
-        setHistoricalFinancials(Array.isArray(data.financeiro) ? data.financeiro : []);
+        setMcByBuildingAllTime({
+          rows: Array.isArray(data?.rows) ? data.rows : [],
+          total: data?.total || { receita: 0, mc: 0, pct: 0 },
+        });
       } catch {
-        if (!cancelled) {
-          setHistoricalReceivables([]);
-          setHistoricalFinancials([]);
-        }
+        if (!cancelled) setMcByBuildingAllTime({ rows: [], total: { receita: 0, mc: 0, pct: 0 } });
       } finally {
         if (!cancelled) setHistoricalLoading(false);
       }
@@ -186,67 +227,33 @@ export function DashboardGeral() {
 
   useEffect(() => {
     let cancelled = false;
-
-    const normalizeFilter = (value: any): string => {
-      const str = String(value ?? '').trim();
-      if (!str) return 'all';
-      const lowered = str.toLowerCase();
-      if (lowered === 'undefined' || lowered === 'null') return 'all';
-      return str;
-    };
-
     const run = async () => {
-      setMcByBuildingLoading(true);
       try {
-        const now = new Date();
-        const defaultEnd = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-        const defaultStart = addMonths(defaultEnd, -12);
-        const effectiveStart = startDate || defaultStart;
-        const effectiveEnd = endDate || startDate || defaultEnd;
-
-        // Rows (Top 5) não sofrem influência de filtro.
-        const rowsParams: any = {
-          company_id: 'all',
-          building_id: 'all',
-          user_id: 'all',
-          requester_id: 'all',
-          start_date: format(effectiveStart, 'yyyy-MM-dd'),
-          end_date: format(effectiveEnd, 'yyyy-MM-dd'),
-          top: 5,
-          time_budget_seconds: 15,
-          max_concurrency: 4,
+        setOperationalSeriesLoading(true);
+        const range = getEffectiveRange();
+        const params: any = {
+          start_date: format(range.start, 'yyyy-MM-dd'),
+          end_date: format(range.end, 'yyyy-MM-dd'),
         };
-        // Total respeita filtros (empresa/obra/usuário/solicitante), mas sem data.
-        const totalParams: any = {
-          company_id: normalizeFilter(selectedCompany),
-          building_id: normalizeFilter(fcSelectedBuilding),
-          user_id: normalizeFilter(selectedUser),
-          requester_id: normalizeFilter(selectedRequester),
-          start_date: format(effectiveStart, 'yyyy-MM-dd'),
-          end_date: format(effectiveEnd, 'yyyy-MM-dd'),
-          top: 5,
-          time_budget_seconds: 15,
-          max_concurrency: 4,
-        };
+        if (selectedCompany !== 'all') params.company_id = selectedCompany;
+        if (fcSelectedBuilding !== 'all') params.building_id = fcSelectedBuilding;
 
-        const [{ data: rowsData }, { data: totalData }] = await Promise.all([
-          siengeApi.get('/mc-by-building', { params: rowsParams }),
-          siengeApi.get('/mc-by-building', { params: totalParams }),
-        ]);
+        const { data } = await api.get('/operational/series', { params });
         if (cancelled) return;
-        setMcByBuildingResp({
-          rows: Array.isArray(rowsData?.rows) ? rowsData.rows : [],
-          total: totalData?.total || { receita_operacional: 0, mc: 0, mc_percent: 0 },
-          diagnostic: {
-            rows: rowsData?.diagnostic,
-            total: totalData?.diagnostic,
-          },
+        setOperationalSeries({
+          range: data?.range || { start: '', end: '' },
+          rows: Array.isArray(data?.rows) ? data.rows : [],
+          total: data?.total || { receita_operacional: 0, custo_variavel: 0, mc: 0, mc_percent: 0 },
         });
       } catch {
         if (cancelled) return;
-        setMcByBuildingResp({ rows: [], total: { receita_operacional: 0, mc: 0, mc_percent: 0 } });
+        setOperationalSeries({
+          range: { start: '', end: '' },
+          rows: [],
+          total: { receita_operacional: 0, custo_variavel: 0, mc: 0, mc_percent: 0 },
+        });
       } finally {
-        if (!cancelled) setMcByBuildingLoading(false);
+        if (!cancelled) setOperationalSeriesLoading(false);
       }
     };
 
@@ -254,95 +261,23 @@ export function DashboardGeral() {
     return () => {
       cancelled = true;
     };
-  }, [dataRevision, endDate, fcSelectedBuilding, selectedCompany, selectedRequester, selectedUser, startDate]);
-
-  const stats = useMemo(() => {
-    const ordersArray = Array.isArray(orders) ? orders : [];
-    const total = ordersArray.reduce((acc: number, curr: any) => acc + toMoney(curr.totalAmount), 0);
-    const avg = ordersArray.length > 0 ? total / ordersArray.length : 0;
-
-    let receitaOperacional = 0;
-    let cpv = 0;
-
-    (Array.isArray(receivableTitles) ? receivableTitles : []).forEach((row: any) => {
-      const amount = getRowAmount(row);
-      if (amount <= 0) return;
-      if (isRevenueRow(row, true)) receitaOperacional += amount;
-      else cpv += amount;
-    });
-
-    (Array.isArray(financialTitles) ? financialTitles : []).forEach((row: any) => {
-      const amount = getRowAmount(row);
-      if (amount <= 0) return;
-      if (isRevenueRow(row, false)) receitaOperacional += amount;
-      else cpv += amount;
-    });
-    
-    const fTotal = financialTitles.reduce((acc: number, curr: any) => acc + toMoney(curr.amount), 0);
-    const rTotal = receivableTitles.reduce((acc: number, curr: any) => acc + toMoney(curr.amount), 0);
-    const balance = rTotal - fTotal;
-
-    const margemContribuicao = receitaOperacional - cpv;
-
-    return { total, avg, receitaOperacional, fTotal, rTotal, balance, cpv, margemContribuicao };
-  }, [orders, financialTitles, receivableTitles]);
-
-  const hasUsableMcByBuildingTotals = useMemo(() => {
-    const rows = Array.isArray(mcByBuildingResp.rows) ? mcByBuildingResp.rows : [];
-    if (rows.length > 0) return true;
-    const receita = toNumberSafe(mcByBuildingResp.total?.receita_operacional);
-    const mc = toNumberSafe(mcByBuildingResp.total?.mc);
-    return Math.abs(receita || 0) > 0 || Math.abs(mc || 0) > 0;
-  }, [mcByBuildingResp.rows, mcByBuildingResp.total]);
+  }, [dataRevision, endDate, fcSelectedBuilding, selectedCompany, startDate]);
 
   const receitaMargemSeries = useMemo(() => {
-    const monthKey = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
-    const { start: effectiveStart, end: effectiveEnd } = getEffectiveRange();
+    const monthToLabel = (m: string) => {
+      const s = String(m || '').trim();
+      const match = s.match(/^(\d{4})-(\d{2})$/);
+      if (!match) return s || '-';
+      const y = Number(match[1]);
+      const mo = Number(match[2]);
+      const d = new Date(y, Math.max(0, mo - 1), 1);
+      return formatMonthLabel(d);
+    };
 
-    const startMonth = new Date(effectiveStart.getFullYear(), effectiveStart.getMonth(), 1);
-    const endMonth = new Date(effectiveEnd.getFullYear(), effectiveEnd.getMonth(), 1);
-    const months: { key: string; label: string }[] = [];
-    for (let d = new Date(startMonth); d.getTime() <= endMonth.getTime(); d = new Date(d.getFullYear(), d.getMonth() + 1, 1)) {
-      months.push({ key: monthKey(d), label: formatMonthLabel(d) });
-      // segurança: evita loop infinito em caso de data inválida
-      if (months.length > 48) break;
-    }
-
-    const receitaByMonth: Record<string, number> = {};
-    const cpvByMonth: Record<string, number> = {};
-
-    (Array.isArray(receivableTitles) ? receivableTitles : []).forEach((t: any) => {
-      const d = getRowDate(t);
-      if (!d) return;
-      const key = monthKey(d);
-      const amount = getRowAmount(t);
-      if (amount <= 0) return;
-      if (isRevenueRow(t, true)) receitaByMonth[key] = (receitaByMonth[key] || 0) + amount;
-      else cpvByMonth[key] = (cpvByMonth[key] || 0) + amount;
-    });
-
-    (Array.isArray(financialTitles) ? financialTitles : []).forEach((t: any) => {
-      const d = getRowDate(t);
-      if (!d) return;
-      const key = monthKey(d);
-      const amount = getRowAmount(t);
-      if (amount <= 0) return;
-      if (isRevenueRow(t, false)) receitaByMonth[key] = (receitaByMonth[key] || 0) + amount;
-      else cpvByMonth[key] = (cpvByMonth[key] || 0) + amount;
-    });
-
-    const receitaChart = months.map((m) => ({ name: m.label, valor: receitaByMonth[m.key] || 0 }));
-    const margemChart = months.map((m) => ({
-      name: m.label,
-      valor: (receitaByMonth[m.key] || 0) - (cpvByMonth[m.key] || 0),
-    }));
-
-    const mcPercentChart = months.map((m) => {
-      const receita = receitaByMonth[m.key] || 0;
-      const margem = receita - (cpvByMonth[m.key] || 0);
-      const pct = receita > 0 ? (margem / receita) * 100 : 0;
-      return { name: m.label, valor: pct };
-    });
+    const rows = Array.isArray(operationalSeries.rows) ? operationalSeries.rows : [];
+    const receitaChart = rows.map((r) => ({ name: monthToLabel(r.month), valor: Number(r.receita_operacional || 0) }));
+    const margemChart = rows.map((r) => ({ name: monthToLabel(r.month), valor: Number(r.mc || 0) }));
+    const mcPercentChart = rows.map((r) => ({ name: monthToLabel(r.month), valor: Number(r.mc_percent || 0) }));
 
     const bestMonth = (series: { name: string; valor: number }[]) => {
       if (!series.length) return { name: '-', valor: 0 };
@@ -357,14 +292,14 @@ export function DashboardGeral() {
       bestMargem: bestMonth(margemChart),
       bestMcPercent: bestMonth(mcPercentChart),
     };
-  }, [endDate, financialTitles, receivableTitles, startDate]);
+  }, [operationalSeries.rows, endDate, startDate]);
 
   const seriesTotals = useMemo(() => {
-    const receita = (receitaMargemSeries.receitaChart || []).reduce((acc, row) => acc + Number(row?.valor || 0), 0);
-    const margem = (receitaMargemSeries.margemChart || []).reduce((acc, row) => acc + Number(row?.valor || 0), 0);
+    const receita = Number(operationalSeries.total?.receita_operacional || 0);
+    const margem = Number(operationalSeries.total?.mc || 0);
     const mcPercent = receita > 0 ? (margem / receita) * 100 : 0;
     return { receita, margem, mcPercent };
-  }, [receitaMargemSeries]);
+  }, [operationalSeries.total]);
 
   const mcGeralPercent = useMemo(() => {
     const receita = Number(seriesTotals.receita || 0);
@@ -373,90 +308,15 @@ export function DashboardGeral() {
   }, [seriesTotals]);
 
   const resumoPorObra = useMemo(() => {
-    const buildingNameMap: Record<string, string> = {};
-    const scopedBuildings = (Array.isArray(buildings) ? buildings : []).filter((b: any) => {
-      if (selectedCompany === 'all') return true;
-      return String(b?.companyId ?? '') === String(selectedCompany);
-    });
-
-    scopedBuildings.forEach((b: any) => {
-      const id = String(b?.id ?? '');
-      if (id) buildingNameMap[id] = String(b?.name || `Obra ${id}`);
-      const code = String(b?.code ?? '');
-      if (code) buildingNameMap[code] = String(b?.name || `Obra ${code}`);
-    });
-
-    const byBuilding = new Map<string, { id: string; name: string; receita: number; custo: number }>();
-
-    // Inicializa com todas as obras do escopo para sempre listar valores discriminados.
-    scopedBuildings.forEach((b: any) => {
-      const id = String(b?.id ?? '');
-      if (!id) return;
-      byBuilding.set(id, {
-        id,
-        name: String(b?.name || `Obra ${id}`),
-        receita: 0,
-        custo: 0,
-      });
-    });
-
-    const passesCompany = (row: any): boolean => {
-      if (selectedCompany === 'all') return true;
-      const rowCompany = String(row?.companyId ?? '').trim();
-      if (rowCompany) return rowCompany === String(selectedCompany);
-      const rawBuilding = String(row?.idObra ?? row?.buildingId ?? row?.codigoObra ?? row?.buildingCode ?? '').trim();
-      if (!rawBuilding) return false;
-      const building = (Array.isArray(buildings) ? buildings : []).find(
-        (b: any) => String(b?.id) === rawBuilding || String(b?.code ?? '') === rawBuilding
-      );
-      return String(building?.companyId ?? '') === String(selectedCompany);
-    };
-
-    const consumeRow = (row: any, defaultRevenue: boolean) => {
-      if (!passesCompany(row)) return;
-
-      const amount = getRowAmount(row);
-      if (amount <= 0) return;
-
-      const rawId = String(row?.idObra ?? row?.buildingId ?? row?.codigoObra ?? row?.buildingCode ?? '').trim();
-      const id = rawId || '0';
-      const name = String(row?.nomeObra || buildingNameMap[id] || (id === '0' ? 'Sem obra' : `Obra ${id}`));
-
-      const current = byBuilding.get(id) || { id, name, receita: 0, custo: 0 };
-      if (isRevenueRow(row, defaultRevenue)) current.receita += amount;
-      else current.custo += amount;
-      byBuilding.set(id, current);
-    };
-
-    // Usa dados históricos completos (sem filtro de data) para exibir acumulado total por obra.
-    (Array.isArray(historicalReceivables) ? historicalReceivables : []).forEach((row: any) => consumeRow(row, true));
-    (Array.isArray(historicalFinancials) ? historicalFinancials : []).forEach((row: any) => consumeRow(row, false));
-
-    const normalizedRows = Array.from(byBuilding.values())
-      .map((r) => {
-        const mc = r.receita - r.custo;
-        const pct = r.receita > 0 ? (mc / r.receita) * 100 : 0;
-        return { id: r.id, name: r.name, receita: r.receita, mc, pct };
-      })
-      .sort((a, b) => {
-        if (b.receita !== a.receita) return b.receita - a.receita;
-        return a.name.localeCompare(b.name);
-      });
-
-    const totalReceita = normalizedRows.reduce((acc, r) => acc + r.receita, 0);
-    const totalMc = normalizedRows.reduce((acc, r) => acc + r.mc, 0);
-
+    const rows = Array.isArray(mcByBuildingAllTime.rows) ? mcByBuildingAllTime.rows : [];
+    const total = mcByBuildingAllTime.total || { receita: 0, mc: 0, pct: 0 };
     return {
-      rows: normalizedRows,
-      total: {
-        receita: totalReceita,
-        mc: totalMc,
-        pct: totalReceita > 0 ? (totalMc / totalReceita) * 100 : 0,
-      },
-      maxReceita: Math.max(1, ...normalizedRows.map((r) => r.receita)),
-      maxMcAbs: Math.max(1, ...normalizedRows.map((r) => Math.abs(r.mc))),
+      rows,
+      total,
+      maxReceita: Math.max(1, ...rows.map((r) => Number(r?.receita || 0))),
+      maxMcAbs: Math.max(1, ...rows.map((r) => Math.abs(Number(r?.mc || 0)))),
     };
-  }, [historicalReceivables, historicalFinancials, buildings, selectedCompany]);
+  }, [mcByBuildingAllTime.rows, mcByBuildingAllTime.total]);
 
   const orderStatusData = useMemo(() => {
     const map: Record<string, number> = {};
@@ -496,6 +356,197 @@ export function DashboardGeral() {
     setObraPage(1);
   }, [selectedCompany, resumoPorObra.rows.length]);
 
+  const printMcReport = () => {
+    const escapeHtml = (value: any) => String(value ?? '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+
+    const selectedCompanyName = selectedCompany === 'all'
+      ? 'Todas'
+      : (companies?.find((c: any) => String(c.id) === String(selectedCompany))?.name || selectedCompany);
+
+    const selectedBuildingName = fcSelectedBuilding === 'all'
+      ? 'Todas'
+      : (buildings?.find((b: any) => String(b.id) === String(fcSelectedBuilding))?.name || fcSelectedBuilding);
+
+    const range = getEffectiveRange();
+    const periodLabel = `${format(range.start, 'dd/MM/yyyy')} até ${format(range.end, 'dd/MM/yyyy')}`;
+
+    const fmtMoney = (n: number) => new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL',
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(n || 0);
+
+    const resolveBuildingNameByIdOrCode = (idOrCode: string): string => {
+      const id = String(idOrCode ?? '').trim();
+      if (!id) return '';
+      const found = (Array.isArray(buildings) ? buildings : []).find((b: any) => (
+        String(b?.id) === id || String(b?.code ?? '') === id
+      ));
+      return found?.name ? String(found.name) : id;
+    };
+
+    const extractNfeBuildingId = (doc: any): string => {
+      const candidates = [
+        doc?.buildingId,
+        doc?.building_id,
+        doc?.enterpriseId,
+        doc?.enterprise_id,
+        doc?.constructionId,
+        doc?.obraId,
+        doc?.obra_id,
+        doc?.buildingCode,
+        doc?.building_code,
+        doc?.codigoObra,
+        doc?.codigoVisivelObra,
+        doc?.costCenterCode,
+        doc?.costCenter,
+      ];
+      for (const c of candidates) {
+        const s = String(c ?? '').trim();
+        if (s && s !== 'undefined' && s !== 'null' && s !== 'None') return s;
+      }
+      return '';
+    };
+
+    const getNfeDate = (doc: any): string => {
+      const raw = doc?.issueDate ?? doc?.emissionDate ?? doc?.dataEmissao ?? doc?.date ?? doc?.createdAt ?? '';
+      const s = String(raw || '').trim();
+      if (!s) return '';
+      try {
+        const d = parseISO(s);
+        if (!Number.isNaN(d.getTime())) return format(d, 'dd/MM/yyyy');
+      } catch {
+        // ignore
+      }
+      const m = s.match(/^(\d{4})-(\d{2})-(\d{2})/);
+      if (m) return `${m[3]}/${m[2]}/${m[1]}`;
+      return s;
+    };
+
+    const getNfeNumber = (doc: any): string => {
+      return String(doc?.number ?? doc?.invoiceNumber ?? doc?.documentNumber ?? doc?.id ?? '').trim();
+    };
+
+    const getNfeAmount = (doc: any): number => {
+      const raw = doc?.totalAmount ?? doc?.totalInvoiceAmount ?? doc?.amount ?? doc?.value ?? doc?.valor ?? doc?.valorTotal;
+      const n = Number(raw ?? 0);
+      return Number.isFinite(n) ? n : 0;
+    };
+
+    const mcRowsHtml = (Array.isArray(resumoPorObra.rows) ? resumoPorObra.rows : []).map((r: any) => {
+      const pct = Number(r?.pct ?? 0);
+      return (
+        '<tr>' +
+          `<td>${escapeHtml(r?.name ?? '')}</td>` +
+          `<td class="num">${escapeHtml(fmtMoney(Number(r?.receita ?? 0)))}</td>` +
+          `<td class="num">${escapeHtml(fmtMoney(Number(r?.mc ?? 0)))}</td>` +
+          `<td class="num">${escapeHtml(String(pct.toLocaleString('pt-BR', { maximumFractionDigits: 0 })))}%</td>` +
+        '</tr>'
+      );
+    }).join('');
+
+    const nfeDocs = (Array.isArray(nfeDocuments) ? nfeDocuments : []);
+    const nfeRowsHtml = nfeDocs.length === 0
+      ? '<tr><td colspan="4" class="muted">Sem NF-e carregadas para o período.</td></tr>'
+      : nfeDocs.map((doc: any) => {
+        const bid = extractNfeBuildingId(doc);
+        const buildingName = bid ? resolveBuildingNameByIdOrCode(bid) : '';
+        const date = getNfeDate(doc);
+        const number = getNfeNumber(doc);
+        const amount = getNfeAmount(doc);
+        return (
+          '<tr>' +
+            `<td>${escapeHtml(buildingName || '-')}</td>` +
+            `<td>${escapeHtml(date)}</td>` +
+            `<td>${escapeHtml(number)}</td>` +
+            `<td class="num">${escapeHtml(fmtMoney(amount))}</td>` +
+          '</tr>'
+        );
+      }).join('');
+
+    const html = `<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Relatório - MC por Obra</title>
+  <style>
+    body { font-family: Arial, sans-serif; color: #111; margin: 24px; }
+    h1 { font-size: 18px; margin: 0 0 12px; }
+    h2 { font-size: 14px; margin: 18px 0 8px; }
+    .meta { font-size: 12px; color: #333; line-height: 1.5; }
+    table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    th, td { border: 1px solid #ddd; padding: 6px 8px; }
+    th { background: #f5f5f5; text-align: left; }
+    td.num, th.num { text-align: right; }
+    .muted { color: #666; }
+  </style>
+</head>
+<body>
+  <h1>Relatório — MC por Obra</h1>
+  <div class="meta">
+    <div><b>Gerado em:</b> ${escapeHtml(new Date().toLocaleString('pt-BR'))}</div>
+    <div><b>Período (UI):</b> ${escapeHtml(periodLabel)}</div>
+    <div><b>Empresa:</b> ${escapeHtml(selectedCompanyName)} &nbsp; <b>Obra:</b> ${escapeHtml(selectedBuildingName)}</div>
+    <div><b>Usuário:</b> ${escapeHtml(selectedUser)} &nbsp; <b>Solicitante:</b> ${escapeHtml(selectedRequester)}</div>
+  </div>
+
+  <h2>MC por Obra (Resumo)</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Obra</th>
+        <th class="num">Receita Operacional</th>
+        <th class="num">Margem Contribuição</th>
+        <th class="num">% MC</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${mcRowsHtml || '<tr><td colspan="4" class="muted">Sem dados por obra.</td></tr>'}
+    </tbody>
+    <tfoot>
+      <tr>
+        <th>Total</th>
+        <th class="num">${escapeHtml(fmtMoney(Number(resumoPorObra.total?.receita ?? 0)))}</th>
+        <th class="num">${escapeHtml(fmtMoney(Number(resumoPorObra.total?.mc ?? 0)))}</th>
+        <th class="num">${escapeHtml(String(Number(resumoPorObra.total?.pct ?? 0).toLocaleString('pt-BR', { maximumFractionDigits: 0 })))}%</th>
+      </tr>
+    </tfoot>
+  </table>
+
+  <h2>NF-e (Detalhado)</h2>
+  <div class="meta muted">Lista das NF-e carregadas na UI (limite atual do backend/UI).</div>
+  <table>
+    <thead>
+      <tr>
+        <th>Obra</th>
+        <th>Data</th>
+        <th>Número</th>
+        <th class="num">Valor</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${nfeRowsHtml}
+    </tbody>
+  </table>
+</body>
+</html>`;
+
+    const w = window.open('', '_blank', 'noopener,noreferrer');
+    if (!w) return;
+    w.document.open();
+    w.document.write(html);
+    w.document.close();
+    w.focus();
+    w.print();
+  };
+
   return (
     <motion.div key="db-geral" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="space-y-8">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
@@ -504,7 +555,7 @@ export function DashboardGeral() {
             label: selectedCompany !== 'all'
               ? `RECEITA — ${companies.find((c: any) => String(c.id) === selectedCompany)?.name || 'Empresa'}`
               : 'RECEITA OPERACIONAL',
-            value: `R$ ${kpiReceitaOperacional.toLocaleString('pt-BR', { maximumFractionDigits: 0 })}`,
+            value: fmtBRL(kpiReceitaOperacional),
             icon: TrendingUp,
             color: 'orange',
             tooltip: 'Receita Operacional calculada pelos lançamentos filtrados (empresa, obra e período).',
@@ -513,7 +564,7 @@ export function DashboardGeral() {
             label: selectedCompany !== 'all'
               ? `MARGEM — ${companies.find((c: any) => String(c.id) === selectedCompany)?.name || 'Empresa'}`
               : 'Margem de Contribuição',
-            value: `R$ ${kpiMargemContribuicao.toLocaleString('pt-BR', { maximumFractionDigits: 0 })}`,
+            value: fmtBRL(kpiMargemContribuicao),
             icon: DollarSign,
             color: kpiMargemContribuicao >= 0 ? 'green' : 'red',
             tooltip: 'Margem de Contribuição (MC): Receita Operacional − Custos, respeitando os filtros aplicados.',
@@ -525,11 +576,74 @@ export function DashboardGeral() {
             <CardHeader className="pb-2 p-4 sm:p-6">
               <CardDescription className="text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-orange-500/70 leading-tight">{kpi.label}</CardDescription>
               <CardTitle className={cn("text-xl sm:text-3xl font-black tracking-tighter mt-1", kpi.color === 'red' ? 'text-red-500' : kpi.color === 'green' ? 'text-green-500' : 'text-white')}>{kpi.value}</CardTitle>
+              {i === 2 && (
+                <button
+                  type="button"
+                  onClick={() => setActiveBuildingsModalOpen(true)}
+                  className="mt-2 h-8 px-3 rounded-lg border border-white/10 bg-white/5 text-white text-[11px] font-black uppercase tracking-wide hover:bg-white/10"
+                >
+                  Ver obras
+                </button>
+              )}
             </CardHeader>
             <div className="h-1 w-full bg-orange-600/20"><div className="h-full bg-orange-600 w-1/3" /></div>
           </Card>
         ))}
       </div>
+
+      {activeBuildingsModalOpen && (
+        <div
+          className="fixed inset-0 z-[999] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 print:hidden"
+          onClick={() => setActiveBuildingsModalOpen(false)}
+        >
+          <div
+            className="w-full max-w-2xl bg-[#161618] border border-white/10 rounded-2xl shadow-2xl overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="p-4 sm:p-6 border-b border-white/10 flex items-center justify-between">
+              <div>
+                <h2 className="text-white text-lg sm:text-xl font-black uppercase tracking-widest leading-tight">Obras ativas</h2>
+                <p className="text-gray-400 text-xs mt-1">{(Array.isArray(activeBuildings) ? activeBuildings : []).length} obras</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setActiveBuildingsModalOpen(false)}
+                className="w-9 h-9 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white flex items-center justify-center"
+                aria-label="Fechar"
+              >
+                ×
+              </button>
+            </div>
+            <div className="max-h-[60vh] overflow-auto">
+              <Table className="text-xs sm:text-sm">
+                <TableHeader className="border-white/10">
+                  <TableRow className="border-white/10 hover:bg-transparent">
+                    <TableHead className="text-gray-300">Obra</TableHead>
+                    <TableHead className="text-gray-300">Código</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {(Array.isArray(activeBuildings) ? activeBuildings : []).map((b: any) => (
+                    <TableRow key={String(b?.id)} className="border-white/10 hover:bg-white/5">
+                      <TableCell className="text-white font-semibold">{String(b?.name || '')}</TableCell>
+                      <TableCell className="text-gray-300">{String(b?.code || b?.id || '')}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+            <div className="p-4 sm:p-6 border-t border-white/10 flex justify-end">
+              <button
+                type="button"
+                onClick={() => setActiveBuildingsModalOpen(false)}
+                className="h-9 px-4 rounded-lg border border-white/10 bg-white/5 text-white text-xs font-black uppercase tracking-wide hover:bg-white/10"
+              >
+                Fechar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Mini gráficos (estilo referência) */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-8">
@@ -542,9 +656,9 @@ export function DashboardGeral() {
             <CardTitle className="text-lg font-black uppercase tracking-tight text-white">Receita Operacional</CardTitle>
             <div className="flex items-center justify-between text-[11px] text-gray-400">
               <span>Melhor mês: {receitaMargemSeries.bestReceita.name}</span>
-              <span className="font-black text-orange-500">R$ {receitaMargemSeries.bestReceita.valor.toLocaleString('pt-BR', { maximumFractionDigits: 0 })}</span>
+              <span className="font-black text-orange-500">{fmtBRL(receitaMargemSeries.bestReceita.valor)}</span>
             </div>
-            <div className="text-2xl sm:text-4xl font-black tracking-tighter text-white">R$ {kpiReceitaOperacional.toLocaleString('pt-BR', { maximumFractionDigits: 0 })}</div>
+            <div className="text-2xl sm:text-4xl font-black tracking-tighter text-white">{fmtBRL(kpiReceitaOperacional)}</div>
           </CardHeader>
           <CardContent className="h-[150px] sm:h-[180px] pt-2 pb-4">
             <ResponsiveContainer width="100%" height="100%">
@@ -558,8 +672,8 @@ export function DashboardGeral() {
                 <XAxis dataKey="name" axisLine={false} tickLine={false} interval={0} tickMargin={8} padding={{ left: 8, right: 8 }} tick={{ fill: '#666', fontSize: 11 }} />
                 <YAxis hide />
                 <Tooltip
-                  labelFormatter={(label: string) => `Mes: ${label}`}
-                  formatter={(value: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value)}
+                  labelFormatter={(label) => `Mês: ${String(label ?? '')}`}
+                  formatter={(value) => fmtBRL(Number(value ?? 0))}
                   contentStyle={{ backgroundColor: '#161618', border: '1px solid rgba(255,255,255,0.1)' }}
                 />
                 <Area type="monotone" dataKey="valor" stroke="#f97316" strokeWidth={3} fill="url(#miniReceita)" dot={{ r: 2 }} activeDot={{ r: 4 }} />
@@ -579,13 +693,13 @@ export function DashboardGeral() {
             <div className="flex items-center justify-between text-[11px] text-gray-400">
               <span>Melhor mês: {receitaMargemSeries.bestMargem.name}</span>
               <span className={cn('font-black', receitaMargemSeries.bestMargem.valor >= 0 ? 'text-emerald-400' : 'text-red-400')}>
-                R$ {receitaMargemSeries.bestMargem.valor.toLocaleString('pt-BR', { maximumFractionDigits: 0 })}
+                {fmtBRL(receitaMargemSeries.bestMargem.valor)}
               </span>
             </div>
             <div className={cn(
               'text-2xl sm:text-4xl font-black tracking-tighter',
               kpiMargemContribuicao >= 0 ? 'text-emerald-400' : 'text-red-500'
-            )}>R$ {kpiMargemContribuicao.toLocaleString('pt-BR', { maximumFractionDigits: 0 })}</div>
+            )}>{fmtBRL(kpiMargemContribuicao)}</div>
           </CardHeader>
           <CardContent className="h-[150px] sm:h-[180px] pt-2 pb-4">
             <ResponsiveContainer width="100%" height="100%">
@@ -599,8 +713,8 @@ export function DashboardGeral() {
                 <XAxis dataKey="name" axisLine={false} tickLine={false} interval={0} tickMargin={8} padding={{ left: 8, right: 8 }} tick={{ fill: '#666', fontSize: 11 }} />
                 <YAxis hide />
                 <Tooltip
-                  labelFormatter={(label: string) => `Mes: ${label}`}
-                  formatter={(value: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value)}
+                  labelFormatter={(label) => `Mês: ${String(label ?? '')}`}
+                  formatter={(value) => fmtBRL(Number(value ?? 0))}
                   contentStyle={{ backgroundColor: '#161618', border: '1px solid rgba(255,255,255,0.1)' }}
                 />
                 <Area type="monotone" dataKey="valor" stroke="#10b981" strokeWidth={3} fill="url(#miniMargem)" dot={{ r: 2 }} activeDot={{ r: 4 }} />
@@ -638,8 +752,8 @@ export function DashboardGeral() {
                 <XAxis dataKey="name" axisLine={false} tickLine={false} interval={0} tickMargin={8} padding={{ left: 8, right: 8 }} tick={{ fill: '#666', fontSize: 11 }} />
                 <YAxis hide />
                 <Tooltip
-                  labelFormatter={(label: string) => `Mes: ${label}`}
-                  formatter={(value: number) => `${Number(value || 0).toLocaleString('pt-BR', { maximumFractionDigits: 1 })}%`}
+                  labelFormatter={(label) => `Mês: ${String(label ?? '')}`}
+                  formatter={(value) => `${Number(value ?? 0).toLocaleString('pt-BR', { maximumFractionDigits: 1 })}%`}
                   contentStyle={{ backgroundColor: '#161618', border: '1px solid rgba(255,255,255,0.1)' }}
                 />
                 <Area type="monotone" dataKey="valor" stroke="#8b5cf6" strokeWidth={3} fill="url(#miniMcPct)" dot={{ r: 2 }} activeDot={{ r: 4 }} />
@@ -652,7 +766,16 @@ export function DashboardGeral() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-8">
         <Card className="lg:col-span-2 bg-[#161618] border-white/5 shadow-2xl" title="Resumo por Obra (todo o período). Receita Operacional = soma de NF (títulos a receber). MC = Receita Líquida − (Custos Variáveis + Custos Diretos) (aqui aproximado pelos títulos a pagar/CPV). %MC = MC / Receita Líquida × 100.">
           <CardHeader>
-            <CardTitle className="text-lg font-black uppercase tracking-tight text-white">MC por Obra</CardTitle>
+            <div className="flex items-center justify-between gap-3">
+              <CardTitle className="text-lg font-black uppercase tracking-tight text-white">MC por Obra</CardTitle>
+              <button
+                type="button"
+                onClick={printMcReport}
+                className="h-8 px-3 rounded-lg border border-white/10 bg-white/5 text-white text-[11px] font-black uppercase tracking-wide hover:bg-white/10"
+              >
+                Imprimir Relatório
+              </button>
+            </div>
           </CardHeader>
           <CardContent className="pt-2">
             <Table className="text-xs sm:text-sm">
@@ -686,7 +809,7 @@ export function DashboardGeral() {
                       <div className="relative h-7 rounded bg-white/5 overflow-hidden">
                         <div className="absolute inset-y-0 left-0 bg-orange-500/30" style={{ width: `${Math.round((r.receita / resumoPorObra.maxReceita) * 100)}%` }} />
                         <div className="relative z-10 px-2 h-full flex items-center justify-end text-white font-semibold">
-                          {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 }).format(r.receita)}
+                          {fmtBRL(r.receita)}
                         </div>
                       </div>
                     </TableCell>
@@ -701,7 +824,7 @@ export function DashboardGeral() {
                           'relative z-10 px-2 h-full flex items-center justify-end font-semibold',
                           r.mc >= 0 ? 'text-emerald-400' : 'text-red-400'
                         )}>
-                          {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 }).format(r.mc)}
+                          {fmtBRL(r.mc)}
                         </div>
                       </div>
                     </TableCell>
@@ -722,10 +845,10 @@ export function DashboardGeral() {
                 <TableRow className="border-white/10 hover:bg-transparent">
                   <TableCell className="text-white font-black">Total</TableCell>
                   <TableCell className="text-white font-black">
-                    {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 }).format(resumoPorObra.total.receita)}
+                    {fmtBRL(resumoPorObra.total.receita)}
                   </TableCell>
                   <TableCell className={cn('font-black', resumoPorObra.total.mc >= 0 ? 'text-emerald-400' : 'text-red-400')}>
-                    {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 }).format(resumoPorObra.total.mc)}
+                    {fmtBRL(resumoPorObra.total.mc)}
                   </TableCell>
                   <TableCell className="text-right text-white font-black">
                     {resumoPorObra.total.pct.toLocaleString('pt-BR', { maximumFractionDigits: 0 })}%

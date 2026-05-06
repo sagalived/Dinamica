@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -39,9 +39,22 @@ def list_companies(
 def list_buildings(
     __: None = Depends(require_database_ready),
     _: AppUser = Depends(get_current_user),
+    active: str = Query(
+        "all",
+        description="Filtro de obras: all | true | false",
+        pattern="^(all|true|false)$",
+    ),
+    company_id: int | None = Query(None, description="Filtrar por company_id"),
     db: Session = Depends(get_db),
 ) -> list[dict]:
-    rows = db.scalars(select(Building).order_by(Building.name)).all()
+    stmt = select(Building)
+    if company_id is not None:
+        stmt = stmt.where(Building.company_id == company_id)
+    if active == "true":
+        stmt = stmt.where(Building.active.is_(True))
+    elif active == "false":
+        stmt = stmt.where(Building.active.is_(False))
+    rows = db.scalars(stmt.order_by(Building.name)).all()
     return [
         {
             "id": row.id,
@@ -51,6 +64,7 @@ def list_buildings(
             "cnpj": row.cnpj,
             "address": row.address,
             "building_type": row.building_type,
+            "active": row.active,
         }
         for row in rows
     ]

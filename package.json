@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "api:dev": ".venv\\Scripts\\python.exe -m uvicorn backend.main:app --host 127.0.0.1 --port 8000",
+    "api:dev": ".venv\\Scripts\\python.exe -m uvicorn backend.main:app --reload --reload-dir backend --host 127.0.0.1 --port 8000",
     "dev:full": "concurrently -k -n API,WEB -c green,cyan \"npm run api:dev\" \"npm run dev\"",
     "start": "python app.py",
     "build": "vite build",

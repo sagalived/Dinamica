@@ -1,20 +1,24 @@
 from typing import Any
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
+from datetime import date as date_only
 import hashlib
 import threading
 import asyncio
+import os
 
 import httpx
 
 from fastapi import APIRouter, Depends, HTTPException, Query
-from sqlalchemy import select
+from sqlalchemy import select, text
 from sqlalchemy.orm import Session
 
 from backend.database import get_db
 from backend.dependencies import get_current_user
 from backend.models import AppUser, Building, Company, Creditor, DirectoryUser
 from backend.schemas import BootstrapResponse, FetchItemsRequest, FetchQuotationsRequest
+from backend.config import SIENGE_SYNC_INTERVAL_MINUTES
 from backend.services.sienge_cache import utc_now_iso
+from backend.services.catalog_sync import upsert_catalog_from_sienge
 from backend.services.sienge_client import sienge_client
 from backend.services.mc_by_building_service import compute_mc_by_building
 from backend.services.sienge_storage import (
@@ -23,6 +27,178 @@ from backend.services.sienge_storage import (
     write_snapshot,
     write_sync_metadata,
 )
+from backend.services.immutable_history import (
+    _add_month,
+    _last_complete_month,
+    _month_start_end,
+    get_immutable_backfill_status,
+    mark_operational_rebuild_done,
+    update_immutable_meta,
+)
+from backend.services.nfe_documents import sync_nfe_documents_range
+
+
+def _parse_iso_datetime(value: str | None) -> datetime | None:
+    if not value:
+        return None
+    raw = str(value).strip()
+    if not raw:
+        return None
+    try:
+        # Aceita ISO com 'Z' e com offset.
+        normalized = raw.replace("Z", "+00:00")
+        return datetime.fromisoformat(normalized)
+    except Exception:
+        return None
+
+
+async def _ensure_immutable_history_step(db: Session, *, months_per_run_override: int | None = None) -> dict[str, Any]:
+    """Garante histórico imutável desde 2019-01-01 sem refazer downloads.
+
+    Estratégia:
+    - Mantém cursor mensal em snapshot (`sienge_immutable_history_meta`).
+    - A cada sync, baixa apenas alguns meses (configurável) até completar.
+    - Meses < mês atual são tratados como imutáveis (não atualiza depois).
+    - NF-e é persistido em tabela própria (`sienge_nfe_documents`).
+    """
+
+    meta = read_snapshot(db, "sienge_immutable_history_meta", default={})
+    if not isinstance(meta, dict):
+        meta = {}
+
+    # Quantos meses processar por sync (para não deixar o sync do dia a dia pesado).
+    if months_per_run_override is not None:
+        months_per_run = int(months_per_run_override)
+    else:
+        try:
+            months_per_run = int(os.getenv("SIENGE_IMMUTABLE_BACKFILL_MONTHS_PER_RUN", "2") or "2")
+        except ValueError:
+            months_per_run = 2
+    months_per_run = max(0, min(months_per_run, 240))
+
+    status = get_immutable_backfill_status(db, start_month="2019-01")
+    target_month = _last_complete_month()
+    cursor = status.cursor_month
+
+    operational_rebuild_pending = bool(meta.get("operational_rebuild_pending", False))
+
+    if cursor > target_month:
+        update_immutable_meta(
+            db,
+            cursor_month=cursor,
+            target_month=target_month,
+            completed=True,
+            operational_rebuild_pending=operational_rebuild_pending,
+            note="backfill_completo",
+        )
+        return {"ok": True, "completed": True, "cursor_month": cursor, "target_month": target_month}
+
+    if months_per_run == 0:
+        # Só reporta status
+        update_immutable_meta(
+            db,
+            cursor_month=cursor,
+            target_month=target_month,
+            completed=False,
+            operational_rebuild_pending=operational_rebuild_pending,
+            note="backfill_desativado_por_env",
+        )
+        return {"ok": True, "completed": False, "cursor_month": cursor, "target_month": target_month}
+
+    processed = 0
+    while processed < months_per_run and cursor <= target_month:
+        m_start, m_end = _month_start_end(cursor)
+
+        await _ensure_cached_dataset_range(
+            db=db,
+            dataset_key="pedidos",
+            start_date=m_start,
+            end_date=m_end,
+            fetcher=sienge_client.fetch_pedidos_range,
+            date_fields_for_infer=["data", "dataEmissao", "date"],
+        )
+        await _ensure_cached_dataset_range(
+            db=db,
+            dataset_key="financeiro",
+            start_date=m_start,
+            end_date=m_end,
+            fetcher=sienge_client.fetch_financeiro_range,
+            date_fields_for_infer=[
+                "dataVencimento",
+                "dueDate",
+                "issueDate",
+                "dataEmissao",
+                "dataContabil",
+            ],
+        )
+        await _ensure_cached_dataset_range(
+            db=db,
+            dataset_key="receber",
+            start_date=m_start,
+            end_date=m_end,
+            fetcher=sienge_client.fetch_receber_range,
+            date_fields_for_infer=[
+                "dataVencimento",
+                "dueDate",
+                "data",
+                "date",
+                "issueDate",
+                "dataEmissao",
+            ],
+        )
+
+        # NF-e: persiste no SQLite (não atualiza meses antigos).
+        try:
+            await sync_nfe_documents_range(db=db, start_date=m_start, end_date=m_end, allow_updates=False)
+        except Exception:
+            # NF-e não deve quebrar o backfill de transacionais.
+            pass
+
+        cursor = _add_month(cursor, 1)
+        processed += 1
+
+        if processed > 0:
+            operational_rebuild_pending = True
+
+    completed = cursor > target_month
+    update_immutable_meta(
+        db,
+        cursor_month=cursor,
+        target_month=target_month,
+        completed=completed,
+        operational_rebuild_pending=operational_rebuild_pending,
+        note=f"processed_months={processed}",
+    )
+
+    # Quando terminar o backfill, faz rebuild uma única vez para materializar toda a série no SQLite.
+    if completed and operational_rebuild_pending:
+        try:
+            from backend.services.operational_aggregates import rebuild_operational_aggregates
+
+            rebuild_operational_aggregates(db)
+            mark_operational_rebuild_done(db)
+        except Exception:
+            pass
+
+    return {
+        "ok": True,
+        "completed": completed,
+        "processed_months": processed,
+        "cursor_month": cursor,
+        "target_month": target_month,
+    }
+
+
+async def _sync_current_month_nfe(db: Session) -> None:
+    if not sienge_client.is_configured:
+        return
+    today = date_only.today()
+    start = (today - timedelta(days=8)).strftime("%Y-%m-%d")
+    end = today.strftime("%Y-%m-%d")
+    try:
+        await sync_nfe_documents_range(db=db, start_date=start, end_date=end, allow_updates=True)
+    except Exception:
+        return
 
 router = APIRouter(prefix="/api/sienge", tags=["sienge"])
 _SYNC_LOCK = threading.Lock()
@@ -99,6 +275,11 @@ async def _ensure_cached_dataset_range(
 
     cached_start = dataset_meta.get("start")
     cached_end = dataset_meta.get("end")
+
+    # Fast path: se o meta já cobre o range solicitado, não revarre o snapshot.
+    # (A inferência completa é O(n) e pode travar a UI em bases grandes.)
+    if cached_start and cached_end and start_date >= cached_start and end_date <= cached_end:
+        return
 
     existing = _to_array(read_snapshot(db, f"{dataset_key}.json", default=[]))
 
@@ -438,243 +619,244 @@ def _date_end_exclusive_ms(value: str | None) -> int | None:
     return base + 24 * 60 * 60 * 1000
 
 
-def _legacy_bootstrap_payload(db: Session, include_transactions: bool = True) -> dict[str, Any]:
-    obras = _to_array(_read_cached_dataset(db, "obras.json", []))
-    usuarios = _to_array(_read_cached_dataset(db, "usuarios.json", []))
-    credores = _to_array(_read_cached_dataset(db, "credores.json", []))
-    companies = _to_array(_read_cached_dataset(db, "empresas.json", []))
+def _legacy_bootstrap_payload(db: Session, include_transactions: bool = True, start_date: str | None = None, end_date: str | None = None) -> dict[str, Any]:
+    obras = [
+        {
+            "id": b.id, "name": b.name, "code": b.id, "codigoVisivel": b.id,
+            "address": b.address, "companyId": b.company_id, "cnpj": b.cnpj,
+            "engineer": "Aguardando Avaliação",
+        }
+        for b in db.scalars(select(Building)).all()
+    ]
+    companies = [
+        {
+            "id": c.id, "name": c.name, "tradeName": c.trade_name,
+            "companyName": c.name, "cnpj": c.cnpj,
+        }
+        for c in db.scalars(select(Company)).all()
+    ]
+    credores = [
+        {
+            "id": c.id, "name": c.name, "tradeName": c.trade_name,
+            "cnpj": c.cnpj, "city": c.city, "state": c.state, "active": c.active,
+        }
+        for c in db.scalars(select(Creditor)).all()
+    ]
+    usuarios = [
+        {
+            "id": row.id, "name": row.name, "nome": row.name,
+            "email": row.email, "active": row.active,
+        }
+        for row in db.scalars(select(DirectoryUser)).all()
+    ]
+
+    pedidos = []
+    financeiro = []
+    receber = []
+
     if include_transactions:
-        pedidos = _to_array(_read_cached_dataset(db, "pedidos.json", []))
-        financeiro = _to_array(_read_cached_dataset(db, "financeiro.json", []))
-        receber = _to_array(_read_cached_dataset(db, "receber.json", []))
-        itens_pedidos = _read_cached_dataset(db, "itens_pedidos.json", {}) or {}
-    else:
-        pedidos = []
-        financeiro = []
-        receber = []
-        itens_pedidos = {}
+        dialect = getattr(getattr(db, "bind", None), "dialect", None)
+        dialect_name = getattr(dialect, "name", "") or ""
 
-    if not obras:
-        obras = [
-            {
-                "id": b.id,
-                "name": b.name,
-                "code": b.id,
-                "address": b.address,
-                "companyId": b.company_id,
-                "cnpj": b.cnpj,
-            }
-            for b in db.scalars(select(Building)).all()
-        ]
-    if not companies:
-        companies = [
-            {
-                "id": c.id,
-                "name": c.name,
-                "tradeName": c.trade_name,
-                "companyName": c.name,
-                "cnpj": c.cnpj,
-            }
-            for c in db.scalars(select(Company)).all()
-        ]
-    if not credores:
-        credores = [
-            {
-                "id": c.id,
-                "name": c.name,
-                "tradeName": c.trade_name,
-                "cnpj": c.cnpj,
-                "city": c.city,
-                "state": c.state,
-                "active": c.active,
-            }
-            for c in db.scalars(select(Creditor)).all()
-        ]
-    if not usuarios:
-        usuarios = [
-            {
-                "id": row.id,
-                "name": row.name,
-                "nome": row.name,
-                "email": row.email,
-                "active": row.active,
-            }
-            for row in db.scalars(select(DirectoryUser).order_by(DirectoryUser.name)).all()
-        ]
+        def _date_expr(col: str) -> str:
+            # Postgres: left(col, 10) -> 'YYYY-MM-DD'
+            if dialect_name in {"postgresql", "postgres"}:
+                return f"left({col}, 10)"
+            # SQLite: substr(col,1,10)
+            return f"substr({col}, 1, 10)"
 
-    building_map: dict[str, dict[str, Any]] = {}
-    for obra in obras:
-        normalized = _normalize_building(obra)
-        for bid in {
-            str(normalized.get("code") or ""),
-            str(normalized.get("id") or ""),
-        }:
-            if bid and bid not in {"None", "undefined"}:
-                building_map[bid] = normalized
-
-    creditor_map: dict[str, str] = {}
-    for credor in credores:
-        normalized = _normalize_creditor(credor)
-        cid = str(normalized.get("id") or "")
-        if cid:
-            creditor_map[cid] = normalized["name"]
-
-    user_map: dict[str, str] = {}
-    for user in usuarios:
-        normalized = _normalize_user(user)
-        uid = str(normalized["id"])
-        if uid:
-            user_map[uid] = normalized["name"]
-
-    normalized_orders: list[dict[str, Any]] = []
-    for pedido in pedidos:
-        building_id = str(pedido.get("codigoVisivelObra") or pedido.get("idObra") or pedido.get("buildingId") or "")
-        supplier_id = str(pedido.get("codigoFornecedor") or pedido.get("idCredor") or pedido.get("supplierId") or "")
-        buyer_id = str(pedido.get("idComprador") or pedido.get("codigoComprador") or pedido.get("buyerId") or "")
-        building_info = building_map.get(building_id, {})
-        normalized_orders.append(
-            {
-                "id": pedido.get("id") or pedido.get("numero") or 0,
-                "buildingId": int(building_id) if building_id.isdigit() else 0,
-                "idObra": int(building_id) if building_id.isdigit() else 0,
-                "codigoVisivelObra": building_id,
-                "companyId": pedido.get("companyId") or building_info.get("companyId"),
-                "buyerId": buyer_id,
-                "idComprador": buyer_id,
-                "codigoComprador": buyer_id,
-                "supplierId": int(supplier_id) if supplier_id.isdigit() else 0,
-                "codigoFornecedor": int(supplier_id) if supplier_id.isdigit() else 0,
-                "date": pedido.get("data") or pedido.get("dataEmissao") or pedido.get("date") or "",
-                "dataEmissao": pedido.get("data") or pedido.get("dataEmissao") or pedido.get("date") or "",
-                "totalAmount": _safe_float(pedido.get("totalAmount") or pedido.get("valorTotal")),
-                "valorTotal": _safe_float(pedido.get("totalAmount") or pedido.get("valorTotal")),
-                "status": pedido.get("status") or pedido.get("situacao") or "N/A",
-                "situacao": pedido.get("status") or pedido.get("situacao") or "N/A",
-                "paymentCondition": pedido.get("condicaoPagamento") or pedido.get("paymentMethod") or "A Prazo",
-                "condicaoPagamento": pedido.get("condicaoPagamento") or pedido.get("paymentMethod") or "A Prazo",
-                "deliveryDate": pedido.get("dataEntrega") or pedido.get("prazoEntrega") or "",
-                "dataEntrega": pedido.get("dataEntrega") or pedido.get("prazoEntrega") or "",
-                "internalNotes": pedido.get("internalNotes") or pedido.get("observacao") or "",
-                "observacao": pedido.get("internalNotes") or pedido.get("observacao") or "",
-                "nomeObra": pedido.get("nomeObra") or building_info.get("name") or (f"Obra {building_id}" if building_id else "Obra sem nome"),
-                "nomeFornecedor": pedido.get("nomeFornecedor") or creditor_map.get(supplier_id) or (f"Credor {supplier_id}" if supplier_id else "Credor sem nome"),
-                "nomeComprador": pedido.get("nomeComprador") or pedido.get("buyerName") or user_map.get(buyer_id) or buyer_id,
-                "solicitante": pedido.get("solicitante") or pedido.get("requesterId") or pedido.get("createdBy") or user_map.get(buyer_id) or buyer_id,
-                "requesterId": pedido.get("requesterId") or pedido.get("solicitante") or pedido.get("createdBy") or user_map.get(buyer_id) or buyer_id,
-                "createdBy": pedido.get("createdBy") or pedido.get("nomeComprador") or user_map.get(buyer_id) or buyer_id,
-            }
-        )
-
-    normalized_financial: list[dict[str, Any]] = []
-    for item in financeiro:
-        creditor_id = str(item.get("creditorId") or item.get("idCredor") or item.get("codigoFornecedor") or item.get("debtorId") or "")
-        building_id = str(item.get("idObra") or item.get("codigoObra") or item.get("enterpriseId") or item.get("buildingId") or "")
-        building_info = building_map.get(building_id, {})
-        company_id = (
-            item.get("companyId")
-            or next(
-                (
-                    lnk["href"].rstrip("/").split("/")[-1]
-                    for lnk in (item.get("links") or [])
-                    if lnk.get("rel") == "company" and lnk.get("href")
-                ),
-                None,
+        where_params: dict[str, Any] = {}
+        where_pedidos = ""
+        where_financeiro = ""
+        where_receber = ""
+        if start_date and end_date:
+            where_params = {"start_date": start_date, "end_date": end_date}
+            pedidos_date = _date_expr("data_emissao")
+            financeiro_date = _date_expr("data_vencimento")
+            receber_date = _date_expr("data_vencimento")
+            where_pedidos = (
+                f"WHERE data_emissao IS NOT NULL AND {pedidos_date} <> '' "
+                f"AND {pedidos_date} >= :start_date AND {pedidos_date} <= :end_date"
             )
-            or building_info.get("companyId")
-        )
-        name = item.get("nomeCredor") or item.get("creditorName") or item.get("nomeFantasiaCredor") or item.get("fornecedor") or item.get("credor") or creditor_map.get(creditor_id) or "Credor sem nome"
-        normalized_financial.append(
-            {
-                "id": item.get("id") or item.get("numero") or item.get("codigoTitulo") or item.get("documentNumber") or 0,
-                "companyId": int(company_id) if str(company_id).isdigit() else company_id,
-                "creditorId": creditor_id,
-                "buildingId": int(building_id) if building_id.isdigit() else 0,
-                "idObra": int(building_id) if building_id.isdigit() else 0,
-                "codigoObra": building_id,
-                "dataVencimento": item.get("dataVencimento") or item.get("issueDate") or item.get("dueDate") or item.get("dataVencimentoProjetado") or item.get("dataEmissao") or item.get("dataContabil") or "",
-                "descricao": item.get("descricao") or item.get("historico") or item.get("tipoDocumento") or item.get("notes") or item.get("observacao") or "Título a Pagar",
-                "valor": _safe_float(item.get("totalInvoiceAmount") or item.get("valor") or item.get("amount") or item.get("valorTotal") or item.get("valorLiquido") or item.get("valorBruto")),
-                "situacao": item.get("situacao") or item.get("status") or "Pendente",
-                "creditorName": name,
-                "nomeCredor": name,
-                "nomeObra": item.get("nomeObra") or building_info.get("name") or (f"Obra {building_id}" if building_id else "Obra sem nome"),
-                "documentNumber": item.get("documentNumber") or item.get("numeroDocumento") or item.get("numero") or item.get("codigoTitulo") or "",
-                "links": item.get("links") or [],
-            }
-        )
+            where_financeiro = (
+                f"WHERE data_vencimento IS NOT NULL AND {financeiro_date} <> '' "
+                f"AND {financeiro_date} >= :start_date AND {financeiro_date} <= :end_date"
+            )
+            where_receber = (
+                f"WHERE data_vencimento IS NOT NULL AND {receber_date} <> '' "
+                f"AND {receber_date} >= :start_date AND {receber_date} <= :end_date"
+            )
+        try:
+            for row in db.execute(text(f"SELECT * FROM vw_pedidos {where_pedidos}"), where_params).mappings():
+                pedidos.append({
+                    "id": row["id"] or 0,
+                    "buildingId": row["building_id"] or 0,
+                    "idObra": row["building_id"] or 0,
+                    "codigoVisivelObra": str(row["building_id"] or ""),
+                    "companyId": row["company_id"],
+                    "buyerId": row["buyer_id"] or "",
+                    "idComprador": row["buyer_id"] or "",
+                    "codigoComprador": row["buyer_id"] or "",
+                    "supplierId": row["supplier_id"] or 0,
+                    "codigoFornecedor": row["supplier_id"] or 0,
+                    "date": row["data_emissao"] or "",
+                    "dataEmissao": row["data_emissao"] or "",
+                    "totalAmount": float(row["total_amount"] or 0),
+                    "valorTotal": float(row["total_amount"] or 0),
+                    "status": row["status"] or "N/A",
+                    "situacao": row["status"] or "N/A",
+                    "paymentCondition": row["payment_condition"] or "A Prazo",
+                    "condicaoPagamento": row["payment_condition"] or "A Prazo",
+                    "deliveryDate": row["delivery_date"] or "",
+                    "dataEntrega": row["delivery_date"] or "",
+                    "internalNotes": row["internal_notes"] or "",
+                    "observacao": row["internal_notes"] or "",
+                    "nomeObra": row["nome_obra"] or f"Obra {row['building_id']}",
+                    "nomeFornecedor": row["nome_fornecedor"] or f"Credor {row['supplier_id']}",
+                    "nomeComprador": row["nome_comprador"] or row["buyer_id"],
+                    "solicitante": row["solicitante"] or row["buyer_id"],
+                    "requesterId": row["solicitante"] or row["buyer_id"],
+                    "createdBy": row["solicitante"] or row["buyer_id"],
+                })
 
-    normalized_receivable: list[dict[str, Any]] = []
-    for item in receber:
-        building_id = str(item.get("idObra") or item.get("codigoObra") or item.get("enterpriseId") or item.get("buildingId") or "")
-        building_info = building_map.get(building_id, {})
-        links = item.get("links") or []
-        raw_value = _safe_float(
-            item.get("rawValue")
-            if item.get("rawValue") is not None
-            else item.get("value")
-            or item.get("valor")
-            or item.get("valorSaldo")
-            or item.get("totalInvoiceAmount")
-            or item.get("valorTotal")
-            or item.get("amount")
-        )
-        company_id = item.get("companyId") or building_info.get("companyId") or _extract_company_id_from_links(links)
-        normalized_receivable.append(
-            {
-                "id": item.get("id") or item.get("numero") or item.get("numeroTitulo") or item.get("codigoTitulo") or item.get("documentNumber") or 0,
-                "companyId": int(company_id) if str(company_id).isdigit() else company_id,
-                "buildingId": int(building_id) if building_id.isdigit() else 0,
-                "idObra": int(building_id) if building_id.isdigit() else 0,
-                "codigoObra": building_id,
-                "dataVencimento": item.get("data") or item.get("date") or item.get("dataVencimento") or item.get("dataEmissao") or item.get("issueDate") or item.get("dataVencimentoProjetado") or "",
-                "descricao": item.get("descricao") or item.get("historico") or item.get("observacao") or item.get("notes") or item.get("description") or "Título a Receber",
-                "nomeCliente": item.get("nomeCliente") or item.get("nomeFantasiaCliente") or item.get("cliente") or item.get("clientName") or "Extrato/Cliente",
-                "valor": abs(raw_value),
-                "rawValue": raw_value,
-                "situacao": str(item.get("situacao") or item.get("status") or "ABERTO").upper(),
-                "nomeObra": item.get("nomeObra") or building_info.get("name") or (f"Obra {building_id}" if building_id else "Obra sem nome"),
-                "documentId": item.get("documentId") or "",
-                "documentNumber": item.get("documentNumber") or "",
-                "installmentNumber": item.get("installmentNumber"),
-                "statementOrigin": item.get("statementOrigin") or "",
-                "statementType": item.get("statementType") or "",
-                "billId": item.get("billId"),
-                "type": item.get("type") or "Income",
-                # bankAccountCode extraído do link rel="bank-account" (ex: ...bank-account/SANTANDER)
-                "bankAccountCode": (
-                    item.get("bankAccountCode")
-                    or next(
-                        (lnk["href"].rstrip("/").split("/")[-1]
-                         for lnk in links
-                         if lnk.get("rel") == "bank-account" and lnk.get("href")),
-                        "",
-                    )
-                ),
-                "links": links,
-            }
-        )
+            for row in db.execute(text(f"SELECT * FROM vw_financeiro {where_financeiro}"), where_params).mappings():
+                financeiro.append({
+                    "id": row["id"] or 0,
+                    "numero": row["id"] or 0,
+                    "codigoTitulo": row["id"] or 0,
+                    "companyId": row["company_id"],
+                    "creditorId": row["creditor_id"] or "",
+                    "idCredor": row["creditor_id"] or "",
+                    "buildingId": row["building_id"] or 0,
+                    "idObra": row["building_id"] or 0,
+                    "codigoObra": str(row["building_id"] or ""),
+                    "dataVencimento": row["data_vencimento"] or "",
+                    "descricao": row["descricao"] or "Título a Pagar",
+                    "valor": float(row["valor"] or 0),
+                    "situacao": row["situacao"] or "Pendente",
+                    "status": row["situacao"] or "Pendente",
+                    "creditorName": row["creditor_name"] or f"Credor {row['creditor_id']}",
+                    "nomeCredor": row["creditor_name"] or f"Credor {row['creditor_id']}",
+                    "nomeObra": row["nome_obra"] or f"Obra {row['building_id']}",
+                    "documentNumber": row["document_number"] or "",
+                })
 
-    saldo_bancario = sum(
-        _safe_float(item.get("rawValue"))
-        for item in normalized_receivable
-        if str(item.get("type") or "").strip().lower() != "expense"
-    ) - sum(
-        _safe_float(item.get("rawValue"))
-        for item in normalized_receivable
-        if str(item.get("type") or "").strip().lower() == "expense"
-    )
+            for row in db.execute(text(f"SELECT * FROM vw_receber {where_receber}"), where_params).mappings():
+                receber.append({
+                    "id": row["id"] or 0,
+                    "numero": row["id"] or 0,
+                    "numeroTitulo": row["id"] or 0,
+                    "codigoTitulo": row["id"] or 0,
+                    "companyId": row["company_id"],
+                    "clientId": row["client_id"] or "",
+                    "buildingId": row["building_id"] or 0,
+                    "idObra": row["building_id"] or 0,
+                    "codigoObra": str(row["building_id"] or ""),
+                    "dataVencimento": row["data_vencimento"] or "",
+                    "dataPagamento": row["data_pagamento"] or "",
+                    "valor": float(row["valor"] or 0),
+                    "descricao": row["descricao"] or "Título a Receber",
+                    "situacao": row["situacao"] or "Pendente",
+                    "clientName": row["client_name"] or f"Cliente {row['client_id']}",
+                    "nomeCliente": row["client_name"] or f"Cliente {row['client_id']}",
+                    "nomeObra": row["nome_obra"] or f"Obra {row['building_id']}",
+                    "documentNumber": row["document_number"] or "",
+                })
+        except Exception as e:
+            # Fallback to mapping raw JSON caches if views fail
+            raw_pedidos = _to_array(_read_cached_dataset(db, "pedidos.json", []))
+            for item in raw_pedidos:
+                pedidos.append({
+                    "id": item.get("id") or 0,
+                    "buildingId": item.get("buildingId") or 0,
+                    "idObra": item.get("buildingId") or 0,
+                    "codigoVisivelObra": str(item.get("buildingId") or ""),
+                    "companyId": item.get("companyId"),
+                    "buyerId": item.get("buyerId") or "",
+                    "idComprador": item.get("buyerId") or "",
+                    "codigoComprador": item.get("buyerId") or "",
+                    "supplierId": item.get("supplierId") or 0,
+                    "codigoFornecedor": item.get("supplierId") or 0,
+                    "date": item.get("date") or item.get("dataEmissao") or "",
+                    "dataEmissao": item.get("date") or item.get("dataEmissao") or "",
+                    "totalAmount": float(item.get("totalAmount") or item.get("amount") or 0),
+                    "valorTotal": float(item.get("totalAmount") or item.get("amount") or 0),
+                    "status": item.get("status") or item.get("situacao") or "N/A",
+                    "situacao": item.get("status") or item.get("situacao") or "N/A",
+                    "paymentCondition": item.get("paymentCondition") or "A Prazo",
+                    "condicaoPagamento": item.get("paymentCondition") or "A Prazo",
+                    "deliveryDate": item.get("deliveryDate") or "",
+                    "dataEntrega": item.get("deliveryDate") or "",
+                    "internalNotes": item.get("internalNotes") or "",
+                    "observacao": item.get("internalNotes") or "",
+                    "nomeObra": item.get("buildingName") or f"Obra {item.get('buildingId')}",
+                    "nomeFornecedor": item.get("supplierName") or f"Credor {item.get('supplierId')}",
+                    "nomeComprador": item.get("buyerName") or item.get("buyerId"),
+                    "solicitante": item.get("requesterName") or item.get("requesterId"),
+                    "requesterId": item.get("requesterName") or item.get("requesterId"),
+                    "createdBy": item.get("requesterName") or item.get("requesterId"),
+                })
+
+            raw_financeiro = _to_array(_read_cached_dataset(db, "financeiro.json", []))
+            for item in raw_financeiro:
+                financeiro.append({
+                    "id": item.get("id") or 0,
+                    "numero": item.get("id") or 0,
+                    "codigoTitulo": item.get("id") or 0,
+                    "companyId": item.get("companyId") or item.get("company_id"),
+                    "creditorId": item.get("creditorId") or "",
+                    "idCredor": item.get("creditorId") or "",
+                    "buildingId": item.get("buildingId") or 0,
+                    "idObra": item.get("buildingId") or 0,
+                    "codigoObra": str(item.get("buildingId") or ""),
+                    "dataVencimento": item.get("dueDate") or item.get("dataVencimento") or "",
+                    "dueDate": item.get("dueDate") or item.get("dataVencimento") or "",
+                    "descricao": item.get("description") or item.get("notes") or "Título a Pagar",
+                    "valor": float(item.get("amount") or item.get("totalInvoiceAmount") or item.get("valor") or 0),
+                    "amount": float(item.get("amount") or item.get("totalInvoiceAmount") or item.get("valor") or 0),
+                    "situacao": item.get("status") or item.get("situacao") or "Pendente",
+                    "status": item.get("status") or item.get("situacao") or "Pendente",
+                    "creditorName": item.get("creditorName") or f"Credor {item.get('creditorId')}",
+                    "nomeCredor": item.get("creditorName") or f"Credor {item.get('creditorId')}",
+                    "nomeObra": item.get("buildingName") or f"Obra {item.get('buildingId')}",
+                    "documentNumber": item.get("documentNumber") or "",
+                })
+
+            raw_receber = _to_array(_read_cached_dataset(db, "receber.json", []))
+            for item in raw_receber:
+                receber.append({
+                    "id": item.get("id") or 0,
+                    "numero": item.get("id") or 0,
+                    "numeroTitulo": item.get("id") or 0,
+                    "codigoTitulo": item.get("id") or 0,
+                    "companyId": item.get("companyId") or item.get("company_id"),
+                    "clientId": item.get("customerId") or item.get("clientId") or "",
+                    "buildingId": item.get("buildingId") or 0,
+                    "idObra": item.get("buildingId") or 0,
+                    "codigoObra": str(item.get("buildingId") or ""),
+                    "dataVencimento": item.get("dueDate") or item.get("dataVencimento") or "",
+                    "dueDate": item.get("dueDate") or item.get("dataVencimento") or "",
+                    "dataPagamento": item.get("paymentDate") or item.get("dataPagamento") or "",
+                    "valor": float(item.get("amount") or item.get("rawValue") or item.get("valor") or 0),
+                    "amount": float(item.get("amount") or item.get("rawValue") or item.get("valor") or 0),
+                    "descricao": item.get("description") or item.get("notes") or "Título a Receber",
+                    "situacao": item.get("status") or item.get("situacao") or "Pendente",
+                    "status": item.get("status") or item.get("situacao") or "Pendente",
+                    "clientName": item.get("customerName") or item.get("clientName") or f"Cliente {item.get('customerId')}",
+                    "nomeCliente": item.get("customerName") or item.get("clientName") or f"Cliente {item.get('customerId')}",
+                    "nomeObra": item.get("buildingName") or f"Obra {item.get('buildingId')}",
+                    "documentNumber": item.get("documentNumber") or "",
+                })
 
     return {
-        "obras": list(building_map.values()),
-        "usuarios": [_normalize_user(user) for user in usuarios],
-        "credores": [_normalize_creditor(credor) for credor in credores],
-        "companies": [_normalize_company(company) for company in companies],
-        "pedidos": normalized_orders,
-        "financeiro": normalized_financial,
-        "receber": normalized_receivable,
-        "itensPedidos": {str(key): value for key, value in itens_pedidos.items()},
-        "saldoBancario": saldo_bancario,
-        "latestSync": read_sync_metadata(db),
+        "obras": obras,
+        "usuarios": usuarios,
+        "credores": credores,
+        "companies": companies,
+        "pedidos": pedidos,
+        "financeiro": financeiro,
+        "receber": receber,
+        "itens_pedidos": {},
     }
 
 
@@ -713,7 +895,7 @@ async def run_sync_once(db: Session, source: str = "manual") -> dict[str, Any]:
     _SYNC_STATE["started_at"] = utc_now_iso()
 
     try:
-        payload = await _perform_sync(db)
+        payload = await _perform_sync(db, source=source)
         payload["in_progress"] = False
         payload["message"] = (payload.get("latestSync") or {}).get("message")
         return payload
@@ -724,7 +906,7 @@ async def run_sync_once(db: Session, source: str = "manual") -> dict[str, Any]:
         _SYNC_LOCK.release()
 
 
-async def _perform_sync(db: Session) -> dict[str, Any]:
+async def _perform_sync(db: Session, *, source: str = "manual") -> dict[str, Any]:
     started_at = utc_now_iso()
 
     obras = await sienge_client.fetch_obras()
@@ -743,17 +925,113 @@ async def _perform_sync(db: Session) -> dict[str, Any]:
     if credores:
         _write_cached_dataset(db, "credores.json", credores)
 
-    pedidos = await sienge_client.fetch_pedidos()
-    if pedidos:
-        _write_cached_dataset(db, "pedidos.json", pedidos)
+    # Atualiza as tabelas de catálogo usadas pela UI.
+    # Sem isso, /api/companies, /api/buildings, /api/creditors e /api/directory/users
+    # ficam "congelados" após o seed inicial.
+    if any([obras, usuarios, empresas, credores]):
+        upsert_catalog_from_sienge(
+            db,
+            obras=obras if obras else None,
+            usuarios=usuarios if usuarios else None,
+            empresas=empresas if empresas else None,
+            credores=credores if credores else None,
+        )
 
-    financeiro = await sienge_client.fetch_financeiro()
-    if financeiro:
-        _write_cached_dataset(db, "financeiro.json", financeiro)
+    # Transacionais: atualiza cache de forma incremental para não destruir histórico.
+    pedidos: list[dict[str, Any]] = []
+    financeiro: list[dict[str, Any]] = []
+    receber: list[dict[str, Any]] = []
 
-    receber = await sienge_client.fetch_receber()
-    if receber:
-        _write_cached_dataset(db, "receber.json", receber)
+    if sienge_client.is_configured:
+        try:
+            immutable_meta = read_snapshot(db, "sienge_immutable_history_meta", default={})
+            if isinstance(immutable_meta, dict) and immutable_meta.get("completed") is True:
+                today = date_only.today()
+                if source == "scheduler":
+                    start_date = today.strftime("%Y-%m-%d")
+                else:
+                    start_date = (today - timedelta(days=8)).strftime("%Y-%m-%d")
+                end_date = today.strftime("%Y-%m-%d")
+            else:
+                start_date, end_date = sienge_client._sync_date_range()  # type: ignore[attr-defined]
+        except Exception:
+            start_date, end_date = None, None
+
+        if start_date and end_date:
+            await _ensure_cached_dataset_range(
+                db=db,
+                dataset_key="pedidos",
+                start_date=start_date,
+                end_date=end_date,
+                fetcher=sienge_client.fetch_pedidos_range,
+                date_fields_for_infer=["data", "dataEmissao", "date"],
+            )
+            await _ensure_cached_dataset_range(
+                db=db,
+                dataset_key="financeiro",
+                start_date=start_date,
+                end_date=end_date,
+                fetcher=sienge_client.fetch_financeiro_range,
+                date_fields_for_infer=[
+                    "dataVencimento",
+                    "dueDate",
+                    "issueDate",
+                    "dataEmissao",
+                    "dataContabil",
+                ],
+            )
+            await _ensure_cached_dataset_range(
+                db=db,
+                dataset_key="receber",
+                start_date=start_date,
+                end_date=end_date,
+                fetcher=sienge_client.fetch_receber_range,
+                date_fields_for_infer=[
+                    "dataVencimento",
+                    "dueDate",
+                    "data",
+                    "date",
+                    "issueDate",
+                    "dataEmissao",
+                ],
+            )
+
+    pedidos = _to_array(_read_cached_dataset(db, "pedidos.json", []))
+    financeiro = _to_array(_read_cached_dataset(db, "financeiro.json", []))
+    receber = _to_array(_read_cached_dataset(db, "receber.json", []))
+
+    # Atualiza agregados operacionais (incremental: mês atual).
+    try:
+        from backend.services.operational_aggregates import ensure_operational_aggregates
+
+        ensure_operational_aggregates(db)
+    except Exception:
+        # não quebra o sync por falha em agregados
+        pass
+
+    # NF-e: atualiza apenas a janela recente (últimos 8 dias) no modo incremental.
+    try:
+        await _sync_current_month_nfe(db)
+    except Exception:
+        pass
+
+    # Histórico imutável (desde 2019): baixa meses faltantes sem repetir.
+    # No startup, por padrão baixa tudo de uma vez.
+    try:
+        if sienge_client.is_configured:
+            allow_startup_backfill = str(os.getenv("SIENGE_IMMUTABLE_BACKFILL_ON_STARTUP", "true") or "true").lower() in {
+                "1",
+                "true",
+                "yes",
+                "y",
+                "on",
+            }
+            if source == "startup" and allow_startup_backfill:
+                await _ensure_immutable_history_step(db, months_per_run_override=240)
+            else:
+                await _ensure_immutable_history_step(db)
+    except Exception:
+        pass
 
     itens_pedidos = _read_cached_dataset(db, "itens_pedidos.json", {}) or {}
 
@@ -839,14 +1117,45 @@ async def test_connection(db: Session = Depends(get_db)) -> dict[str, Any]:
         }
 
 
+@router.get("/immutable/status")
+async def immutable_status(
+    current_user: AppUser = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> dict[str, Any]:
+    meta = read_snapshot(db, "sienge_immutable_history_meta", default={})
+    if not isinstance(meta, dict):
+        meta = {}
+    ranges = read_snapshot(db, "sienge_ranges", default={})
+    if not isinstance(ranges, dict):
+        ranges = {}
+    return {
+        "ok": True,
+        "configured": bool(sienge_client.is_configured),
+        "meta": meta,
+        "ranges": ranges,
+        "syncState": get_sync_state(),
+    }
+
+
+@router.post("/immutable/backfill")
+async def immutable_backfill(
+    months: int = Query(12, ge=1, le=240, description="Quantidade de meses a processar nesta execução"),
+    current_user: AppUser = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> dict[str, Any]:
+    if not sienge_client.is_configured:
+        return {"ok": False, "configured": False, "message": "Sienge não configurado"}
+    result = await _ensure_immutable_history_step(db, months_per_run_override=months)
+    return {"ok": True, "configured": True, "result": result}
+
+
 @router.get("/bootstrap", response_model=BootstrapResponse)
 async def bootstrap(
     current_user: AppUser = Depends(get_current_user),
     db: Session = Depends(get_db),
 ) -> BootstrapResponse:
-    # Bootstrap leve: retorna apenas metadados (obras/usuarios/credores).
-    # Pedidos/financeiro/receber chegam via /filtered (filtrado, pequeno).
-    result = _normalize_response_payload({}, db)
+    # Bootstrap leve para UI carregar instantâneo
+    result = _normalize_response_payload({}, db, include_transactions=False)
     counts = _cache_counts(db)
     result.cacheReady = counts.get("pedidos", 0) > 0 or counts.get("financeiro", 0) > 0
     result.cacheCounts = counts
@@ -855,10 +1164,37 @@ async def bootstrap(
 
 @router.post("/sync")
 async def sync(
+    force: bool = True,
+    source: str = "manual",
     current_user: AppUser = Depends(get_current_user),
     db: Session = Depends(get_db),
 ) -> dict[str, Any]:
-    payload = await run_sync_once(db, source="manual")
+    # Throttle: no modo automático, evita bater no SIENGE mais do que o intervalo configurado.
+    if not force:
+        latest = read_sync_metadata(db) or {}
+        last_dt = _parse_iso_datetime(latest.get("finished_at") or latest.get("started_at"))
+        if last_dt:
+            # Normaliza para naive UTC para comparação consistente.
+            if getattr(last_dt, "tzinfo", None) is not None:
+                try:
+                    last_dt = last_dt.astimezone(timezone.utc).replace(tzinfo=None)
+                except Exception:
+                    last_dt = last_dt.replace(tzinfo=None)
+            now = datetime.now(timezone.utc).replace(tzinfo=None)
+            if (now - last_dt) < timedelta(minutes=SIENGE_SYNC_INTERVAL_MINUTES) and latest.get("status") in {"success", "degraded"}:
+                return {
+                    "status": "ok",
+                    "message": "Cache ainda está recente; sync automático ignorado.",
+                    "synced": False,
+                    "skipped": True,
+                    "in_progress": False,
+                    "syncState": get_sync_state(),
+                    "source": latest.get("source") or "cache",
+                    "latestSync": latest,
+                    "data": (latest.get("counts") or {}),
+                }
+
+    payload = await run_sync_once(db, source=source)
     latest_sync = payload.get("latestSync", {})
     synced = bool(payload.get("synced", False))
     in_progress = bool(payload.get("in_progress", False))
@@ -872,6 +1208,7 @@ async def sync(
         ),
         "synced": synced,
         "in_progress": in_progress,
+        "skipped": bool(payload.get("skipped", False)),
         "syncState": get_sync_state(),
         "source": payload.get("source", "unknown"),
         "latestSync": latest_sync,
@@ -937,12 +1274,13 @@ async def filtered_data(
             ],
         )
 
-    payload = _legacy_bootstrap_payload(db)
-
-    obras = _to_array(payload.get("obras", []))
-    pedidos = _to_array(payload.get("pedidos", []))
-    financeiro = _to_array(payload.get("financeiro", []))
-    receber = _to_array(payload.get("receber", []))
+    # Performance: para filtrar, usamos diretamente os snapshots (cache) em vez
+    # de consultar vw_* (que pode ser caro por extrair JSON de sienge_raw_records).
+    obras = _to_array(_read_cached_dataset(db, "obras.json", []))
+    pedidos = _to_array(_read_cached_dataset(db, "pedidos.json", []))
+    financeiro = _to_array(_read_cached_dataset(db, "financeiro.json", []))
+    receber = _to_array(_read_cached_dataset(db, "receber.json", []))
+    latest_sync = read_sync_metadata(db) or {}
 
     building_company_map: dict[str, str] = {}
     for obra in obras:
@@ -1143,7 +1481,7 @@ async def filtered_data(
 
     filtered_orders = []
     for order in pedidos:
-        date_numeric = _to_date_number(order.get("date") or order.get("dataEmissao"))
+        date_numeric = _to_date_number(order.get("dataEmissao") or order.get("data") or order.get("date"))
         if not _in_range(date_numeric, start_ms, end_exclusive_ms):
             continue
         if company_id != "all" and order_company(order) != company_id:
@@ -1318,7 +1656,7 @@ async def filtered_data(
         "pedidos": filtered_orders,
         "financeiro": filtered_financial,
         "receber": filtered_receber,
-        "latestSync": payload.get("latestSync"),
+        "latestSync": latest_sync,
         "filters": {
             "start_date": start_date,
             "end_date": end_date,
@@ -1342,7 +1680,7 @@ async def mc_by_building(
     building_id: str = "all",
     user_id: str = "all",
     requester_id: str = "all",
-    top: int = Query(5, ge=1, le=50),
+    top: int = Query(5, ge=1, le=500),
     debug: bool = Query(False, description="Quando true, inclui diagnóstico detalhado do rateio por obra"),
     time_budget_seconds: int = Query(90, ge=10, le=240, description="Tempo máximo (s) para buscar rateios faltantes antes de responder"),
     max_concurrency: int = Query(10, ge=2, le=50, description="Concorrência máxima de chamadas ao Sienge (valores altos tendem a gerar 429)"),

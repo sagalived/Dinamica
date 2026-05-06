@@ -15,9 +15,9 @@ FLET_PORT = int(os.getenv("FLET_PORT", "8550"))
 
 DATABASE_URL = os.getenv(
     "DATABASE_URL",
-    "postgresql+psycopg2://postgres:postgres@127.0.0.1:5432/dinamica",
+    "postgresql+psycopg://postgres:admin@127.0.0.1:5432/Sienge",
 )
 JWT_SECRET = os.getenv("JWT_SECRET", "change-this-secret-in-production")
 JWT_ALGORITHM = "HS256"
 JWT_EXPIRE_MINUTES = int(os.getenv("JWT_EXPIRE_MINUTES", "480"))
-SIENGE_SYNC_INTERVAL_MINUTES = int(os.getenv("SIENGE_SYNC_INTERVAL_MINUTES", "20"))
+SIENGE_SYNC_INTERVAL_MINUTES = int(os.getenv("SIENGE_SYNC_INTERVAL_MINUTES", "360"))

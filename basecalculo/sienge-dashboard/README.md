@@ -16,12 +16,16 @@ http://localhost:5173
 
 ## Configure as credenciais
 
-Edite o arquivo `.env`:
+Este frontend consome dados via endpoints do backend em `/api` (ex.: `/api/sienge/bootstrap`).
+As credenciais do Sienge devem ficar no backend (no `.env`), não no bundle do navegador.
+
+Edite o arquivo `.env` (credenciais de teste/local):
 
 ```env
-VITE_SIENGE_BASE_URL=https://SEU_CLIENTE.sienge.com.br
-VITE_SIENGE_ACCESS_NAME=seu-access-name
-VITE_SIENGE_TOKEN=seu-token
+SIENGE_INSTANCE=SEU_CLIENTE
+SIENGE_BASE_URL=https://api.sienge.com.br/SEU_CLIENTE
+SIENGE_ACCESS_NAME=seu-access-name
+SIENGE_TOKEN=seu-token
 ```
 
 ## Fórmulas usadas

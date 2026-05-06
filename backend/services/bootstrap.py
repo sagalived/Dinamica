@@ -55,6 +55,16 @@ def ensure_seed_data(db: Session) -> None:
 
     if db.scalar(select(Building).limit(1)) is None:
         for item in _read_json("obras.json"):
+            raw_active = item.get("active")
+            raw_inactive = item.get("inactive")
+            if isinstance(raw_active, bool):
+                is_active = raw_active
+            elif isinstance(raw_inactive, bool):
+                is_active = not raw_inactive
+            else:
+                status = item.get("status") or item.get("situation") or item.get("situacao") or ""
+                status_text = str(status).strip().lower()
+                is_active = not any(token in status_text for token in ("inativ", "encerr", "cancel", "finaliz", "conclu"))
             db.merge(
                 Building(
                     id=int(item.get("id")),
@@ -66,6 +76,7 @@ def ensure_seed_data(db: Session) -> None:
                     created_by=item.get("createdBy"),
                     modified_by=item.get("modifiedBy"),
                     building_type=item.get("buildingTypeDescription"),
+                    active=bool(is_active),
                 )
             )
 

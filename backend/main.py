@@ -1,6 +1,7 @@
 import asyncio
 import logging
 import threading
+from datetime import datetime, timedelta, timezone
 
 from pathlib import Path
 
@@ -13,9 +14,10 @@ from sqlalchemy.orm import Session
 
 from backend.config import APP_NAME, BASE_DIR, SIENGE_SYNC_INTERVAL_MINUTES
 from backend.database import Base, SessionLocal, engine
-from backend.routers import admin, auth, catalog, core, dashboard, kanban, logistics, sienge
+from backend.routers import admin, auth, catalog, core, dashboard, kanban, logistics, sienge, operational
 from backend.routers.sienge import run_sync_once
 from backend.services.bootstrap import ensure_seed_data
+from backend.services.db_migrations import ensure_sqlite_schema
 
 # Load environment variables from project-root .env (independente do cwd)
 load_dotenv(dotenv_path=Path(__file__).resolve().parent.parent / ".env", override=False)
@@ -30,6 +32,7 @@ app.include_router(dashboard.router)
 app.include_router(admin.router)
 app.include_router(catalog.router)
 app.include_router(sienge.router)
+app.include_router(operational.router)
 app.include_router(kanban.router)
 app.include_router(logistics.router)
 
@@ -43,9 +46,22 @@ app.add_middleware(
 
 
 async def _run_sienge_scheduler() -> None:
-    interval_seconds = max(1, SIENGE_SYNC_INTERVAL_MINUTES) * 60
+    tz_br = timezone(timedelta(hours=-3))
+    target_hours = [0, 6, 12, 18]
     while True:
-        await asyncio.sleep(interval_seconds)
+        now = datetime.now(tz_br)
+        next_run = None
+        for h in target_hours:
+            candidate = now.replace(hour=h, minute=0, second=0, microsecond=0)
+            if candidate > now:
+                next_run = candidate
+                break
+        if next_run is None:
+            next_run = (now + timedelta(days=1)).replace(hour=0, minute=0, second=0, microsecond=0)
+        
+        wait_seconds = (next_run - now).total_seconds()
+        logger.info("SIENGE scheduler aguardando %d segundos (próxima execução: %s)", wait_seconds, next_run.strftime("%Y-%m-%d %H:%M:%S"))
+        await asyncio.sleep(wait_seconds)
         try:
             threading.Thread(
                 target=_run_sienge_sync_blocking,
@@ -75,6 +91,7 @@ async def on_startup() -> None:
     app.state.sienge_scheduler_task = None
     try:
         Base.metadata.create_all(bind=engine)
+        ensure_sqlite_schema(engine)
         with Session(engine) as db:
             ensure_seed_data(db)
         app.state.database_ready = True

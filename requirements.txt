@@ -1,7 +1,9 @@
 fastapi==0.115.12
 uvicorn==0.34.2
 sqlalchemy==2.0.40
+psycopg[binary]
 psycopg2-binary==2.9.10
+pg8000
 pandas==2.2.3
 httpx==0.28.1
 requests==2.32.3

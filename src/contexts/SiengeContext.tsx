@@ -41,7 +41,7 @@ import {
   AreaChart, Area, Cell, PieChart, Pie, LineChart, Line, Legend
 } from 'recharts';
 
-import { sienge as api, kanbanApi } from '../lib/api';
+import { sienge as api, api as baseApi, kanbanApi } from '../lib/api';
 import type { AuthUser, Building, Creditor, PriceAlert, PurchaseOrder, User } from '../lib/types';
 import { cn } from '../lib/utils';
 import { fixText } from '../lib/text';
@@ -360,7 +360,7 @@ export function SiengeProvider({ children }: { children: React.ReactNode }) {
     return null;
   }, [bootstrapHasCoreData]);
 
-  const applyBootstrapData = useCallback((payload: any) => {
+  const applyBootstrapData = useCallback(async (payload: any) => {
     const bDataRaw = Array.isArray(payload?.obras) ? payload.obras : [];
     const uDataRaw = Array.isArray(payload?.usuarios) ? payload.usuarios : [];
     const cDataRaw = Array.isArray(payload?.credores) ? payload.credores : [];
@@ -375,7 +375,20 @@ export function SiengeProvider({ children }: { children: React.ReactNode }) {
     const receberCount = Number(cacheCounts?.receber ?? 0);
     const isLightBootstrap = !!cacheCounts && rawOrdersArray.length === 0 && fDataRaw.length === 0 && rDataRaw.length === 0 && (pedidosCount > 0 || financeiroCount > 0 || receberCount > 0);
 
-    const bData = bDataRaw.map((b: any) => ({
+    let catalogActiveIds: Set<string> | null = null;
+    let catalogActiveRows: any[] = [];
+    try {
+      const resp = await baseApi.get('/buildings', { params: { active: 'true' } });
+      catalogActiveRows = Array.isArray(resp.data) ? resp.data : [];
+      if (catalogActiveRows.length > 0) {
+        catalogActiveIds = new Set(catalogActiveRows.map((row: any) => String(row?.id)));
+      }
+    } catch {
+      catalogActiveIds = null;
+      catalogActiveRows = [];
+    }
+
+    let bData = bDataRaw.map((b: any) => ({
       id: b.id,
       name: fixText(b.nome || b.name || b.tradeName || b.enterpriseName || b.address || `Obra ${b.code || b.codigoVisivel || b.id}`),
       code: String(b.code || b.codigoVisivel || b.id || ''),
@@ -385,6 +398,25 @@ export function SiengeProvider({ children }: { children: React.ReactNode }) {
       companyId: b.idCompany || b.companyId,
       engineer: fixText(b.engineer || b.responsavel || b.nomeResponsavel || b.gerente || b.engenheiro || b.responsavelTecnico || 'Aguardando Avaliação'),
     }));
+
+    // Por padrão, exibe apenas obras ativas (via /api/buildings?active=true)
+    if (catalogActiveIds && catalogActiveIds.size > 0) {
+      bData = bData.filter((b: any) => catalogActiveIds!.has(String(b?.id)));
+    }
+
+    // Fallback: se o bootstrap não trouxe obras (ou foi todo filtrado), usa o catálogo do DB.
+    if (bData.length === 0 && catalogActiveRows.length > 0) {
+      bData = catalogActiveRows.map((row: any) => ({
+        id: row.id,
+        name: fixText(row.name || `Obra ${row.id}`),
+        code: String(row.id || ''),
+        latitude: undefined,
+        longitude: undefined,
+        address: fixText(row.address),
+        companyId: row.company_id,
+        engineer: 'Aguardando Avaliação',
+      }));
+    }
 
     const uData = uDataRaw.map((u: any) => ({
       id: String(u.id),
@@ -629,7 +661,7 @@ export function SiengeProvider({ children }: { children: React.ReactNode }) {
         }
       }
 
-      applyBootstrapData(payload);
+      await applyBootstrapData(payload);
     } catch (error) {
       console.error('Error fetching initial data:', error);
       setApiStatus('offline');
@@ -728,39 +760,31 @@ export function SiengeProvider({ children }: { children: React.ReactNode }) {
     setApiStatus('checking');
     setSyncProgressSafe(1);
     try {
-      // Fase 1: refresh rápido (bootstrap). O refreshData já faz /sync só se o cache estiver vazio.
-      startLinearProgress(1, 80, 45_000);
-      const refreshed = await refreshData();
-      if (!refreshed) {
+      // Fase 1: executa sync manual (forçado) e recarrega bootstrap.
+      startLinearProgress(1, 75, 60_000);
+      const isConnected = await checkConnection();
+      if (!isConnected) {
         clearSyncProgressTimer();
         setSyncProgressSafe(0);
         return;
       }
 
-      // Fase 2: carregar dados filtrados para a UI (janela padrão de 12 meses)
-      startLinearProgress(80, 95, 25_000);
-      try {
-        const effectiveStart = hasManualDateFilter
-          ? (startDate || null)
-          : defaultWindow.start;
-        const effectiveEnd = hasManualDateFilter
-          ? (endDate || startDate || null)
-          : defaultWindow.end;
-
-        const params: any = {
-          company_id: selectedCompany,
-          building_id: fcSelectedBuilding,
-          user_id: selectedUser,
-          requester_id: selectedRequester,
-        };
-        if (effectiveStart) params.start_date = format(effectiveStart, 'yyyy-MM-dd');
-        if (effectiveEnd) params.end_date = format(effectiveEnd, 'yyyy-MM-dd');
-
-        const filteredResp = await api.get('/filtered', { params });
-        applyServerFilteredData(filteredResp.data);
-      } catch {
-        // mantém fallback já existente no effect — não quebra o fluxo do botão
+      let payload: any = null;
+      const syncResponse = await api.post('/sync', null, { params: { force: true, source: 'manual' } });
+      if (syncResponse.data?.in_progress) {
+        payload = await waitForSharedCache();
+      } else {
+        const refreshed = await api.get('/bootstrap');
+        payload = refreshed.data;
       }
+
+      if (payload) {
+        await applyBootstrapData(payload);
+      }
+
+      // Fase 2: atualizar dados filtrados para a UI (ou all-time no modo total).
+      // Removido o call para /filtered, o useEffect (runServerSideFiltering) cuidará disso localmente
+      startLinearProgress(75, 95, 5_000);
 
       clearSyncProgressTimer();
       setSyncProgressSafe(100);
@@ -775,6 +799,31 @@ export function SiengeProvider({ children }: { children: React.ReactNode }) {
       window.setTimeout(() => setSyncProgressSafe(0), 450);
     }
   };
+
+  useEffect(() => {
+    if (!sessionUser) return;
+    const intervalId = window.setInterval(async () => {
+      if (syncing) return;
+      if (apiStatus !== 'online') return;
+
+      const last = lastUpdate?.getTime?.() ?? 0;
+      const ageMs = Date.now() - last;
+      if (!Number.isFinite(ageMs) || ageMs < 6 * 60 * 60 * 1000) return;
+
+      try {
+        setSyncing(true);
+        await api.post('/sync', null, { params: { force: false, source: 'auto' } });
+        const refreshed = await api.get('/bootstrap');
+        await applyBootstrapData(refreshed.data);
+      } catch {
+        // Silencioso: não derruba a UI.
+      } finally {
+        setSyncing(false);
+      }
+    }, 60_000);
+
+    return () => window.clearInterval(intervalId);
+  }, [apiStatus, applyBootstrapData, lastUpdate, sessionUser, syncing]);
 
   const refreshData = async (): Promise<boolean> => {
     setLoading(true);
@@ -809,7 +858,7 @@ export function SiengeProvider({ children }: { children: React.ReactNode }) {
       }
 
       setDataRevision(0);
-      applyBootstrapData(payload);
+      await applyBootstrapData(payload);
       return true;
     } catch (error) {
       console.error('Error refreshing data:', error);
@@ -867,10 +916,11 @@ export function SiengeProvider({ children }: { children: React.ReactNode }) {
   ), []);
 
   const defaultWindow = useMemo(() => {
+    // “Últimos 12 meses” por mês fechado (não ancorado no dia do mês).
+    // Ex: hoje 05/05 → start 01/06 do ano anterior (12 meses incluindo o mês atual).
     const today = new Date();
     const end = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-    const twelveMonthsAgo = addMonths(end, -12);
-    const start = new Date(twelveMonthsAgo.getFullYear(), twelveMonthsAgo.getMonth(), twelveMonthsAgo.getDate());
+    const start = new Date(end.getFullYear(), end.getMonth() - 11, 1);
     return { start, end };
   }, []);
 
@@ -879,18 +929,18 @@ export function SiengeProvider({ children }: { children: React.ReactNode }) {
   const dateRange = useMemo(() => {
     const effectiveStartDate = hasManualDateFilter
       ? (startDate || null)
-      : defaultWindow.start;
+      : (globalPeriodMode === 'all' ? null : defaultWindow.start);
     const start = effectiveStartDate ? toStartOfDay(effectiveStartDate) : null;
     const effectiveEndDate = hasManualDateFilter
       ? (endDate || startDate || null)
-      : defaultWindow.end;
+      : (globalPeriodMode === 'all' ? null : defaultWindow.end);
     const endExclusive = effectiveEndDate ? addDays(new Date(
       effectiveEndDate.getFullYear(),
       effectiveEndDate.getMonth(),
       effectiveEndDate.getDate()
     ), 1).getTime() : null;
     return { start, endExclusive };
-  }, [defaultWindow.end, defaultWindow.start, endDate, hasManualDateFilter, startDate, toStartOfDay]);
+  }, [defaultWindow.end, defaultWindow.start, endDate, globalPeriodMode, hasManualDateFilter, startDate, toStartOfDay]);
 
   const matchesDateRange = useCallback((numericValue?: number) => {
     if (!dateRange.start && !dateRange.endExclusive) return true;
@@ -1225,10 +1275,13 @@ export function SiengeProvider({ children }: { children: React.ReactNode }) {
     const runServerSideFiltering = async () => {
       const effectiveStart = hasManualDateFilter
         ? (startDate || null)
-        : defaultWindow.start;
+        : (globalPeriodMode === 'all' ? null : defaultWindow.start);
       const effectiveEnd = hasManualDateFilter
         ? (endDate || startDate || null)
-        : defaultWindow.end;
+        : (globalPeriodMode === 'all' ? null : defaultWindow.end);
+
+      const startDateIso = effectiveStart ? format(effectiveStart, 'yyyy-MM-dd') : undefined;
+      const endDateIso = effectiveEnd ? format(effectiveEnd, 'yyyy-MM-dd') : undefined;
 
       // O endpoint de NF-e exige startDate/endDate. Mesmo que o modo global seja
       // “total”, usamos a janela padrão (últimos 12 meses) quando o usuário não
@@ -1236,6 +1289,9 @@ export function SiengeProvider({ children }: { children: React.ReactNode }) {
       const nfeStart = effectiveStart || defaultWindow.start;
       const nfeEnd = effectiveEnd || defaultWindow.end;
 
+      // Preferência: filtrar no backend (/filtered), pois:
+      // - Bootstrap é leve (não traz transações)
+      // - Títulos a pagar/receber nem sempre têm obra direta (backend faz rateio quando necessário)
       try {
         const params: any = {
           company_id: selectedCompany,
@@ -1243,18 +1299,15 @@ export function SiengeProvider({ children }: { children: React.ReactNode }) {
           user_id: selectedUser,
           requester_id: selectedRequester,
         };
-        if (effectiveStart) params.start_date = format(effectiveStart, 'yyyy-MM-dd');
-        if (effectiveEnd) params.end_date = format(effectiveEnd, 'yyyy-MM-dd');
+        if (startDateIso) params.start_date = startDateIso;
+        if (endDateIso) params.end_date = endDateIso;
 
-        const response = await api.get('/filtered', { params });
+        const filteredResponse = await api.get('/filtered', { params });
         if (!cancelled) {
-          applyServerFilteredData(response.data);
+          applyServerFilteredData(filteredResponse.data);
         }
-      } catch (error) {
-        if (cancelled) return;
-        // Fallback local se endpoint /filtered estiver indisponível.
-        // Usa refs (não estado) para não re-disparar o effect → evita loop.
-
+      } catch (err) {
+        // Fallback: filtragem local quando offline/erro no backend.
         const buildingPasses = (value: any): boolean => {
           if (fcSelectedBuilding === 'all') return true;
           const current = String(value?.buildingId ?? value?.idObra ?? value?.codigoObra ?? value?.buildingCode ?? '');
@@ -1286,9 +1339,11 @@ export function SiengeProvider({ children }: { children: React.ReactNode }) {
           return inDate && inBuilding && buildingPasses(r);
         });
 
-        setOrders(filteredOrders);
-        setFinancialTitles(filteredFinancial);
-        setReceivableTitles(filteredReceivable);
+        if (!cancelled) {
+          setOrders(filteredOrders);
+          setFinancialTitles(filteredFinancial);
+          setReceivableTitles(filteredReceivable);
+        }
       }
 
       // NF-e (Receita Operacional): busca independente do /filtered.
@@ -1464,6 +1519,29 @@ export function SiengeProvider({ children }: { children: React.ReactNode }) {
       return Array.from(ids).filter(id => companyBuildingIds.has(id)).length || companyBuildingIds.size;
     }
     return ids.size || buildings.length;
+  }, [buildings, financialTitles, orders, receivableTitles, selectedCompany]);
+
+  const activeBuildings = useMemo(() => {
+    const ids = new Set<string>();
+    orders.forEach((o) => { if (o?.buildingId) ids.add(String(o.buildingId)); });
+    financialTitles.forEach((f) => { if (f?.buildingId) ids.add(String(f.buildingId)); });
+    receivableTitles.forEach((r) => { if (r?.buildingId) ids.add(String(r.buildingId)); });
+
+    const byCompany = (list: any[]) => {
+      if (selectedCompany === 'all') return list;
+      const companyBuildingIds = new Set(
+        buildings.filter(b => String(b.companyId) === selectedCompany).map(b => String(b.id))
+      );
+      return list.filter((b) => companyBuildingIds.has(String(b.id)));
+    };
+
+    // Se não temos ids (ex: bootstrap leve recém carregado), cai para lista completa (ou por empresa).
+    if (ids.size === 0) {
+      return byCompany(buildings).slice().sort((a: any, b: any) => String(a?.name || '').localeCompare(String(b?.name || ''), 'pt-BR'));
+    }
+
+    const active = buildings.filter((b: any) => ids.has(String(b.id)) || (b?.code && ids.has(String(b.code))));
+    return byCompany(active).slice().sort((a: any, b: any) => String(a?.name || '').localeCompare(String(b?.name || ''), 'pt-BR'));
   }, [buildings, financialTitles, orders, receivableTitles, selectedCompany]);
 
   // Analytics Calculations
@@ -1804,6 +1882,7 @@ export function SiengeProvider({ children }: { children: React.ReactNode }) {
     selectedCompany, setSelectedCompany, selectedUser, setSelectedUser, selectedRequester, setSelectedRequester,
     globalPeriodMode, setGlobalPeriodMode,
     activeBuildingCount,
+    activeBuildings,
     applyFilters,
     syncSienge
   };

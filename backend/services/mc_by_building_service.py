@@ -162,6 +162,18 @@ async def compute_mc_by_building(
         doc_num = str(item.get("documentNumber") or "").strip().upper()
         return ("NF" in doc_id) or ("NF" in doc_num)
 
+    def _should_ignore(item: dict[str, Any]) -> bool:
+        statement_type = str(item.get("statementType") or item.get("operationType") or "").strip().lower()
+        origin = str(item.get("statementOrigin") or item.get("origin") or "").strip().lower()
+        # Ignora transferências e BC (movimentações bancárias que não entram no operacional)
+        if "transf" in statement_type or "transfer" in statement_type:
+            return True
+        if "saque" in statement_type:
+            return True
+        if origin == "bc":
+            return True
+        return False
+
     def _is_expense(item: dict[str, Any]) -> bool:
         typ = str(item.get("type") or "").strip().lower()
         if typ == "expense":
@@ -210,21 +222,31 @@ async def compute_mc_by_building(
         return bid_str
 
     receita_por_bill: dict[str, float] = {}
+    receita_por_obra_direto: dict[str, float] = {}
     custo_por_bill: dict[str, float] = {}
     custo_por_obra_direto: dict[str, float] = {}
     fallback_buildings_by_bill: dict[str, set[str]] = {}
     for item in receber:
         if not isinstance(item, dict):
             continue
+        if _should_ignore(item):
+            continue
         bill_id = item.get("billId") or item.get("bill_id")
         bill_id_str = str(bill_id or "").strip()
         bid = _item_building_id(item)
 
-        # Receita operacional: somente Income + NF
-        if _is_nota_fiscal_income(item):
+        # Receita operacional: toda entrada (não Expense). Preferimos billId->rateio,
+        # mas aceitamos alocação direta por obra quando não houver billId.
+        if not _is_expense(item):
+            amount = _amount_receber_abs(item)
+            if amount == 0:
+                continue
+            if bid and not bill_id_str:
+                receita_por_obra_direto[bid] = receita_por_obra_direto.get(bid, 0.0) + amount
+                continue
             if not bill_id_str:
                 continue
-            receita_por_bill[bill_id_str] = receita_por_bill.get(bill_id_str, 0.0) + _amount_receber_abs(item)
+            receita_por_bill[bill_id_str] = receita_por_bill.get(bill_id_str, 0.0) + amount
             if bid:
                 fallback_buildings_by_bill.setdefault(bill_id_str, set()).add(bid)
             continue
@@ -468,7 +490,7 @@ async def compute_mc_by_building(
         fallback_used_bills.add(bid)
         return [(b, 1.0) for b in sorted(fallback_buildings)]
 
-    receita_por_obra: dict[str, float] = {}
+    receita_por_obra: dict[str, float] = dict(receita_por_obra_direto)
     custo_por_obra: dict[str, float] = dict(custo_por_obra_direto)
 
     def allocate(target: dict[str, float], amount: float, weights: list[tuple[str, float]]) -> None:
@@ -489,7 +511,10 @@ async def compute_mc_by_building(
     for bid, custo in custo_por_bill.items():
         allocate(custo_por_obra, custo, weights_for_bill(bid))
 
-    obra_ids = {*(receita_por_obra.keys()), *(custo_por_obra.keys())}
+    # Inclui também todas as obras (para mostrar receita 0 no final), respeitando filtros.
+    obra_ids: set[str] = set(str(_normalize_building(o).get("id") or "").strip() for o in obras if isinstance(o, dict))
+    obra_ids.discard("")
+    obra_ids = {*(obra_ids), *(receita_por_obra.keys()), *(custo_por_obra.keys())}
     rows: list[dict[str, Any]] = []
     for obra_id in obra_ids:
         if building_aliases is not None and obra_id not in building_aliases:
@@ -514,7 +539,6 @@ async def compute_mc_by_building(
         )
 
     rows.sort(key=lambda r: float(r.get("receita_operacional") or 0.0), reverse=True)
-    all_rows_with_receita = [r for r in rows if float(r.get("receita_operacional") or 0.0) > 0]
 
     # Total deve refletir também obras com custo e receita 0 (MC negativo),
     # senão o dashboard fica “Receita = MC” ou “Total = 0” quando só há despesas.
@@ -522,7 +546,7 @@ async def compute_mc_by_building(
     total_mc = sum(float(r.get("mc") or 0.0) for r in rows)
     total_pct = (total_mc / total_receita * 100.0) if total_receita > 0 else 0.0
 
-    rows = all_rows_with_receita[: int(top)]
+    rows = rows[: int(top)]
 
     diag: dict[str, Any] = {
         "bills": len(bill_ids),

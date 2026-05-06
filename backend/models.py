@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import Boolean, Column, DateTime, Integer, String, Text, ForeignKey, Float
+from sqlalchemy import Boolean, Column, DateTime, Integer, String, Text, ForeignKey, Float, UniqueConstraint
 from sqlalchemy.orm import relationship
 
 from backend.database import Base
@@ -53,6 +53,7 @@ class Building(TimestampMixin, Base):
     created_by = Column(String(120), nullable=True)
     modified_by = Column(String(120), nullable=True)
     building_type = Column(String(120), nullable=True)
+    active = Column(Boolean, default=True, nullable=False)
 
 
 class Creditor(TimestampMixin, Base):
@@ -145,4 +146,49 @@ class SiengeSnapshot(TimestampMixin, Base):
     __tablename__ = "sienge_snapshots"
 
     key = Column(String(120), primary_key=True)
+    payload = Column(Text, nullable=False)
+
+
+class SiengeRawRecord(TimestampMixin, Base):
+    __tablename__ = "sienge_raw_records"
+
+    dataset = Column(String(80), primary_key=True)
+    record_id = Column(String(200), primary_key=True)
+    payload = Column(Text, nullable=False)
+
+
+class OperationalMonthlyAggregate(TimestampMixin, Base):
+    __tablename__ = "operational_monthly_aggregates"
+    __table_args__ = (
+        UniqueConstraint("month", "company_id", "building_id", name="uq_operational_month"),
+    )
+
+    id = Column(Integer, primary_key=True)
+    # YYYY-MM
+    month = Column(String(7), index=True, nullable=False)
+    # ids do SIENGE nem sempre são inteiros nos payloads; armazenamos como string
+    company_id = Column(String(40), index=True, nullable=True)
+    building_id = Column(String(40), index=True, nullable=True)
+
+    receita_operacional = Column(Float, nullable=False, default=0.0)
+    custo_variavel = Column(Float, nullable=False, default=0.0)
+    mc = Column(Float, nullable=False, default=0.0)
+    mc_percent = Column(Float, nullable=False, default=0.0)
+
+
+class SiengeNfeDocument(TimestampMixin, Base):
+    __tablename__ = "sienge_nfe_documents"
+
+    # ID do documento no Sienge (quando disponível). Se não existir, geramos assinatura estável.
+    document_id = Column(String(120), primary_key=True)
+
+    # Campos principais para consulta
+    issue_date = Column(String(10), index=True, nullable=True)  # YYYY-MM-DD
+    company_id = Column(String(40), index=True, nullable=True)
+    supplier_id = Column(String(40), index=True, nullable=True)
+    series = Column(String(40), index=True, nullable=True)
+    number = Column(String(40), index=True, nullable=True)
+    total_amount = Column(Float, nullable=False, default=0.0)
+
+    # Payload bruto do Sienge para auditoria/reprocessamento.
     payload = Column(Text, nullable=False)
