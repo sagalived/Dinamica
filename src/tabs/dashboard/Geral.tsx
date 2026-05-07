@@ -63,6 +63,7 @@ export function DashboardGeral() {
     activeBuildingCount,
     startDate,
     endDate,
+    globalPeriodMode,
   } = useSienge();
 
   const [activeBuildingsModalOpen, setActiveBuildingsModalOpen] = useState(false);
@@ -168,8 +169,10 @@ export function DashboardGeral() {
     const now = new Date();
     const defaultEnd = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     const defaultStart = addMonths(defaultEnd, -12);
+    const allTimeStart = new Date(2019, 0, 1);
+    const useAllTime = globalPeriodMode === 'all' && !startDate && !endDate;
     return {
-      start: startDate || defaultStart,
+      start: startDate || (useAllTime ? allTimeStart : defaultStart),
       end: endDate || startDate || defaultEnd,
     };
   };
@@ -261,7 +264,7 @@ export function DashboardGeral() {
     return () => {
       cancelled = true;
     };
-  }, [dataRevision, endDate, fcSelectedBuilding, selectedCompany, startDate]);
+  }, [dataRevision, endDate, fcSelectedBuilding, globalPeriodMode, selectedCompany, startDate]);
 
   const receitaMargemSeries = useMemo(() => {
     const monthToLabel = (m: string) => {
@@ -292,7 +295,7 @@ export function DashboardGeral() {
       bestMargem: bestMonth(margemChart),
       bestMcPercent: bestMonth(mcPercentChart),
     };
-  }, [operationalSeries.rows, endDate, startDate]);
+  }, [operationalSeries.rows, endDate, globalPeriodMode, startDate]);
 
   const seriesTotals = useMemo(() => {
     const receita = Number(operationalSeries.total?.receita_operacional || 0);

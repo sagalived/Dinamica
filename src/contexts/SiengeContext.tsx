@@ -500,7 +500,11 @@ export function SiengeProvider({ children }: { children: React.ReactNode }) {
     }
 
     const allFData = fDataRaw.map((f: any) => {
-      const dStr = f.dataVencimento || f.issueDate || f.dueDate || f.dataVencimentoProjetado || f.dataEmissao || f.dataContabil || '---';
+      const statusText = f.situacao || f.status || 'Pendente';
+      const paymentStr = f.paymentDate || f.dataPagamento || f.payOffDate || f.settlementDate || '';
+      const dStr = isSettledFinancialStatus(statusText) && paymentStr
+        ? paymentStr
+        : (f.dataVencimento || f.dueDate || f.dataVencimentoProjetado || f.issueDate || f.dataEmissao || f.dataContabil || '---');
       let dueDateNumeric = 0;
       try {
         const d = parseISO(String(dStr));
@@ -535,14 +539,19 @@ export function SiengeProvider({ children }: { children: React.ReactNode }) {
         })(),
         dueDate: dStr,
         dueDateNumeric,
+        paymentDate: paymentStr,
         amount: parseFloat(f.totalInvoiceAmount || f.valor || f.amount || f.valorTotal || f.valorLiquido || f.valorBruto) || 0,
-        status: f.situacao || f.status || 'Pendente',
+        status: statusText,
         documentNumber: String(f.documentNumber || f.numeroDocumento || f.numero || f.codigoTitulo || ''),
       };
     });
 
     const allRData = rDataRaw.map((r: any) => {
-      const dStr = r.dataVencimento || r.data || r.date || r.dataEmissao || r.issueDate || r?.dataVencimentoProjetado || '---';
+      const statusText = String(r.situacao || r.status || 'ABERTO').toUpperCase();
+      const paymentStr = r.paymentDate || r.dataPagamento || r.payOffDate || r.settlementDate || '';
+      const dStr = isSettledFinancialStatus(statusText) && paymentStr
+        ? paymentStr
+        : (r.dataVencimento || r.dueDate || r?.dataVencimentoProjetado || r.data || r.date || r.dataEmissao || r.issueDate || '---');
       let dueDateNumeric = 0;
       try {
         const d = parseISO(String(dStr));
@@ -577,9 +586,10 @@ export function SiengeProvider({ children }: { children: React.ReactNode }) {
         clientName: fixText(r.nomeCliente || r.nomeFantasiaCliente || r.cliente || r.clientName || 'Extrato/Cliente'),
         dueDate: dStr,
         dueDateNumeric,
+        paymentDate: paymentStr,
         amount: Math.abs(rawValue),
         rawValue,
-        status: String(r.situacao || r.status || 'ABERTO').toUpperCase(),
+        status: statusText,
         type: r.type || 'Income',
         statementType: r.statementType || '',
         statementOrigin: r.statementOrigin || '',
@@ -1112,7 +1122,11 @@ export function SiengeProvider({ children }: { children: React.ReactNode }) {
     }).sort((a, b) => (b.dateNumeric || 0) - (a.dateNumeric || 0));
 
     const filteredFinancialData = fDataRaw.map((f: any) => {
-      const dStr = f.dataVencimento || f.issueDate || f.dueDate || f.dataVencimentoProjetado || f.dataEmissao || f.dataContabil || '---';
+      const statusText = f.situacao || f.status || 'Pendente';
+      const paymentStr = f.paymentDate || f.dataPagamento || f.payOffDate || f.settlementDate || '';
+      const dStr = isSettledFinancialStatus(statusText) && paymentStr
+        ? paymentStr
+        : (f.dataVencimento || f.dueDate || f.dataVencimentoProjetado || f.issueDate || f.dataEmissao || f.dataContabil || '---');
       let dueDateNumeric = 0;
       try {
         const d = parseISO(String(dStr));
@@ -1147,14 +1161,19 @@ export function SiengeProvider({ children }: { children: React.ReactNode }) {
         })(),
         dueDate: dStr,
         dueDateNumeric,
+        paymentDate: paymentStr,
         amount: parseFloat(f.totalInvoiceAmount || f.valor || f.amount || f.valorTotal || f.valorLiquido || f.valorBruto) || 0,
-        status: f.situacao || f.status || 'Pendente',
+        status: statusText,
         documentNumber: String(f.documentNumber || f.numeroDocumento || f.numero || f.codigoTitulo || ''),
       };
     });
 
     const filteredReceivableData = rDataRaw.map((r: any) => {
-      const dStr = r.dataVencimento || r.data || r.date || r.dataEmissao || r.issueDate || r?.dataVencimentoProjetado || '---';
+      const statusText = String(r.situacao || r.status || 'ABERTO').toUpperCase();
+      const paymentStr = r.paymentDate || r.dataPagamento || r.payOffDate || r.settlementDate || '';
+      const dStr = isSettledFinancialStatus(statusText) && paymentStr
+        ? paymentStr
+        : (r.dataVencimento || r.dueDate || r?.dataVencimentoProjetado || r.data || r.date || r.dataEmissao || r.issueDate || '---');
       let dueDateNumeric = 0;
       try {
         const d = parseISO(String(dStr));
@@ -1188,9 +1207,10 @@ export function SiengeProvider({ children }: { children: React.ReactNode }) {
         clientName: fixText(r.nomeCliente || r.nomeFantasiaCliente || r.cliente || r.clientName || 'Extrato/Cliente'),
         dueDate: dStr,
         dueDateNumeric,
+        paymentDate: paymentStr,
         amount: Math.abs(rawValue),
         rawValue,
-        status: String(r.situacao || r.status || 'ABERTO').toUpperCase(),
+        status: statusText,
         type: r.type || 'Income',
         statementType: r.statementType || '',
         statementOrigin: r.statementOrigin || '',
@@ -1283,10 +1303,9 @@ export function SiengeProvider({ children }: { children: React.ReactNode }) {
       const startDateIso = effectiveStart ? format(effectiveStart, 'yyyy-MM-dd') : undefined;
       const endDateIso = effectiveEnd ? format(effectiveEnd, 'yyyy-MM-dd') : undefined;
 
-      // O endpoint de NF-e exige startDate/endDate. Mesmo que o modo global seja
-      // “total”, usamos a janela padrão (últimos 12 meses) quando o usuário não
-      // escolheu datas manualmente.
-      const nfeStart = effectiveStart || defaultWindow.start;
+      // O endpoint de NF-e exige startDate/endDate. Em "Periodo total",
+      // usa o inicio historico do cache local.
+      const nfeStart = effectiveStart || (globalPeriodMode === 'all' ? new Date(2019, 0, 1) : defaultWindow.start);
       const nfeEnd = effectiveEnd || defaultWindow.end;
 
       // Preferência: filtrar no backend (/filtered), pois:

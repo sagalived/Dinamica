@@ -14,6 +14,7 @@ from sqlalchemy.orm import Session
 from backend.repositories.sienge_snapshot_repository import SiengeSnapshotRepository
 from backend.services.sienge_cache import utc_now_iso
 from backend.services.sienge_client import sienge_client
+from backend.services.sienge_local_files import append_pending_payload
 
 
 def _to_array(payload: Any) -> list[dict]:
@@ -461,6 +462,13 @@ async def compute_mc_by_building(
                         weights_by_bill[bid] = []
                         continue
                     fetched_count += 1
+                    append_pending_payload(
+                        "bills_buildings_cost",
+                        {bid: payload},
+                        reason="rateio por obra ausente no banco",
+                        start_date=bid,
+                        end_date=bid,
+                    )
                     cache_key = _bill_buildings_cost_cache_key(bid)
                     repo.write(cache_key, payload)
                     rows = _extract_buildings_cost_rows(payload)

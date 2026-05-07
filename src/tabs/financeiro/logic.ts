@@ -52,5 +52,21 @@ export function translateStatementType(value: unknown): string {
 
 export function isSettledFinancialStatus(value: unknown): boolean {
   const status = normalizeStatus(value);
-  return ['S', 'BAIXADO', 'BAIXADA', 'PAGO', 'PAGA', 'LIQUIDADO', 'LIQUIDADA', 'QUITADO', 'QUITADA'].includes(status);
+  return [
+    'S',
+    'BAIXADO',
+    'BAIXADA',
+    'PAGO',
+    'PAGA',
+    'LIQUIDADO',
+    'LIQUIDADA',
+    'QUITADO',
+    'QUITADA',
+    'RECEBIDO',
+    'RECEBIDA',
+    'RECEBIMENTO',
+    'RECEBIMENTO_TOTAL',
+    'SETTLED',
+    'PAID',
+  ].includes(status);
 }

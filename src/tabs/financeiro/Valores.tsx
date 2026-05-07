@@ -1,14 +1,14 @@
 import React from 'react';
 import { motion } from 'motion/react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../../components/ui/card';
-import { TrendingUp, ArrowDownToLine, ArrowUpFromLine, CheckCircle2, Clock, Landmark, DollarSign, ListOrdered, FileText } from 'lucide-react';
+import { TrendingUp, ArrowDownToLine, ArrowUpFromLine, CheckCircle2, Clock, Landmark, DollarSign, ListOrdered, FileText, AlertTriangle, X } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../components/ui/table';
 import { Badge } from '../../components/ui/badge';
 import { Button } from '../../components/ui/button';
 import { useSienge } from '../../contexts/SiengeContext';
 import { safeFormat } from '../dashboard/logic';
-import { translateStatusLabel, toMoney } from './logic';
+import { isSettledFinancialStatus, translateStatusLabel, toMoney } from './logic';
 import { useMemo, useState } from 'react';
 
 export function FinanceiroValores() {
@@ -16,6 +16,28 @@ export function FinanceiroValores() {
   
   const [financeLimit, setFinanceLimit] = useState<number>(50);
   const [reportType, setReportType] = useState<string>('compras');
+  const [selectedOverdueTitle, setSelectedOverdueTitle] = useState<any>(null);
+
+  const todayStart = useMemo(() => {
+    const now = new Date();
+    return new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+  }, []);
+
+  const isOverdue = (title: any) => {
+    const due = Number(title?.dueDateNumeric || 0);
+    return due > 0 && due < todayStart && !isSettledFinancialStatus(title?.status);
+  };
+
+  const formatMoney = (value: any) => (
+    Number(value || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+  );
+
+  const getPersonName = (title: any, type: 'payable' | 'receivable') => {
+    if (type === 'payable') {
+      return title?.creditorName || title?.nomeCredor || title?.supplierName || 'Credor sem nome';
+    }
+    return title?.clientName || title?.customerName || title?.nomeCliente || title?.creditorName || 'Cliente sem nome';
+  };
 
   const stats = useMemo(() => {
     const ordersArray = Array.isArray(orders) ? orders : [];
@@ -72,12 +94,16 @@ export function FinanceiroValores() {
               className="space-y-8"
             >
               {(() => {
-                const openPayables = financialTitles.filter(t => t.status !== 'BAIXADO' && t.status !== 'PAGO' && t.status !== 'LIQUIDADO').sort((a,b) => (a.dueDateNumeric || 0) - (b.dueDateNumeric || 0));
-                const openReceivables = receivableTitles.filter(t => t.status !== 'BAIXADO' && t.status !== 'PAGO' && t.status !== 'LIQUIDADO').sort((a,b) => (a.dueDateNumeric || 0) - (b.dueDateNumeric || 0));
-                const paidPayables = financialTitles.filter(t => t.status === 'BAIXADO' || t.status === 'PAGO' || t.status === 'LIQUIDADO').sort((a,b) => (b.paymentDateNumeric || b.dueDateNumeric || 0) - (a.paymentDateNumeric || a.dueDateNumeric || 0));
+                const openPayables = financialTitles.filter(t => !isSettledFinancialStatus(t.status)).sort((a,b) => (a.dueDateNumeric || 0) - (b.dueDateNumeric || 0));
+                const openReceivables = receivableTitles.filter(t => !isSettledFinancialStatus(t.status)).sort((a,b) => (a.dueDateNumeric || 0) - (b.dueDateNumeric || 0));
+                const paidPayables = financialTitles.filter(t => isSettledFinancialStatus(t.status)).sort((a,b) => (b.paymentDateNumeric || b.dueDateNumeric || 0) - (a.paymentDateNumeric || a.dueDateNumeric || 0));
+                const overdueReceivables = openReceivables.filter(isOverdue);
+                const overduePayables = openPayables.filter(isOverdue);
 
                 const totalPayable = openPayables.reduce((acc, curr) => acc + (curr.amount || 0), 0);
                 const totalReceivable = openReceivables.reduce((acc, curr) => acc + (curr.amount || 0), 0);
+                const overdueReceivableTotal = overdueReceivables.reduce((acc, curr) => acc + (curr.amount || 0), 0);
+                const overduePayableTotal = overduePayables.reduce((acc, curr) => acc + (curr.amount || 0), 0);
                 return (
                   <>
                     {/* Demonstração de Resultados (DRE) Projetada */}
@@ -212,6 +238,68 @@ export function FinanceiroValores() {
                       </Card>
                     </div>
 
+                    {(overdueReceivables.length > 0 || overduePayables.length > 0) && (
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        {overdueReceivables.length > 0 && (
+                          <Card className="bg-red-950/20 border-red-500/20 shadow-none">
+                            <CardHeader className="p-4 pb-2">
+                              <CardTitle className="text-sm font-black uppercase tracking-tight text-red-300 flex items-center gap-2">
+                                <AlertTriangle size={16} /> Receber em atraso
+                              </CardTitle>
+                              <CardDescription className="text-[11px] text-red-200/70">
+                                {overdueReceivables.length} título(s) • R$ {formatMoney(overdueReceivableTotal)}
+                              </CardDescription>
+                            </CardHeader>
+                            <CardContent className="px-4 pb-4 pt-1 grid grid-cols-1 sm:grid-cols-2 gap-2">
+                              {overdueReceivables.slice(0, 4).map((title: any, idx: number) => (
+                                <button
+                                  key={`overdue-rec-${title.id || idx}`}
+                                  type="button"
+                                  onClick={() => setSelectedOverdueTitle({ ...title, alertType: 'receivable' })}
+                                  className="text-left rounded-lg border border-red-500/20 bg-black/20 p-3 hover:bg-red-500/10 transition-colors"
+                                >
+                                  <p className="text-[10px] font-black uppercase text-red-300 truncate">{getPersonName(title, 'receivable')}</p>
+                                  <div className="mt-1 flex items-center justify-between gap-2">
+                                    <span className="text-xs text-gray-400">{safeFormat(title.dueDate, 'dd/MM/yy')}</span>
+                                    <span className="text-xs font-black text-white whitespace-nowrap">R$ {formatMoney(title.amount)}</span>
+                                  </div>
+                                </button>
+                              ))}
+                            </CardContent>
+                          </Card>
+                        )}
+
+                        {overduePayables.length > 0 && (
+                          <Card className="bg-orange-950/20 border-orange-500/20 shadow-none">
+                            <CardHeader className="p-4 pb-2">
+                              <CardTitle className="text-sm font-black uppercase tracking-tight text-orange-300 flex items-center gap-2">
+                                <AlertTriangle size={16} /> Pagar em atraso
+                              </CardTitle>
+                              <CardDescription className="text-[11px] text-orange-200/70">
+                                {overduePayables.length} título(s) • R$ {formatMoney(overduePayableTotal)}
+                              </CardDescription>
+                            </CardHeader>
+                            <CardContent className="px-4 pb-4 pt-1 grid grid-cols-1 sm:grid-cols-2 gap-2">
+                              {overduePayables.slice(0, 4).map((title: any, idx: number) => (
+                                <button
+                                  key={`overdue-pay-${title.id || idx}`}
+                                  type="button"
+                                  onClick={() => setSelectedOverdueTitle({ ...title, alertType: 'payable' })}
+                                  className="text-left rounded-lg border border-orange-500/20 bg-black/20 p-3 hover:bg-orange-500/10 transition-colors"
+                                >
+                                  <p className="text-[10px] font-black uppercase text-orange-300 truncate">{getPersonName(title, 'payable')}</p>
+                                  <div className="mt-1 flex items-center justify-between gap-2">
+                                    <span className="text-xs text-gray-400">{safeFormat(title.dueDate, 'dd/MM/yy')}</span>
+                                    <span className="text-xs font-black text-white whitespace-nowrap">R$ {formatMoney(title.amount)}</span>
+                                  </div>
+                                </button>
+                              ))}
+                            </CardContent>
+                          </Card>
+                        )}
+                      </div>
+                    )}
+
                     <div className="flex flex-col gap-6 sm:gap-8">
                       {/* CONTAS A RECEBER */}
                       <Card className="bg-[#161618] border-white/5 shadow-2xl flex flex-col h-[400px]">
@@ -238,11 +326,11 @@ export function FinanceiroValores() {
                                 </TableRow>
                               ) : (
                                 openReceivables.slice(0, financeLimit).map((title, idx) => (
-                                  <TableRow key={title.id || `rec-${idx}`} className="border-white/5 hover:bg-white/5 border-l-2 border-l-emerald-500/50">
+                                  <TableRow key={title.id || `rec-${idx}`} className={cn("border-white/5 hover:bg-white/5 border-l-2", isOverdue(title) ? "border-l-red-500/70 bg-red-500/5" : "border-l-emerald-500/50")}>
                                     <TableCell className="text-xs font-mono text-gray-500">{title.id}</TableCell>
                                     <TableCell>
                                       <p className="font-bold text-emerald-400 truncate max-w-[200px]" title={title.creditorName || title.customerName}>
-                                        {title.creditorName || title.customerName || "Desconhecido"}
+                                        {getPersonName(title, 'receivable')}
                                       </p>
                                       <p className="text-[9px] text-gray-500 truncate max-w-[200px]">{title.description}</p>
                                     </TableCell>
@@ -250,7 +338,7 @@ export function FinanceiroValores() {
                                       {safeFormat(title.dueDate, 'dd/MM/yy')}
                                     </TableCell>
                                     <TableCell className="text-right font-black text-white whitespace-nowrap">
-                                      R$ {(title.amount || 0).toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}
+                                      R$ {formatMoney(title.amount)}
                                     </TableCell>
                                   </TableRow>
                                 ))
@@ -290,7 +378,7 @@ export function FinanceiroValores() {
                                 </TableRow>
                               ) : (
                                 openPayables.slice(0, financeLimit).map((title, idx) => (
-                                  <TableRow key={title.id || `pay-${idx}`} className="border-white/5 hover:bg-white/5 border-l-2 border-l-orange-500/50">
+                                  <TableRow key={title.id || `pay-${idx}`} className={cn("border-white/5 hover:bg-white/5 border-l-2", isOverdue(title) ? "border-l-red-500/70 bg-red-500/5" : "border-l-orange-500/50")}>
                                     <TableCell className="text-xs font-mono text-gray-500">{title.id}</TableCell>
                                     <TableCell>
                                       <p className="font-bold text-gray-300 truncate max-w-[200px]" title={title.creditorName}>
@@ -302,7 +390,7 @@ export function FinanceiroValores() {
                                       {safeFormat(title.dueDate, 'dd/MM/yy')}
                                     </TableCell>
                                     <TableCell className="text-right font-black text-orange-500 whitespace-nowrap">
-                                      R$ {(title.amount || 0).toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}
+                                      R$ {formatMoney(title.amount)}
                                     </TableCell>
                                   </TableRow>
                                 ))
@@ -379,6 +467,67 @@ export function FinanceiroValores() {
               })()}
             </motion.div>
 
+            {selectedOverdueTitle && (
+              <div
+                className="fixed inset-0 z-[999] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4"
+                onClick={() => setSelectedOverdueTitle(null)}
+              >
+                <div
+                  className="bg-[#111] border border-white/10 rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden"
+                  onClick={(event) => event.stopPropagation()}
+                >
+                  <div className="p-5 border-b border-white/10 flex items-start justify-between gap-4">
+                    <div>
+                      <p className={cn(
+                        "text-[10px] font-black uppercase tracking-widest mb-1",
+                        selectedOverdueTitle.alertType === 'payable' ? 'text-orange-400' : 'text-red-300'
+                      )}>
+                        {selectedOverdueTitle.alertType === 'payable' ? 'Conta a pagar em atraso' : 'Conta a receber em atraso'}
+                      </p>
+                      <h2 className="text-xl font-black text-white uppercase leading-tight">
+                        {getPersonName(selectedOverdueTitle, selectedOverdueTitle.alertType === 'payable' ? 'payable' : 'receivable')}
+                      </h2>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setSelectedOverdueTitle(null)}
+                      className="shrink-0 rounded-full p-2 bg-white/5 text-gray-400 hover:text-white hover:bg-white/10 transition-colors"
+                    >
+                      <X size={18} />
+                    </button>
+                  </div>
+
+                  <div className="p-5 grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+                    <div className="rounded-xl bg-black/30 border border-white/5 p-4">
+                      <span className="block text-[10px] font-black uppercase tracking-widest text-gray-500 mb-1">Valor</span>
+                      <strong className="text-2xl font-black text-white">R$ {formatMoney(selectedOverdueTitle.amount)}</strong>
+                    </div>
+                    <div className="rounded-xl bg-black/30 border border-white/5 p-4">
+                      <span className="block text-[10px] font-black uppercase tracking-widest text-gray-500 mb-1">Vencimento</span>
+                      <strong className="text-lg font-black text-red-300">{safeFormat(selectedOverdueTitle.dueDate, 'dd/MM/yyyy')}</strong>
+                    </div>
+                    <div className="rounded-xl bg-black/30 border border-white/5 p-4">
+                      <span className="block text-[10px] font-black uppercase tracking-widest text-gray-500 mb-1">Título</span>
+                      <strong className="text-sm font-mono text-gray-200 break-all">{selectedOverdueTitle.id || selectedOverdueTitle.documentNumber || 'Sem número'}</strong>
+                    </div>
+                    <div className="rounded-xl bg-black/30 border border-white/5 p-4">
+                      <span className="block text-[10px] font-black uppercase tracking-widest text-gray-500 mb-1">Status</span>
+                      <Badge variant="outline" className="border-red-500/30 bg-red-500/10 text-red-300">
+                        {translateStatusLabel(selectedOverdueTitle.status)}
+                      </Badge>
+                    </div>
+                    <div className="sm:col-span-2 rounded-xl bg-black/30 border border-white/5 p-4">
+                      <span className="block text-[10px] font-black uppercase tracking-widest text-gray-500 mb-1">Descrição</span>
+                      <p className="text-gray-200 leading-relaxed">{selectedOverdueTitle.description || selectedOverdueTitle.documentNumber || 'Sem descrição disponível.'}</p>
+                    </div>
+                    <div className="sm:col-span-2 rounded-xl bg-black/30 border border-white/5 p-4">
+                      <span className="block text-[10px] font-black uppercase tracking-widest text-gray-500 mb-1">Obra</span>
+                      <p className="text-gray-200">{selectedOverdueTitle.buildingName || selectedOverdueTitle.buildingId || selectedOverdueTitle.buildingCode || 'Sem obra vinculada'}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
 
     </>
   );

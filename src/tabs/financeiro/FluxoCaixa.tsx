@@ -27,6 +27,7 @@ export function FinanceiroFluxoTab() {
     fcHideInternal, setFcHideInternal,
     loading, companies, buildings,
     allFinancialTitles, allReceivableTitles,
+    nfeDocuments,
     setDataRevision
   } = useSienge();
   
@@ -70,6 +71,23 @@ export function FinanceiroFluxoTab() {
       endNumeric: fcEffectiveEnd ? parseInt(format(fcEffectiveEnd, 'yyyyMMdd')) : null,
     });
   }, [allFinancialTitles, allReceivableTitles, defaultWindow.end, defaultWindow.start, fcEndDate, fcHideInternal, fcPeriodMode, fcSelectedBuilding, fcSelectedCompany, fcStartDate, buildings]);
+
+  const nfeSummary = useMemo(() => {
+    const docs = Array.isArray(nfeDocuments) ? nfeDocuments : [];
+    const total = docs.reduce((acc: number, doc: any) => {
+      const value = Number(
+        doc?.totalAmount ??
+        doc?.totalInvoiceAmount ??
+        doc?.amount ??
+        doc?.value ??
+        doc?.valor ??
+        doc?.valorTotal ??
+        0
+      );
+      return acc + (Number.isFinite(value) ? value : 0);
+    }, 0);
+    return { count: docs.length, total };
+  }, [nfeDocuments]);
 
   return (
     <motion.div
@@ -372,6 +390,12 @@ export function FinanceiroFluxoTab() {
               <div className="flex flex-col">
                 <span className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Registros</span>
                 <span className="font-mono text-gray-300 font-black">{fluxoDeCaixaData.length.toLocaleString('pt-BR')}</span>
+              </div>
+              <div className="flex flex-col">
+                <span className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">NF Emitidas</span>
+                <span className="font-mono text-sky-300 font-black">
+                  {nfeSummary.count.toLocaleString('pt-BR')} / R$ {nfeSummary.total.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}
+                </span>
               </div>
            </div>
            <div className="flex flex-col text-right">
