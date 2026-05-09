@@ -1,0 +1,27 @@
+DADOS QUE O SISTEMA BAIXA DO SIENGE (resumo)
+
+1) Cadastros (cache local em /data)
+- Empresas (companies)            -> /companies            -> data/empresas.json
+- Obras (enterprises)             -> /enterprises          -> data/obras.json (e obras_by_code.json)
+- Usuários (users)                -> /users                -> data/usuarios.json
+- Credores (creditors)            -> /creditors            -> data/credores.json
+- Solicitantes (cache auxiliar)   -> (gerado)              -> data/solicitantes-cache.json
+- Unidades de medida              -> (catálogo)            -> data/units-of-measure.json
+
+2) Operacional/Financeiro (via SIENGE API; cache em snapshots no SQLite data/local.db)
+- Pedidos de compra               -> /purchase-orders
+- Itens do pedido                 -> /purchase-orders/{id}/items
+- Títulos a pagar (bills)         -> /bills
+- Extrato (receitas/despesas)     -> /accounts-statements
+- NF-e (documentos)               -> /nfe/documents
+- Rateio por obra (bill)          -> /bills/{billId}/buildings-cost
+
+3) Janela de datas
+- O sync automático usa uma janela operacional (histórico + pequeno futuro).
+- Ajustável por env (sem expor valores):
+  - SIENGE_SYNC_START_DATE=YYYY-MM-DD (ou SIENGE_SYNC_HISTORY_DAYS)
+  - SIENGE_SYNC_END_DATE=YYYY-MM-DD (ou SIENGE_SYNC_FUTURE_DAYS)
+
+Arquivos desta exportação
+- json/data_cache/*.json contém as cópias dos cadastros em /data.
+- json/samples_*.json contém amostras de respostas geradas do cache local.

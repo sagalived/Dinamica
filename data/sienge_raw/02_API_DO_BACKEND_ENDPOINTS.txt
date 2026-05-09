@@ -1,0 +1,36 @@
+API DO BACKEND (FastAPI) — endpoints principais
+
+Base
+- Local: http://127.0.0.1:8000
+- Produção: depende do seu deploy (Render)
+
+Autenticação
+- A API exige autenticação (token) na maioria dos endpoints.
+- O contrato completo está em: json/openapi_backend.json
+
+Endpoints (alto nível)
+- GET /health
+  - Status do sistema/cache
+
+- GET /bootstrap
+  - Retorna metadados (obras, usuários, credores etc). O “grosso” chega via /filtered.
+
+- POST /sync
+  - Dispara sync manual no cache local.
+
+- GET /filtered
+  - Retorna listas filtradas (pequenas) para a UI/importação.
+  - Parâmetros:
+    - start_date=YYYY-MM-DD (opcional)
+    - end_date=YYYY-MM-DD (opcional)
+    - company_id, building_id, user_id, requester_id (default: all)
+  - Conteúdo típico:
+    - pedidos, financeiro, receber
+
+- GET /mc-by-building
+  - Calcula TOP obras por Receita Operacional e Margem (MC) com rateio.
+  - Aceita start_date/end_date + filtros (company_id/building_id/etc)
+
+Outros
+- Existem endpoints auxiliares (kanban, logística, catálogos etc).
+- Veja a lista completa gerada em: json/openapi_backend_paths.txt

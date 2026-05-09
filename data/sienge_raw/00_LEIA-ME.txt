@@ -1,0 +1,46 @@
+PACOTE "camada APiteste" — exportação de dados/API (Dinamica)
+
+Objetivo
+- Entregar, em arquivos separados, o que este sistema consegue baixar do SIENGE e expõe via API.
+- Facilitar levar os JSONs para outro sistema (ETL/importação).
+
+Conteúdo desta pasta
+- txt/ : documentação em .txt (endpoints, datasets, como baixar)
+- json/:
+  - openapi_backend.json: contrato da API FastAPI (paths/params/response)
+  - openapi_backend_paths.txt: lista simplificada de endpoints
+  - samples_filtered_*.json: exemplos do endpoint /filtered
+  - samples_mc_by_building_*.json: exemplos do endpoint /mc-by-building
+  - data_cache/*.json: cópias dos JSONs existentes em /data (obras, usuários, empresas etc)
+
+Segurança
+- NÃO incluí token/senha em nenhum arquivo.
+- Variáveis sensíveis devem ficar em .env (que já está ignorado pelo Git).
+
+Como usar (resumo)
+1) Para listar endpoints do backend: veja json/openapi_backend_paths.txt
+2) Para importar dados “base”: use json/data_cache/*.json
+3) Para dados por período/recorte: use json/samples_filtered_*.json e/ou chame a API (/filtered)
+
+Observação importante sobre “obra”
+- Alguns dados do SIENGE (ex.: /bills) não vêm com vínculo direto de obra. O sistema faz rateio por billId (buildings-cost).
+DATABASE_URL=sqlite:///./data/local.db
+API_HOST=127.0.0.1
+PORT=8000
+FLET_HOST=127.0.0.1
+FLET_PORT=8550
+
+# Credenciais do Sienge (NUNCA commitar token real).
+# Preencha com as suas credenciais de teste/local.
+SIENGE_INSTANCE=SEU_CLIENTE
+SIENGE_BASE_URL=https://api.sienge.com.br/SEU_CLIENTE
+
+# Opção A (recomendado): Access Name + Token
+SIENGE_ACCESS_NAME=seu-access-name
+SIENGE_TOKEN=seu-token
+
+# Opção B: usuário/senha (se seu ambiente usar Basic)
+# SIENGE_USERNAME=seu-usuario
+# SIENGE_PASSWORD=sua-senha
+
+SIENGE_SYNC_INTERVAL_MINUTES=20

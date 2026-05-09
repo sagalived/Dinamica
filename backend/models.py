@@ -192,3 +192,31 @@ class SiengeNfeDocument(TimestampMixin, Base):
 
     # Payload bruto do Sienge para auditoria/reprocessamento.
     payload = Column(Text, nullable=False)
+
+
+class SiengeFinancialReport(TimestampMixin, Base):
+    __tablename__ = "sienge_financial_reports"
+    __table_args__ = (
+        UniqueConstraint("building_id", name="uq_sienge_financial_report_building"),
+    )
+
+    id = Column(Integer, primary_key=True)
+    building_id = Column(String(40), index=True, nullable=False)
+    building_code = Column(String(80), nullable=True)
+    building_name = Column(String(255), nullable=True)
+    company_id = Column(String(40), index=True, nullable=True)
+    company_name = Column(String(255), nullable=True)
+    
+    # Dados financeiros
+    custo_direto = Column(Float, nullable=False, default=0.0)
+    custo_indireto = Column(Float, nullable=False, default=0.0)
+    custo_total = Column(Float, nullable=False, default=0.0)
+    receita = Column(Float, nullable=False, default=0.0)
+    margem = Column(Float, nullable=False, default=0.0)
+    margem_percentual = Column(Float, nullable=False, default=0.0)
+    
+    # Controle de sincronização
+    data_atualizacao = Column(String(10), nullable=True)  # YYYY-MM-DD
+    
+    # Payload bruto do Sienge para auditoria/reprocessamento.
+    payload = Column(Text, nullable=False)

@@ -98,6 +98,7 @@ function filterByDate(
   startNumeric: number | null,
   endNumeric: number | null,
 ): boolean {
+  if (startNumeric === null && endNumeric === null) return true
   const dn: number = item.dueDateNumeric || 0
   if (!dn) return false
   const itemN = dateToNumeric(dn)

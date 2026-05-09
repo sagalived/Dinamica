@@ -1,19 +1,20 @@
-import React, { useMemo, useState, useEffect } from 'react';
+﻿import React, { useMemo, useState, useEffect } from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useSienge } from '../contexts/SiengeContext';
 import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
 import { NavigationMenu } from './NavigationMenu';
 import { cn } from '../lib/utils';
-import { SlidersHorizontal, ChevronDown, RefreshCw, Sun, Moon, LogOut, User as UserIcon, Download, Calendar as CalendarIcon, Truck, LayoutDashboard, DollarSign, Bell, Map as MapIcon } from 'lucide-react';
+import { SlidersHorizontal, ChevronDown, RefreshCw, Sun, Moon, LogOut, User as UserIcon, Download, Calendar as CalendarIcon, Truck, LayoutDashboard, DollarSign, Bell, Map as MapIcon, X, Search } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { format } from 'date-fns';
+import { format, subMonths } from 'date-fns';
 import { Button } from './ui/button';
 import logoWordmark from '../assets/dinamica-wordmark.svg';
 import logoWordmarkDark from '../assets/dinamica-wordmark-dark.svg';
+import ModalComponent from '@/components/Modal';
 
 export function LayoutPrincipal() {
   const { isDark, toggleThemeMode, themeMode } = useTheme();
@@ -22,9 +23,11 @@ export function LayoutPrincipal() {
   const navigate = useNavigate();
   const path = location.pathname;
   const isDashboardGeral = path === '/';
+  const [syncDetailsOpen, setSyncDetailsOpen] = useState(false);
 
   const {
     syncSienge, syncing, syncProgress, apiStatus,
+    syncInfo,
     applyFilters,
     globalPeriodMode, setGlobalPeriodMode,
     startDate, setStartDate, endDate, setEndDate,
@@ -36,29 +39,60 @@ export function LayoutPrincipal() {
   } = useSienge();
 
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+  const [buildingIdInput, setBuildingIdInput] = useState('');
+  const [allTimeYear, setAllTimeYear] = useState(new Date().getFullYear());
+  const [isCompanyModalOpen, setIsCompanyModalOpen] = useState(false);
+  const [isBuildingModalOpen, setIsBuildingModalOpen] = useState(false);
+  const [isBuyerModalOpen, setIsBuyerModalOpen] = useState(false);
+  const [isRequesterModalOpen, setIsRequesterModalOpen] = useState(false);
+  const [companySearch, setCompanySearch] = useState('');
+  const [buildingSearch, setBuildingSearch] = useState('');
+  const [buyerSearch, setBuyerSearch] = useState('');
+  const [requesterSearch, setRequesterSearch] = useState('');
+  const showFilters = path === '/' || path.startsWith('/financeiro') || path.startsWith('/dashboard/financeiro');
+  const showBuyerRequesterFilters = path === '/financeiro/alerta';
+  const latestSyncLabel = syncInfo?.finished_at || syncInfo?.started_at
+    ? new Date(syncInfo.finished_at || syncInfo.started_at).toLocaleString('pt-BR')
+    : 'Sem sincronizaÃ§Ã£o registrada';
+  const updatedFiles = (syncInfo as any)?.updated_files || [];
 
   useEffect(() => {
-    // Na aba Dashboard/Geral esses filtros não são usados.
+    const now = new Date();
+    setGlobalPeriodMode('last6m');
+    setAllTimeYear(now.getFullYear());
+    setStartDate(subMonths(now, 3));
+    setEndDate(now);
+  }, [setEndDate, setGlobalPeriodMode, setStartDate]);
+
+  useEffect(() => {
+    // Na aba Dashboard/Geral esses filtros nÃ£o sÃ£o usados.
     if (!isDashboardGeral) return;
     if (selectedUser !== 'all') setSelectedUser('all');
     if (selectedRequester !== 'all') setSelectedRequester('all');
   }, [isDashboardGeral, selectedRequester, selectedUser, setSelectedRequester, setSelectedUser]);
 
+  useEffect(() => {
+    if (showBuyerRequesterFilters) return;
+    if (selectedUser !== 'all') setSelectedUser('all');
+    if (selectedRequester !== 'all') setSelectedRequester('all');
+  }, [selectedRequester, selectedUser, setSelectedRequester, setSelectedUser, showBuyerRequesterFilters]);
+
   const availableTabs = useMemo(() => (
     isRestrictedUser
-      ? [{ id: '/logistica', label: 'Logística', icon: Truck }]
+      ? [{ id: '/logistica', label: 'LogÃ­stica', icon: Truck }]
       : [
           { id: '/', label: 'Dashboard', icon: LayoutDashboard },
           { id: '/financeiro', label: 'Financeiro', icon: DollarSign },
           { id: '/financeiro/alerta', label: 'Alertas', icon: Bell },
           { id: '/obras/mapa', label: 'Mapa de Obras', icon: MapIcon },
-          { id: '/logistica', label: 'Logística', icon: Truck },
+          { id: '/logistica', label: 'LogÃ­stica', icon: Truck },
           { id: '/acessos', label: 'Acessos', icon: UserIcon },
         ]
   ), [isRestrictedUser]);
 
   // Map route to activeTab for NavigationMenu
-  const activeTab = path.startsWith('/financeiro') ? 'finance' : 
+  const activeTab = path.startsWith('/dashboard/financeiro') ? 'dashboard-financeiro' :
+                    path.startsWith('/financeiro') ? 'finance' : 
                     path.startsWith('/logistica') ? 'logistics' :
                     path.startsWith('/acessos') ? 'access' :
                     path.startsWith('/obras') ? 'map' : 'dashboard';
@@ -66,6 +100,7 @@ export function LayoutPrincipal() {
   const setActiveTab = (id: string) => {
     const routeMap: Record<string, string> = {
       'dashboard': '/',
+      'dashboard-financeiro': '/dashboard/financeiro',
       'finance': '/financeiro',
       'alerts': '/financeiro/alerta',
       'map': '/obras/mapa',
@@ -73,17 +108,112 @@ export function LayoutPrincipal() {
       'access': '/acessos',
       'obras-diario': '/obras/diario',
       'financeiro-fluxo': '/financeiro/fluxo',
-      'financeiro-leandro': '/financeiro/leandro'
+      'financeiro-leandro': '/financeiro/leandro',
+      'financeiro-centro-custo': '/financeiro/centro-custo'
     };
     if (routeMap[id]) navigate(routeMap[id]);
   };
-
-  const showFilters = !['/logistica', '/acessos', '/obras/diario', '/financeiro/fluxo', '/financeiro/leandro'].includes(path);
 
   const buildingFilterOptions = useMemo(() => {
     if (selectedCompany === 'all') return buildings;
     return (buildings || []).filter((b: any) => String(b?.companyId) === String(selectedCompany));
   }, [buildings, selectedCompany]);
+
+  const yearOptions = useMemo(() => {
+    const currentYear = new Date().getFullYear();
+    const years: number[] = [];
+    for (let year = 2026; year <= currentYear + 1; year += 1) {
+      years.push(year);
+    }
+    return years;
+  }, []);
+
+  const filteredCompanies = useMemo(() => {
+    const term = companySearch.trim().toLowerCase();
+    if (!term) return companies || [];
+    return (companies || []).filter((c: any) => {
+      const name = String(c?.name || '').toLowerCase();
+      const id = String(c?.id || '');
+      return name.includes(term) || id.includes(term);
+    });
+  }, [companies, companySearch]);
+
+  const filteredBuildings = useMemo(() => {
+    const term = buildingSearch.trim().toLowerCase();
+    if (!term) return buildingFilterOptions || [];
+    return (buildingFilterOptions || []).filter((b: any) => {
+      const name = String(b?.name || '').toLowerCase();
+      const id = String(b?.id || '');
+      const code = String(b?.code || '');
+      return name.includes(term) || id.includes(term) || code.includes(term);
+    });
+  }, [buildingFilterOptions, buildingSearch]);
+
+  const filteredUsers = useMemo(() => {
+    const term = buyerSearch.trim().toLowerCase();
+    if (!term) return users || [];
+    return (users || []).filter((u: any) => {
+      const name = String(u?.name || '').toLowerCase();
+      const id = String(u?.id || '');
+      return name.includes(term) || id.includes(term);
+    });
+  }, [buyerSearch, users]);
+
+  const filteredRequesters = useMemo(() => {
+    const term = requesterSearch.trim().toLowerCase();
+    if (!term) return requesters || [];
+    return (requesters || []).filter((r: any) => {
+      const name = String(r?.name || '').toLowerCase();
+      const id = String(r?.id || '');
+      return name.includes(term) || id.includes(term);
+    });
+  }, [requesterSearch, requesters]);
+
+  useEffect(() => {
+    if (!showFilters) return;
+
+    const now = new Date();
+    if (globalPeriodMode === 'last6m') {
+      setStartDate(subMonths(now, 3));
+      setEndDate(now);
+      return;
+    }
+
+    const periodStart = new Date(allTimeYear, 0, 1);
+    const periodEnd = new Date(allTimeYear, 11, 31);
+    setStartDate(periodStart);
+    setEndDate(periodEnd > now ? now : periodEnd);
+  }, [allTimeYear, globalPeriodMode, setEndDate, setStartDate, showFilters]);
+
+  useEffect(() => {
+    const value = buildingIdInput.trim();
+    if (!value) return;
+
+    const matchedBuilding = (buildings || []).find(
+      (b: any) => String(b?.id) === value || String(b?.code || '') === value,
+    );
+
+    if (!matchedBuilding) return;
+
+    const nextBuildingId = String(matchedBuilding?.id);
+    const nextCompanyId = String(matchedBuilding?.companyId || matchedBuilding?.company_id || '');
+
+    if (fcSelectedBuilding !== nextBuildingId) {
+      setFcSelectedBuilding(nextBuildingId);
+    }
+
+    if (nextCompanyId && selectedCompany !== nextCompanyId) {
+      setSelectedCompany(nextCompanyId);
+    }
+  }, [buildingIdInput, buildings, fcSelectedBuilding, selectedCompany, setFcSelectedBuilding, setSelectedCompany]);
+
+  useEffect(() => {
+    if (fcSelectedBuilding === 'all') {
+      setBuildingIdInput('');
+      return;
+    }
+    setBuildingIdInput(String(fcSelectedBuilding));
+  }, [fcSelectedBuilding]);
 
   useEffect(() => {
     if (!showFilters) return;
@@ -97,7 +227,17 @@ export function LayoutPrincipal() {
 
   const downloadData = () => {
     // Moved to Context or we can re-implement here later
-    alert("Função de download movida temporariamente");
+    alert("FunÃ§Ã£o de download movida temporariamente");
+  };
+
+  const clearFilters = () => {
+    setGlobalPeriodMode('last6m');
+    setAllTimeYear(new Date().getFullYear());
+    setBuildingIdInput('');
+    setSelectedCompany('all');
+    setFcSelectedBuilding('all');
+    setSelectedUser('all');
+    setSelectedRequester('all');
   };
 
   if (!sessionUser) return null;
@@ -110,56 +250,44 @@ export function LayoutPrincipal() {
       
       {/* Header */}
       <header className={cn(
-        "border-b backdrop-blur-xl sticky top-0 z-50 print:hidden shadow-sm",
-        isDark ? "border-slate-800 bg-[#11141A]/95" : "border-slate-200 bg-white/95"
+        "border-b sticky top-0 z-50 print:hidden",
+        isDark ? "border-slate-800 bg-[#11141A]" : "border-slate-200 bg-white"
       )}>
-        <div className="tablet-safe-wrap w-full max-w-[98%] 2xl:max-w-[1800px] mx-auto px-4 sm:px-6 h-16 sm:h-20 flex items-center justify-between gap-3">
-          {/* Logo */}
-          <div className="flex items-center gap-3 shrink-0 min-w-0">
-            <img
-              src={isDark ? logoWordmarkDark : logoWordmark}
-              alt="Dinâmica Empreendimentos"
-              className={cn(
-                "w-auto",
-                isDark ? "h-10 sm:h-11" : "h-9 sm:h-11"
-              )}
-            />
-            <div>
-              <h1 className="hidden">Dinâmica</h1>
-              <div className="flex items-center gap-2">
-                <p className="hidden sm:block text-[10px] font-bold tracking-[0.2em] text-[#4CB232] uppercase">Dashboard Financeiro</p>
-                {apiStatus === 'online' && (
-                  <span className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-[9px] font-bold text-emerald-500 uppercase tracking-wider">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                    Live
-                  </span>
+        <div className="w-full max-w-[98%] 2xl:max-w-[1800px] mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4 flex flex-col gap-2">
+          {/* Main Header Row */}
+          <div className="w-full flex items-center gap-3 sm:gap-4 lg:gap-5">
+            {/* Logo */}
+            <div className="flex items-center gap-2 sm:gap-3 shrink min-w-0">
+              <img
+                src={isDark ? logoWordmarkDark : logoWordmark}
+                alt="DinÃ¢mica Empreendimentos"
+                className={cn(
+                  "w-auto",
+                  isDark ? "h-9 sm:h-10" : "h-8 sm:h-10"
                 )}
-              </div>
+              />
+              <h1 className="hidden">DinÃ¢mica</h1>
             </div>
-          </div>
 
-          {/* Desktop Nav */}
-          <NavigationMenu activeTab={activeTab} setActiveTab={setActiveTab as any} isRestrictedUser={isRestrictedUser} />
-
-          {/* Desktop Actions */}
-          <div className="hidden xl:flex items-center gap-2 2xl:gap-3">
+            {/* Desktop Actions */}
+            <div className="hidden lg:flex items-center gap-3 shrink-0 ml-auto">
             <div className={cn(
-              "flex flex-col rounded-xl border px-3 py-2 text-xs font-bold min-w-[128px] max-w-[150px]",
+              "flex flex-col rounded-lg border px-2 py-1.5 text-xs font-bold",
               isDark ? "border-slate-700 bg-slate-900 text-slate-200" : "border-slate-200 bg-slate-50 text-slate-700"
             )}>
-              <div className="flex items-center gap-2">
-                <UserIcon size={14} className="text-[#4CB232]" />
-                <span className="truncate">{sessionUser.name}</span>
+              <div className="flex items-center gap-1.5">
+                <UserIcon size={12} className="text-[#4CB232]" />
+                <span className="truncate max-w-[90px]">{sessionUser.name}</span>
               </div>
               <Button
                 onClick={logout}
                 variant="outline"
                 className={cn(
-                  "mt-2 h-9 font-bold rounded-lg px-3 gap-2",
+                  "mt-1 h-7 text-xs font-bold rounded-md px-2 gap-1",
                   isDark ? "border-slate-700 bg-slate-800 text-slate-100 hover:bg-slate-700" : "border-slate-200 bg-white text-slate-700 hover:bg-slate-100"
                 )}
               >
-                <LogOut size={14} />
+                <LogOut size={11} />
                 <span>Sair</span>
               </Button>
             </div>
@@ -168,74 +296,174 @@ export function LayoutPrincipal() {
               onClick={toggleThemeMode}
               variant="outline"
               className={cn(
-                "rounded-xl h-11 px-3 2xl:px-4 gap-2 font-bold",
+                "rounded-lg h-9 px-2 gap-1.5 font-bold text-sm",
                 isDark ? "border-slate-700 bg-slate-900 text-slate-100 hover:bg-slate-800" : "border-slate-200 bg-white text-slate-700 hover:bg-slate-100"
               )}
             >
-              {isDark ? <Sun size={16} /> : <Moon size={16} />}
-              <span>{isDark ? 'Dia' : 'Noite'}</span>
-            </Button>
-            
-            <Button
-              onClick={syncSienge}
-              disabled={syncing}
-              className={cn(
-                "relative overflow-hidden text-white font-bold rounded-xl h-11 px-3 2xl:px-4 gap-2 shrink-0 min-w-[176px]",
-                isDark ? "bg-[#1B3C58] hover:bg-[#234b6e]" : "bg-[#102A40] hover:bg-[#173A57]"
-              )}
-            >
-              {syncing && (
-                <span
-                  aria-hidden
-                  className={cn(
-                    "absolute inset-y-0 left-0",
-                    isDark ? "bg-white/10" : "bg-white/20"
-                  )}
-                  style={{ width: `${Math.max(0, Math.min(100, syncProgress || 0))}%` }}
-                />
-              )}
-              <span className="relative z-10 flex items-center gap-2">
-                <RefreshCw size={16} className={cn(syncing && "animate-spin")} />
-                <span>{syncing ? "Atualizando..." : "Atualizar Dados"}</span>
-              </span>
+              {isDark ? <Sun size={14} /> : <Moon size={14} />}
+              <span className="hidden xl:inline">{isDark ? 'Dia' : 'Noite'}</span>
             </Button>
             
             <Button
               onClick={downloadData}
               variant="outline"
-              className="bg-[#4CB232]/10 text-[#3A9928] border-[#4CB232]/30 hover:bg-[#4CB232] hover:text-white font-bold rounded-xl h-11 px-3 2xl:px-4 gap-2"
+              className="bg-[#4CB232]/10 text-[#3A9928] border-[#4CB232]/30 hover:bg-[#4CB232] hover:text-white font-bold rounded-lg h-9 px-2 gap-1.5 text-sm"
             >
-              <Download size={16} />
-              <span className="hidden 2xl:inline">Baixar Dados</span>
+              <Download size={14} />
+              <span className="hidden xl:inline">Baixar</span>
             </Button>
           </div>
 
-          {/* Mobile Actions (Menu Toggle) */}
-          <div className="flex xl:hidden items-center gap-2">
+            {/* Mobile Actions */}
+            <div className="flex lg:hidden items-center gap-1">
             <button
               onClick={syncSienge}
               disabled={syncing}
-              className={cn("w-9 h-9 flex items-center justify-center rounded-xl text-white", isDark ? "bg-[#1B3C58]" : "bg-[#102A40]")}
+              className={cn("w-8 h-8 flex items-center justify-center rounded-lg text-white", isDark ? "bg-[#1B3C58]" : "bg-[#102A40]")}
             >
-              <RefreshCw size={16} className={cn(syncing && "animate-spin")} />
+              <RefreshCw size={14} className={cn(syncing && "animate-spin")} />
             </button>
             <button
               onClick={toggleThemeMode}
-              className={cn("w-9 h-9 flex items-center justify-center rounded-xl", isDark ? "bg-slate-900 text-slate-100" : "bg-white text-slate-700 border border-slate-200")}
+              className={cn("w-8 h-8 flex items-center justify-center rounded-lg", isDark ? "bg-slate-900 text-slate-100" : "bg-white text-slate-700 border border-slate-200")}
             >
-              {isDark ? <Sun size={15} /> : <Moon size={15} />}
+              {isDark ? <Sun size={14} /> : <Moon size={14} />}
             </button>
             <button
               onClick={logout}
-              className={cn("w-9 h-9 flex items-center justify-center rounded-xl", isDark ? "bg-slate-800 text-slate-200" : "bg-slate-200 text-slate-700")}
+              className={cn("w-8 h-8 flex items-center justify-center rounded-lg", isDark ? "bg-slate-800 text-slate-200" : "bg-slate-200 text-slate-700")}
             >
-              <LogOut size={16} />
+              <LogOut size={14} />
             </button>
+            </div>
+          </div>
+
+          {/* Status Block Row - Centered like navigation tabs */}
+          <div className="relative z-40 w-full flex justify-start lg:justify-center overflow-x-auto lg:overflow-visible custom-scrollbar">
+            <div className="hidden lg:flex items-center gap-2.5 flex-nowrap">
+              {apiStatus === 'online' && (
+                <span className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-emerald-500/10 border border-emerald-500/25 text-[11px] font-black text-emerald-500 uppercase tracking-wider whitespace-nowrap">
+                  <span className="w-1 h-1 rounded-full bg-emerald-500 animate-pulse" style={{ marginBottom: '0px', marginTop: '0px' }} />
+                  Live
+                </span>
+              )}
+              <span className={cn(
+                "inline-flex items-center rounded-lg border px-3.5 py-2 text-[11px] font-bold uppercase tracking-wider whitespace-nowrap",
+                isDark ? "border-slate-700 bg-slate-900 text-slate-300" : "border-slate-200 bg-white text-slate-600"
+              )} style={{ marginBottom: '0px', marginTop: '0px' }}>
+                {latestSyncLabel}
+              </span>
+              <button
+                type="button"
+                onClick={syncSienge}
+                disabled={syncing}
+                className={cn(
+                  "inline-flex items-center gap-1.5 rounded-lg border px-3.5 py-2 text-[11px] font-black uppercase tracking-wider transition whitespace-nowrap",
+                  isDark
+                    ? "border-[#4CB232]/35 bg-[#4CB232]/12 text-[#8BE06B] hover:bg-[#4CB232]/25"
+                    : "border-[#4CB232]/35 bg-[#4CB232]/12 text-[#2D7A1D] hover:bg-[#4CB232]/22"
+                )}
+                style={{ marginBottom: '0px', marginTop: '0px' }}
+              >
+                <RefreshCw size={13} className={cn(syncing && 'animate-spin')} />
+                <span className="hidden sm:inline">{syncing ? 'Sincronizando' : 'Sincronizar'}</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setSyncDetailsOpen(true)}
+                className={cn(
+                  "inline-flex items-center gap-1.5 rounded-lg border px-3.5 py-2 text-[11px] font-black uppercase tracking-wider transition whitespace-nowrap",
+                  isDark
+                    ? "border-slate-700 bg-slate-900 text-slate-200 hover:bg-slate-800"
+                    : "border-slate-200 bg-white text-slate-600 hover:bg-slate-100"
+                )}
+                style={{ marginBottom: '0px', marginTop: '0px' }}
+              >
+                Detalhar AtualizaÃ§Ã£o
+              </button>
+            </div>
+          </div>
+
+          {/* Navigation Tabs */}
+          <div className="relative z-40 w-full flex justify-start lg:justify-center overflow-x-auto lg:overflow-visible custom-scrollbar pb-1" style={{ marginBottom: '0px', marginTop: '0px' }}>
+            <div className="w-fit">
+              <NavigationMenu activeTab={activeTab} setActiveTab={setActiveTab as any} isRestrictedUser={isRestrictedUser} />
+            </div>
           </div>
         </div>
       </header>
 
-      <main className="w-full max-w-full 2xl:max-w-[1800px] mx-auto px-4 sm:px-6 py-6 sm:py-10 pb-24 xl:pb-10 pt-24 xl:pt-10">
+      {syncDetailsOpen && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/70 p-4 print:hidden" onClick={() => setSyncDetailsOpen(false)}>
+          <div
+            className={cn(
+              "w-full max-w-3xl rounded-2xl border shadow-2xl overflow-hidden",
+              isDark ? "border-slate-800 bg-[#11141A]" : "border-slate-200 bg-white"
+            )}
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className={cn("flex items-start justify-between gap-4 border-b px-5 py-4", isDark ? "border-slate-800" : "border-slate-200") }>
+              <div>
+                <div className="text-[11px] uppercase tracking-[0.24em] text-[#4CB232] font-black">Detalhamento da atualizaÃ§Ã£o</div>
+                <div className={cn("mt-1 text-sm", isDark ? "text-slate-300" : "text-slate-600")}>{syncInfo?.message || 'SincronizaÃ§Ã£o concluÃ­da'}</div>
+              </div>
+              <Button variant="ghost" onClick={() => setSyncDetailsOpen(false)}>Fechar</Button>
+            </div>
+            <div className="p-5 space-y-4 max-h-[70vh] overflow-auto custom-scrollbar">
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+                <div className={cn("rounded-xl border p-3", isDark ? "border-slate-800 bg-white/[0.03]" : "border-slate-200 bg-slate-50")}>
+                  <div className="text-[10px] uppercase tracking-wider text-slate-400">InÃ­cio</div>
+                  <div className={cn("mt-1 text-sm font-semibold", isDark ? "text-white" : "text-slate-900")}>{syncInfo?.started_at ? new Date(syncInfo.started_at).toLocaleString('pt-BR') : 'â€”'}</div>
+                </div>
+                <div className={cn("rounded-xl border p-3", isDark ? "border-slate-800 bg-white/[0.03]" : "border-slate-200 bg-slate-50")}>
+                  <div className="text-[10px] uppercase tracking-wider text-slate-400">Fim</div>
+                  <div className={cn("mt-1 text-sm font-semibold", isDark ? "text-white" : "text-slate-900")}>{syncInfo?.finished_at ? new Date(syncInfo.finished_at).toLocaleString('pt-BR') : 'â€”'}</div>
+                </div>
+                <div className={cn("rounded-xl border p-3", isDark ? "border-slate-800 bg-white/[0.03]" : "border-slate-200 bg-slate-50")}>
+                  <div className="text-[10px] uppercase tracking-wider text-slate-400">Arquivos atualizados</div>
+                  <div className={cn("mt-1 text-sm font-semibold", isDark ? "text-emerald-300" : "text-emerald-700")}>{updatedFiles.length}</div>
+                </div>
+              </div>
+
+              <div className={cn("rounded-xl border p-3 text-sm", isDark ? "border-slate-800 bg-white/[0.02] text-slate-300" : "border-slate-200 bg-slate-50 text-slate-700")}>
+                <div className="text-[10px] uppercase tracking-wider text-slate-400">Ãšltima atualizaÃ§Ã£o</div>
+                <div className="mt-1 font-medium">{latestSyncLabel}</div>
+              </div>
+
+              {updatedFiles.length > 0 ? (
+                <div className={cn("overflow-hidden rounded-2xl border", isDark ? "border-slate-800" : "border-slate-200")}>
+                  <table className="w-full border-separate border-spacing-0 text-sm">
+                    <thead className={cn(isDark ? "bg-slate-900 text-slate-300" : "bg-slate-50 text-slate-600")}>
+                      <tr>
+                        <th className="px-3 py-2 text-left text-[11px] uppercase tracking-wider">Arquivo</th>
+                        <th className="px-3 py-2 text-left text-[11px] uppercase tracking-wider">Dataset</th>
+                        <th className="px-3 py-2 text-left text-[11px] uppercase tracking-wider">Motivo</th>
+                        <th className="px-3 py-2 text-left text-[11px] uppercase tracking-wider">PerÃ­odo</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {updatedFiles.map((file: any) => (
+                        <tr key={file.file_name} className={cn("border-t", isDark ? "border-slate-800 odd:bg-white/[0.02]" : "border-slate-200 odd:bg-slate-50")}>
+                          <td className={cn("px-3 py-2 font-mono text-xs break-all", isDark ? "text-slate-100" : "text-slate-800")}>{file.file_name}</td>
+                          <td className={cn("px-3 py-2", isDark ? "text-slate-300" : "text-slate-700")}>{file.dataset}</td>
+                          <td className={cn("px-3 py-2", isDark ? "text-slate-300" : "text-slate-700")}>{file.reason || 'â€”'}</td>
+                          <td className={cn("px-3 py-2 text-xs", isDark ? "text-slate-400" : "text-slate-500")}>{file.start_date || 'â€”'} {file.end_date ? `atÃ© ${file.end_date}` : ''}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <div className={cn("rounded-xl border p-4 text-sm", isDark ? "border-slate-800 bg-white/[0.02] text-slate-400" : "border-slate-200 bg-slate-50 text-slate-500")}>
+                  Nenhum arquivo novo foi gerado nesta atualizaÃ§Ã£o.
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      <main className="w-full max-w-full 2xl:max-w-[1800px] mx-auto px-4 sm:px-6 py-6 sm:py-10 pb-24 xl:pb-10 pt-10 xl:pt-8">
         
         {/* Filters Topbar */}
         {showFilters && (
@@ -250,13 +478,11 @@ export function LayoutPrincipal() {
             <div className={cn("md:block", mobileFiltersOpen ? "block" : "hidden")}>
               <div className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-end gap-4 px-4 sm:px-6 pb-4 sm:pb-6 pt-0">
                 <div className="space-y-2 flex-1 sm:flex-none">
-                  <Label className="text-[10px] font-black uppercase tracking-widest text-orange-500">Período</Label>
+                  <Label className="text-[10px] font-black uppercase tracking-widest text-orange-500">PerÃ­odo</Label>
                   <div className="flex items-center gap-2 bg-black/30 border border-white/10 rounded-xl p-1 h-11">
                     <button
                       onClick={() => {
                         setGlobalPeriodMode('last6m');
-                        setStartDate(undefined);
-                        setEndDate(undefined);
                       }}
                       className={cn(
                         "h-9 px-3 rounded-lg text-[11px] font-black uppercase tracking-wide transition-all",
@@ -265,13 +491,11 @@ export function LayoutPrincipal() {
                           : "text-gray-300 hover:text-white hover:bg-white/10"
                       )}
                     >
-                      Últimos 12 meses
+                      Ãšltimos 3 meses
                     </button>
                     <button
                       onClick={() => {
                         setGlobalPeriodMode('all');
-                        setStartDate(undefined);
-                        setEndDate(undefined);
                       }}
                       className={cn(
                         "h-9 px-3 rounded-lg text-[11px] font-black uppercase tracking-wide transition-all",
@@ -280,9 +504,19 @@ export function LayoutPrincipal() {
                           : "text-gray-300 hover:text-white hover:bg-white/10"
                       )}
                     >
-                      Período total
+                      PerÃ­odo total
                     </button>
                   </div>
+                </div>
+
+                <div className="space-y-2 w-[100px]">
+                  <Label className="text-[10px] font-black uppercase tracking-widest text-orange-500">ID</Label>
+                  <input
+                    value={buildingIdInput}
+                    onChange={(e) => setBuildingIdInput(e.target.value)}
+                    placeholder="obra"
+                    className="w-full h-11 rounded-xl bg-black/40 border border-white/10 px-3 text-sm font-bold text-white placeholder:text-gray-500 outline-none focus:border-orange-500"
+                  />
                 </div>
 
                 <div className="space-y-2 flex-1 sm:flex-none">
@@ -291,7 +525,7 @@ export function LayoutPrincipal() {
                     <PopoverTrigger asChild>
                       <Button variant="outline" className={cn("w-full sm:w-[160px] bg-black/40 border-white/10 h-11 rounded-xl justify-start text-left font-bold text-white", !startDate && "text-gray-400")}>
                         <CalendarIcon className="mr-2 h-4 w-4 text-orange-500" />
-                        {startDate ? format(startDate, "dd/MM/yyyy") : <span>Início</span>}
+                        {startDate ? format(startDate, "dd/MM/yyyy") : <span>InÃ­cio</span>}
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-0 bg-[#161618] border-white/10" align="start">
@@ -335,77 +569,175 @@ export function LayoutPrincipal() {
 
                 <div className="space-y-2 flex-1 min-w-[200px]">
                   <Label className="text-[10px] font-black uppercase tracking-widest text-orange-500">Empresa (Sienge)</Label>
-                  <Select value={selectedCompany} onValueChange={setSelectedCompany}>
-                    <SelectTrigger className="w-full bg-black/40 border-white/10 h-11 rounded-xl text-white font-bold">
-                      <span className="truncate">{selectedCompany === 'all' ? 'Todas as Empresas' : companies?.find((c: any) => String(c.id) === selectedCompany)?.name || 'Todas as Empresas'}</span>
-                    </SelectTrigger>
-                    <SelectContent className="bg-[#161618] border-white/10 text-white">
-                      <SelectItem value="all">Todas as Empresas</SelectItem>
-                      {companies?.map((c: any) => (
-                        <SelectItem key={`empresa-${c.id}`} value={String(c.id)}>{c.name || `Empresa ${c.id}`}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <div className="flex items-center gap-2">
+                    <div className="flex-1">
+                      <Select value={selectedCompany} onValueChange={setSelectedCompany}>
+                        <SelectTrigger className="w-full bg-black/40 border-white/10 h-11 rounded-xl text-white font-bold">
+                          <span className="truncate">{selectedCompany === 'all' ? 'Todas as Empresas' : companies?.find((c: any) => String(c.id) === selectedCompany)?.name || 'Todas as Empresas'}</span>
+                        </SelectTrigger>
+                        <SelectContent className="bg-[#161618] border-white/10 text-white">
+                          <SelectItem value="all">Todas as Empresas</SelectItem>
+                          {companies?.map((c: any) => (
+                            <SelectItem key={`empresa-${c.id}`} value={String(c.id)}>{c.name || `Empresa ${c.id}`}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => setIsCompanyModalOpen(true)}
+                      className="h-11 w-11 p-0 border-white/10 bg-black/30 text-white hover:bg-white/10 rounded-xl"
+                      aria-label="Buscar empresa"
+                    >
+                      <Search size={16} />
+                    </Button>
+                  </div>
                 </div>
 
                 <div className="space-y-2 flex-1 min-w-[200px]">
                   <Label className="text-[10px] font-black uppercase tracking-widest text-orange-500">Obra</Label>
-                  <Select value={fcSelectedBuilding} onValueChange={setFcSelectedBuilding}>
-                    <SelectTrigger className="w-full bg-black/40 border-white/10 h-11 rounded-xl text-white font-bold">
-                      <span className="truncate">{fcSelectedBuilding === 'all' ? 'Todas as Obras' : buildings?.find((b: any) => String(b.id) === fcSelectedBuilding)?.name || `Obra ${fcSelectedBuilding}`}</span>
-                    </SelectTrigger>
-                    <SelectContent className="bg-[#161618] border-white/10 text-white">
-                      <SelectItem value="all">Todas as Obras</SelectItem>
-                      {buildingFilterOptions?.map((b: any) => (
-                        <SelectItem key={`obra-${b.id}`} value={String(b.id)}>{b.name || `Obra ${b.id}`}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
+                  <div className="flex items-center gap-2">
+                    <div className="flex-1">
+                      <Select
+                        value={fcSelectedBuilding}
+                        onValueChange={(value) => {
+                          setFcSelectedBuilding(value);
+                          if (value === 'all') {
+                            setBuildingIdInput('');
+                            return;
+                          }
 
-                {!isDashboardGeral && (
-                  <>
-                    <div className="space-y-2 flex-1 min-w-[180px]">
-                      <Label className="text-[10px] font-black uppercase tracking-widest text-orange-500">Comprador</Label>
-                      <Select value={selectedUser} onValueChange={setSelectedUser}>
+                          setBuildingIdInput(value);
+                          const selected = (buildings || []).find((b: any) => String(b?.id) === String(value));
+                          if (selected?.companyId || selected?.company_id) {
+                            setSelectedCompany(String(selected.companyId || selected.company_id));
+                          }
+                        }}
+                      >
                         <SelectTrigger className="w-full bg-black/40 border-white/10 h-11 rounded-xl text-white font-bold">
-                          <span className="truncate">{selectedUser === 'all' ? 'Todos' : users?.find((u: any) => String(u.id) === selectedUser)?.name || 'Todos'}</span>
+                          <span className="truncate">{fcSelectedBuilding === 'all' ? 'Todas as Obras' : buildings?.find((b: any) => String(b.id) === fcSelectedBuilding)?.name || `Obra ${fcSelectedBuilding}`}</span>
                         </SelectTrigger>
                         <SelectContent className="bg-[#161618] border-white/10 text-white">
-                          <SelectItem value="all">Todos os Compradores</SelectItem>
-                          {users?.map((u: any) => (
-                            <SelectItem key={`user-${u.id}`} value={String(u.id)}>{u.name}</SelectItem>
+                          <SelectItem value="all">Todas as Obras</SelectItem>
+                          {buildingFilterOptions?.map((b: any) => (
+                            <SelectItem key={`obra-${b.id}`} value={String(b.id)}>{b.name || `Obra ${b.id}`}</SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
+                    </div>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => setIsBuildingModalOpen(true)}
+                      className="h-11 w-11 p-0 border-white/10 bg-black/30 text-white hover:bg-white/10 rounded-xl"
+                      aria-label="Buscar obra"
+                    >
+                      <Search size={16} />
+                    </Button>
+                  </div>
+                </div>
+
+                {globalPeriodMode === 'all' && (
+                  <div className="space-y-2 w-[120px]">
+                    <Label className="text-[10px] font-black uppercase tracking-widest text-orange-500">Ano</Label>
+                    <Select value={String(allTimeYear)} onValueChange={(value) => setAllTimeYear(Number(value))}>
+                      <SelectTrigger className="w-full bg-black/40 border-white/10 h-11 rounded-xl text-white font-bold">
+                        <span className="truncate">{String(allTimeYear)}</span>
+                      </SelectTrigger>
+                      <SelectContent className="bg-[#161618] border-white/10 text-white">
+                        {yearOptions.map((year) => (
+                          <SelectItem key={`year-${year}`} value={String(year)}>{String(year)}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
+
+                {showBuyerRequesterFilters && (
+                  <>
+                    <div className="space-y-2 flex-1 min-w-[180px]">
+                      <Label className="text-[10px] font-black uppercase tracking-widest text-orange-500">Comprador</Label>
+                      <div className="flex items-center gap-2">
+                        <div className="flex-1">
+                          <Select value={selectedUser} onValueChange={setSelectedUser}>
+                            <SelectTrigger className="w-full bg-black/40 border-white/10 h-11 rounded-xl text-white font-bold">
+                              <span className="truncate">{selectedUser === 'all' ? 'Todos' : users?.find((u: any) => String(u.id) === selectedUser)?.name || 'Todos'}</span>
+                            </SelectTrigger>
+                            <SelectContent className="bg-[#161618] border-white/10 text-white">
+                              <SelectItem value="all">Todos os Compradores</SelectItem>
+                              {users?.map((u: any) => (
+                                <SelectItem key={`user-${u.id}`} value={String(u.id)}>{u.name}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={() => setIsBuyerModalOpen(true)}
+                          className="h-11 w-11 p-0 border-white/10 bg-black/30 text-white hover:bg-white/10 rounded-xl"
+                          aria-label="Buscar comprador"
+                        >
+                          <Search size={16} />
+                        </Button>
+                      </div>
                     </div>
 
                     <div className="space-y-2 flex-1 min-w-[180px]">
                       <Label className="text-[10px] font-black uppercase tracking-widest text-orange-500">Solicitante</Label>
-                      <Select value={selectedRequester} onValueChange={setSelectedRequester}>
-                        <SelectTrigger className="w-full bg-black/40 border-white/10 h-11 rounded-xl text-white font-bold">
-                          <span className="truncate">{selectedRequester === 'all' ? 'Todos' : requesters?.find((r: any) => String(r.id) === selectedRequester)?.name || 'Todos'}</span>
-                        </SelectTrigger>
-                        <SelectContent className="bg-[#161618] border-white/10 text-white">
-                          <SelectItem value="all">Todos os Solicitantes</SelectItem>
-                          {requesters?.map((r: any) => (
-                            <SelectItem key={`requester-${r.id}`} value={String(r.id)}>{r.name}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                      <div className="flex items-center gap-2">
+                        <div className="flex-1">
+                          <Select value={selectedRequester} onValueChange={setSelectedRequester}>
+                            <SelectTrigger className="w-full bg-black/40 border-white/10 h-11 rounded-xl text-white font-bold">
+                              <span className="truncate">{selectedRequester === 'all' ? 'Todos' : requesters?.find((r: any) => String(r.id) === selectedRequester)?.name || 'Todos'}</span>
+                            </SelectTrigger>
+                            <SelectContent className="bg-[#161618] border-white/10 text-white">
+                              <SelectItem value="all">Todos os Solicitantes</SelectItem>
+                              {requesters?.map((r: any) => (
+                                <SelectItem key={`requester-${r.id}`} value={String(r.id)}>{r.name}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={() => setIsRequesterModalOpen(true)}
+                          className="h-11 w-11 p-0 border-white/10 bg-black/30 text-white hover:bg-white/10 rounded-xl"
+                          aria-label="Buscar solicitante"
+                        >
+                          <Search size={16} />
+                        </Button>
+                      </div>
                     </div>
                   </>
                 )}
 
-                <Button 
-                  onClick={() => {
-                    applyFilters();
-                    setMobileFiltersOpen(false);
-                  }} 
-                  className="h-11 px-6 bg-orange-600 hover:bg-orange-700 text-white font-black rounded-xl shadow-lg shadow-orange-600/20 w-full sm:w-auto"
-                >
-                  Confirmar Filtro
-                </Button>
+                <div className="flex items-end gap-2 w-full sm:w-auto">
+                  <Button
+                    onClick={() => {
+                      clearFilters();
+                      applyFilters();
+                      setMobileFiltersOpen(false);
+                    }}
+                    variant="outline"
+                    className="h-11 px-4 border-white/10 bg-black/30 text-white hover:bg-white/10 font-black rounded-xl w-full sm:w-auto"
+                  >
+                    <X size={14} className="mr-2" />
+                    Limpar
+                  </Button>
+                  <Button 
+                    onClick={() => {
+                      applyFilters();
+                      setMobileFiltersOpen(false);
+                    }} 
+                    className="h-11 px-6 bg-orange-600 hover:bg-orange-700 text-white font-black rounded-xl shadow-lg shadow-orange-600/20 w-full sm:w-auto"
+                  >
+                    <SlidersHorizontal size={14} className="mr-2" />
+                    Filtrar
+                  </Button>
+                </div>
               </div>
             </div>
           </div>
@@ -413,7 +745,175 @@ export function LayoutPrincipal() {
 
         <Outlet />
 
+        {isCompanyModalOpen && (
+          <ModalComponent title="Selecionar empresa" onClose={() => setIsCompanyModalOpen(false)}>
+            <input
+              value={companySearch}
+              onChange={(e) => setCompanySearch(e.target.value)}
+              placeholder="Buscar por nome ou ID"
+              className={cn("w-full h-10 rounded-lg border px-3 text-sm", isDark ? "bg-black/30 border-white/10 text-white placeholder:text-slate-500" : "bg-white border-slate-300 text-slate-800")}
+            />
+            <div className="max-h-[340px] overflow-auto space-y-2">
+              <label className={cn("flex items-center gap-2 text-sm cursor-pointer", isDark ? "text-slate-200" : "text-slate-700")}>
+                <input
+                  type="checkbox"
+                  checked={selectedCompany === 'all'}
+                  onChange={() => {
+                    setSelectedCompany('all');
+                    setIsCompanyModalOpen(false);
+                  }}
+                />
+                Todas as empresas
+              </label>
+              {filteredCompanies.map((c: any) => {
+                const id = String(c.id);
+                return (
+                  <label key={`company-modal-${id}`} className={cn("flex items-center gap-2 text-sm cursor-pointer", isDark ? "text-slate-200" : "text-slate-700")}>
+                    <input
+                      type="checkbox"
+                      checked={selectedCompany === id}
+                      onChange={() => {
+                        setSelectedCompany(id);
+                        setFcSelectedBuilding('all');
+                        setBuildingIdInput('');
+                        setIsCompanyModalOpen(false);
+                      }}
+                    />
+                    <span className="truncate">{c.name || `Empresa ${id}`} (ID: {id})</span>
+                  </label>
+                );
+              })}
+            </div>
+          </ModalComponent>
+        )}
+
+        {isBuildingModalOpen && (
+          <ModalComponent title="Selecionar obra" onClose={() => setIsBuildingModalOpen(false)}>
+            <input
+              value={buildingSearch}
+              onChange={(e) => setBuildingSearch(e.target.value)}
+              placeholder="Buscar por nome, ID ou código"
+              className={cn("w-full h-10 rounded-lg border px-3 text-sm", isDark ? "bg-black/30 border-white/10 text-white placeholder:text-slate-500" : "bg-white border-slate-300 text-slate-800")}
+            />
+            <div className="max-h-[340px] overflow-auto space-y-2">
+              <label className={cn("flex items-center gap-2 text-sm cursor-pointer", isDark ? "text-slate-200" : "text-slate-700")}>
+                <input
+                  type="checkbox"
+                  checked={fcSelectedBuilding === 'all'}
+                  onChange={() => {
+                    setFcSelectedBuilding('all');
+                    setBuildingIdInput('');
+                    setIsBuildingModalOpen(false);
+                  }}
+                />
+                Todas as obras
+              </label>
+              {filteredBuildings.map((b: any) => {
+                const id = String(b.id);
+                return (
+                  <label key={`building-modal-${id}`} className={cn("flex items-center gap-2 text-sm cursor-pointer", isDark ? "text-slate-200" : "text-slate-700")}>
+                    <input
+                      type="checkbox"
+                      checked={fcSelectedBuilding === id}
+                      onChange={() => {
+                        setFcSelectedBuilding(id);
+                        setBuildingIdInput(id);
+                        if (b?.companyId || b?.company_id) {
+                          setSelectedCompany(String(b.companyId || b.company_id));
+                        }
+                        setIsBuildingModalOpen(false);
+                      }}
+                    />
+                    <span>{b.name || `Obra ${id}`} (ID: {id})</span>
+                  </label>
+                );
+              })}
+            </div>
+          </ModalComponent>
+        )}
+
+        {showBuyerRequesterFilters && isBuyerModalOpen && (
+          <ModalComponent title="Selecionar comprador" onClose={() => setIsBuyerModalOpen(false)}>
+            <input
+              value={buyerSearch}
+              onChange={(e) => setBuyerSearch(e.target.value)}
+              placeholder="Buscar por nome ou ID"
+              className={cn("w-full h-10 rounded-lg border px-3 text-sm", isDark ? "bg-black/30 border-white/10 text-white placeholder:text-slate-500" : "bg-white border-slate-300 text-slate-800")}
+            />
+            <div className="max-h-[340px] overflow-auto space-y-2">
+              <label className={cn("flex items-center gap-2 text-sm cursor-pointer", isDark ? "text-slate-200" : "text-slate-700")}>
+                <input
+                  type="checkbox"
+                  checked={selectedUser === 'all'}
+                  onChange={() => {
+                    setSelectedUser('all');
+                    setIsBuyerModalOpen(false);
+                  }}
+                />
+                Todos os compradores
+              </label>
+              {filteredUsers.map((u: any) => {
+                const id = String(u.id);
+                return (
+                  <label key={`buyer-modal-${id}`} className={cn("flex items-center gap-2 text-sm cursor-pointer", isDark ? "text-slate-200" : "text-slate-700")}>
+                    <input
+                      type="checkbox"
+                      checked={selectedUser === id}
+                      onChange={() => {
+                        setSelectedUser(id);
+                        setIsBuyerModalOpen(false);
+                      }}
+                    />
+                    <span className="truncate">{u.name || `Usuário ${id}`}</span>
+                  </label>
+                );
+              })}
+            </div>
+          </ModalComponent>
+        )}
+
+        {showBuyerRequesterFilters && isRequesterModalOpen && (
+          <ModalComponent title="Selecionar solicitante" onClose={() => setIsRequesterModalOpen(false)}>
+            <input
+              value={requesterSearch}
+              onChange={(e) => setRequesterSearch(e.target.value)}
+              placeholder="Buscar por nome ou ID"
+              className={cn("w-full h-10 rounded-lg border px-3 text-sm", isDark ? "bg-black/30 border-white/10 text-white placeholder:text-slate-500" : "bg-white border-slate-300 text-slate-800")}
+            />
+            <div className="max-h-[340px] overflow-auto space-y-2">
+              <label className={cn("flex items-center gap-2 text-sm cursor-pointer", isDark ? "text-slate-200" : "text-slate-700")}>
+                <input
+                  type="checkbox"
+                  checked={selectedRequester === 'all'}
+                  onChange={() => {
+                    setSelectedRequester('all');
+                    setIsRequesterModalOpen(false);
+                  }}
+                />
+                Todos os solicitantes
+              </label>
+              {filteredRequesters.map((r: any) => {
+                const id = String(r.id);
+                return (
+                  <label key={`requester-modal-${id}`} className={cn("flex items-center gap-2 text-sm cursor-pointer", isDark ? "text-slate-200" : "text-slate-700")}>
+                    <input
+                      type="checkbox"
+                      checked={selectedRequester === id}
+                      onChange={() => {
+                        setSelectedRequester(id);
+                        setIsRequesterModalOpen(false);
+                      }}
+                    />
+                    <span className="truncate">{r.name || `Solicitante ${id}`}</span>
+                  </label>
+                );
+              })}
+            </div>
+          </ModalComponent>
+        )}
+
       </main>
     </div>
   );
 }
+

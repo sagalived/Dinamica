@@ -1,0 +1,10 @@
+EMPRESA: BRASIL STEEL COMPANY REPRESENTACOES LTDA
+ID_EMPRESA: 9
+Fonte: Sienge API ao vivo, sem uso do banco local.
+Valores em Real (BRL). Margem = MC / Receita. MC = Receita - (Custos + Despesas).
+Gerado em: 2026-05-06
+
+OBRA;ID_OBRA;RECEITA;CUSTOS;DESPESAS;TOTAL_VARIAVEIS;MC;MARGEM
+ESCRITORIO BRASIL STEEL;90001;R$ 0,00;R$ 0,00;R$ 0,00;R$ 0,00;R$ 0,00;0,00%
+
+TOTAL;9;R$ 0,00;R$ 0,00;R$ 0,00;R$ 0,00;R$ 0,00;0,00%

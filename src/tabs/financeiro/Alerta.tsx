@@ -12,6 +12,7 @@ import { Button } from '../../components/ui/button';
 import { ResponsiveContainer, LineChart, Line } from 'recharts';
 import { useState, useMemo } from 'react';
 import { format } from 'date-fns';
+import { FilterBar, FilterState } from '../../components/FilterBar';
 
 export function FinanceiroAlerta() {
   const { 
@@ -33,6 +34,15 @@ export function FinanceiroAlerta() {
   const [isPrinting, setIsPrinting] = useState(false);
   const [searchItem, setSearchItem] = useState('');
   const [expandedDetail, setExpandedDetail] = useState<any>(null);
+  const [currentFilters, setCurrentFilters] = useState<FilterState | null>(null);
+
+  const handleFilterApply = (filters: FilterState) => {
+    setCurrentFilters(filters);
+  };
+
+  const handleFilterClear = () => {
+    setCurrentFilters(null);
+  };
 
   const resolveBuildingName = (id: any) => buildings.find((b: any) => String(b.id) === String(id))?.name || id;
 
@@ -87,6 +97,8 @@ export function FinanceiroAlerta() {
               exit={{ opacity: 0, scale: 0.95 }}
               className="w-full space-y-6"
             >
+              {/* Filtros */}
+              <FilterBar onFilter={handleFilterApply} onClear={handleFilterClear} />
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
                 <h3 className="text-xl sm:text-2xl font-black text-white flex items-center gap-3">
                   <Bell className="text-orange-500" size={24} />

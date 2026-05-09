@@ -1,0 +1,2 @@
+CATEGORIA;DESCRICAO;VALOR
+# Arquivo de template para 'mc-por-obra' — preencha os dados abaixo

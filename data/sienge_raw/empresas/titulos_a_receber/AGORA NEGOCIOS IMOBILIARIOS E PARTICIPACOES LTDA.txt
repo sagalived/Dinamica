@@ -1,0 +1,22 @@
+﻿EMPRESA: AGORA NEGOCIOS IMOBILIARIOS E PARTICIPACOES LTDA
+ID_EMPRESA: 6
+PERIODO: 2019-01-01 ate 2026-05-30
+Fonte: Sienge API REST ao vivo (/accounts-receivable/receivable-bills e installments), sem uso do banco local.
+Observacao: SPC, Serasa, taxa administrativa e seguro ficam como Nao/R$ 0,00 quando o endpoint do Sienge nao retorna esses campos.
+Atualizado ate o mes processado: 2026-05
+Registros: companies=10; customers=134; works=347; titles=1488; installments=1488; months-written=89.
+
+OBRAS ADMINISTRADAS
+ID_OBRA;OBRA
+60004;BRASILIDADE URBANISMO - LARGO DOS VENTOS
+60002;CASACOR - BANGALÔ REFÚGIO
+60003;CASACOR - LOFT
+60006;CASAS DUPLEX DE 132,00 M² - TAPUIO
+60001;ESCRITORIO AGORA NEGOCIOS IMOBILIARIOS E PARTICIPACOES LTDA
+60005;VILLA SANTORINI
+
+TITULOS_A_RECEBER
+Título;Cód. empresa;Empresa;Documento;Nº documento;Data emissão;Cód. cliente;Cliente;Origem;Inadimplente;SPC;Serasa;Subjudice;Taxa administrativa;Seguro;Valor a receber;Valor baixado;Valor líquido;Valor total;Observação
+1195;6;AGORA NEGOCIOS IMOBILIARIOS E PARTICIPACOES LTDA;REC;1;05/11/2024;69;AJUSTE DE CAIXA;CR;Não;Não;Não;Não;R$ 0,00;R$ 0,00;R$ 0,00;R$ 1.158,03;R$ 1.158,03;R$ 1.158,03;REEMBOLSO REFERENTE A COMPRA DE BEBIDAS CASA COR
+
+TOTAL;6;AGORA NEGOCIOS IMOBILIARIOS E PARTICIPACOES LTDA;;;;;;;;;;;R$ 0,00;R$ 0,00;R$ 0,00;R$ 1.158,03;R$ 1.158,03;R$ 1.158,03;

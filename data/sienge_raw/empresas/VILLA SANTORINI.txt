@@ -1,0 +1,12 @@
+﻿EMPRESA: VILLA SANTORINI
+ID_EMPRESA: 10
+PERIODO: 2019-01-01 ate 2026-05-06
+Fonte: Sienge API REST ao vivo (accounts-statements, bills, bill budget-categories e cost-centers), sem uso do banco local. Arquivo atualizado incrementalmente de 20 em 20 registros.
+Formula: Margem = MC / Receita. MC = Receita - Custos/Despesas.
+Registros: accounts-statements=11; statements-applied=0; bills=12; bills-applied=12; bill-categories=12; cost-centers=2; batches-written=11.
+
+OBRA;ID_OBRA;RECEITA;CUSTOS_DESPESAS;MC;MARGEM
+ESCRITORIO VILLA SANTORINI;10001;R$ 0,00;R$ 66.539,71;R$ -66.539,71;0,00%
+OBRA VILLA SANTORINI;10002;R$ 0,00;R$ 0,00;R$ 0,00;0,00%
+
+TOTAL;10;R$ 0,00;R$ 66.539,71;R$ -66.539,71;0,00%

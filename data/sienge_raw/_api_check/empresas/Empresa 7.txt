@@ -1,0 +1,10 @@
+﻿EMPRESA: Empresa 7
+ID_EMPRESA: 7
+PERIODO: 2019-01-01 ate 2026-05-30
+Fonte: Sienge API REST ao vivo (accounts-statements, bills, bill budget-categories e cost-centers), sem uso do banco local. Arquivo atualizado incrementalmente de 20 em 20 registros.
+Formula: Margem = MC / Receita. MC = Receita - Custos/Despesas.
+Registros: accounts-statements=0; statements-applied=0; bills=0; bills-applied=0; bill-categories=0; cost-centers=0; batches-written=0.
+
+OBRA;ID_OBRA;RECEITA;CUSTOS_DESPESAS;MC;MARGEM
+
+TOTAL;7;R$ 0,00;R$ 0,00;R$ 0,00;0,00%

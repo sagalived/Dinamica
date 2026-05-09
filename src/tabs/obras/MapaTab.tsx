@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../..
 import { Map as MapIcon, Search, User as UserIcon } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { sienge as api } from '../../lib/api';
+import { FilterBar, FilterState } from '../../components/FilterBar';
 
 export function MapaTab() {
   const { 
@@ -18,6 +19,17 @@ export function MapaTab() {
     setBuildings
   } = useSienge();
 
+  // Estado dos filtros
+  const [currentFilters, setCurrentFilters] = useState<FilterState | null>(null);
+
+  const handleFilterApply = (filters: FilterState) => {
+    setCurrentFilters(filters);
+  };
+
+  const handleFilterClear = () => {
+    setCurrentFilters(null);
+  };
+
   const { isAdmin } = useAuth();
 
   const buildingOptions = [...buildings].sort((a, b) => a.name.localeCompare(b.name));
@@ -28,18 +40,22 @@ export function MapaTab() {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="grid grid-cols-1 lg:grid-cols-4 gap-4 sm:gap-6 min-h-[400px] sm:h-[600px]"
+      className="space-y-6"
     >
-      {/* 1. Lista de Obras */}
-      <Card className="lg:col-span-1 bg-[#161618] border-white/5 shadow-2xl flex flex-col h-full">
-        <CardHeader className="pb-4">
-          <CardTitle className="text-white font-black uppercase text-sm tracking-tight">Obras Ativas</CardTitle>
-          <CardDescription className="text-xs">
-            {(buildingOptions.filter(b => b.name.toLowerCase().includes(buildingSearch.toLowerCase()) || String(b.id).includes(buildingSearch)) || []).length} encontradas
-          </CardDescription>
-          <div className="mt-3 relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" size={14} />
-            <input 
+      {/* Filtros */}
+      <FilterBar onFilter={handleFilterApply} onClear={handleFilterClear} />
+
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 sm:gap-6 min-h-[400px] sm:h-[600px]">
+        {/* 1. Lista de Obras */}
+        <Card className="lg:col-span-1 bg-[#161618] border-white/5 shadow-2xl flex flex-col h-full">
+          <CardHeader className="pb-4">
+            <CardTitle className="text-white font-black uppercase text-sm tracking-tight">Obras Ativas</CardTitle>
+            <CardDescription className="text-xs">
+              {(buildingOptions.filter(b => b.name.toLowerCase().includes(buildingSearch.toLowerCase()) || String(b.id).includes(buildingSearch)) || []).length} encontradas
+            </CardDescription>
+            <div className="mt-3 relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" size={14} />
+              <input 
               type="text" 
               placeholder="Pesquisar obra..." 
               className="w-full bg-black/40 border border-white/10 rounded-lg py-2 pl-9 pr-3 text-xs text-white placeholder:text-gray-600 focus:outline-none focus:border-orange-500/50"
@@ -250,6 +266,7 @@ export function MapaTab() {
           )}
         </CardContent>
       </Card>
+    </div>
     </motion.div>
   );
 }

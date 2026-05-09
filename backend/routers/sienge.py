@@ -41,6 +41,20 @@ from backend.services.immutable_history import (
 from backend.services.nfe_documents import sync_nfe_documents_range
 from backend.services.sienge_open_accounts import sync_open_accounts_from_sienge
 from backend.services.sienge_received_accounts import sync_received_accounts_by_building_from_sienge
+from backend.services.sienge_financial_reports import (
+    get_financial_reports,
+    cleanup_old_financial_reports,
+    sync_financial_reports,
+)
+from backend.services.sienge_receivable_reconciliation import (
+    sync_receivable_titles_from_sienge,
+    validate_receivable_titles,
+)
+from backend.services.sienge_cache_sync import (
+    sync_and_repopulate_cache,
+    load_receivable_titles_with_fallback,
+    get_cache_stats,
+)
 
 
 def _parse_iso_datetime(value: str | None) -> datetime | None:
@@ -55,6 +69,11 @@ def _parse_iso_datetime(value: str | None) -> datetime | None:
         return datetime.fromisoformat(normalized)
     except Exception:
         return None
+
+
+def _get_min_date_2026() -> datetime:
+    """Retorna a data mínima para filtros: 01/01/2026 00:00:00 UTC"""
+    return datetime(2026, 1, 1, 0, 0, 0, tzinfo=timezone.utc)
 
 
 async def _ensure_immutable_history_step(db: Session, *, months_per_run_override: int | None = None) -> dict[str, Any]:
@@ -520,6 +539,7 @@ async def list_nfe_documents(
     current_user: AppUser = Depends(get_current_user),
     db: Session = Depends(get_db),
 ) -> Any:
+    # Valida e força 2026-01-01 como data mínima
     _validate_iso_date(startDate, "startDate")
     _validate_iso_date(endDate, "endDate")
 
@@ -1859,6 +1879,37 @@ async def filtered_data(
         )
         return building_company_map.get(bid, "")
 
+    def _item_building_id(item: dict[str, Any]) -> str:
+        bid = str(
+            item.get("buildingId")
+            or item.get("idObra")
+            or item.get("codigoObra")
+            or item.get("codigoVisivelObra")
+            or item.get("buildingCode")
+            or item.get("enterpriseId")
+            or ""
+        ).strip()
+        if bid in {"", "None", "undefined", "null", "0"}:
+            return ""
+        return bid
+
+    def _is_receivable_revenue(item: dict[str, Any]) -> bool:
+        # /accounts-statements mistura eventos financeiros diversos.
+        # Para faturamento (print do SIENGE), filtramos apenas receita efetiva.
+        kind = str(item.get("type") or "").strip().lower()
+        if kind:
+            if kind != "income":
+                return False
+
+        statement_type = str(item.get("statementType") or item.get("operationType") or "").strip().lower()
+        if "transf" in statement_type or "transfer" in statement_type or "saque" in statement_type:
+            return False
+
+        amount = _safe_float(
+            item.get("rawValue") if item.get("rawValue") is not None else item.get("valor") or item.get("amount") or item.get("value") or 0
+        )
+        return amount > 0
+
     filtered_financial = []
     if building_aliases is None:
         for item in financeiro:
@@ -1905,17 +1956,66 @@ async def filtered_data(
 
     filtered_receber = []
     if building_aliases is None:
+        bill_ids: list[str] = []
+        seen_bill_ids: set[str] = set()
         for item in receber:
+            if not _is_receivable_revenue(item):
+                continue
             date_numeric = _to_date_number(_transaction_filter_date(item))
             if not _in_range(date_numeric, start_ms, end_exclusive_ms):
                 continue
             if company_id != "all" and financial_company(item) != company_id:
                 continue
-            filtered_receber.append(item)
+            bill_id = str(item.get("billId") or item.get("bill_id") or "").strip()
+            if bill_id and bill_id not in seen_bill_ids:
+                seen_bill_ids.add(bill_id)
+                bill_ids.append(bill_id)
+
+        # Mesmo sem filtro de obra, tenta alocar por rateio para refletir o print por obra.
+        await _ensure_buildings_cost_cached(
+            bill_ids,
+            max_concurrency=10,
+            time_budget_s=45,
+            max_fetch=5000,
+        )
+
+        for item in receber:
+            if not _is_receivable_revenue(item):
+                continue
+            date_numeric = _to_date_number(_transaction_filter_date(item))
+            if not _in_range(date_numeric, start_ms, end_exclusive_ms):
+                continue
+            if company_id != "all" and financial_company(item) != company_id:
+                continue
+
+            bill_id = str(item.get("billId") or item.get("bill_id") or "").strip()
+            raw_value = _safe_float(item.get("rawValue") if item.get("rawValue") is not None else item.get("valor") or item.get("amount") or 0)
+            allocations = _select_allocations(bill_id, raw_value)
+            if allocations:
+                for alloc_building, alloc_amount in allocations:
+                    cloned = dict(item)
+                    cloned["buildingId"] = int(alloc_building) if alloc_building.isdigit() else alloc_building
+                    cloned["idObra"] = int(alloc_building) if alloc_building.isdigit() else alloc_building
+                    cloned["codigoObra"] = alloc_building
+                    cloned["rawValue"] = alloc_amount
+                    cloned["valor"] = abs(alloc_amount)
+                    filtered_receber.append(cloned)
+                continue
+
+            # Sem rateio: inclui apenas quando existir obra direta no próprio item.
+            direct_building = _item_building_id(item)
+            if direct_building:
+                cloned = dict(item)
+                cloned["buildingId"] = int(direct_building) if direct_building.isdigit() else direct_building
+                cloned["idObra"] = int(direct_building) if direct_building.isdigit() else direct_building
+                cloned["codigoObra"] = direct_building
+                filtered_receber.append(cloned)
     else:
         bill_ids: list[str] = []
         seen_bill_ids: set[str] = set()
         for item in receber:
+            if not _is_receivable_revenue(item):
+                continue
             date_numeric = _to_date_number(_transaction_filter_date(item))
             if not _in_range(date_numeric, start_ms, end_exclusive_ms):
                 continue
@@ -1929,6 +2029,8 @@ async def filtered_data(
         await _ensure_buildings_cost_cached(bill_ids)
 
         for item in receber:
+            if not _is_receivable_revenue(item):
+                continue
             date_numeric = _to_date_number(_transaction_filter_date(item))
             if not _in_range(date_numeric, start_ms, end_exclusive_ms):
                 continue
@@ -1936,7 +2038,8 @@ async def filtered_data(
                 continue
             bill_id = str(item.get("billId") or item.get("bill_id") or "").strip()
             raw_value = _safe_float(item.get("rawValue") if item.get("rawValue") is not None else item.get("valor") or item.get("amount") or 0)
-            for alloc_building, alloc_amount in _select_allocations(bill_id, raw_value):
+            allocations = _select_allocations(bill_id, raw_value)
+            for alloc_building, alloc_amount in allocations:
                 if alloc_building not in building_aliases:
                     continue
                 cloned = dict(item)
@@ -1946,6 +2049,16 @@ async def filtered_data(
                 cloned["rawValue"] = alloc_amount
                 cloned["valor"] = abs(alloc_amount)
                 filtered_receber.append(cloned)
+
+            # Fallback para casos sem billId/rateio: usa obra direta se existir.
+            if not allocations:
+                direct_building = _item_building_id(item)
+                if direct_building and direct_building in building_aliases:
+                    cloned = dict(item)
+                    cloned["buildingId"] = int(direct_building) if direct_building.isdigit() else direct_building
+                    cloned["idObra"] = int(direct_building) if direct_building.isdigit() else direct_building
+                    cloned["codigoObra"] = direct_building
+                    filtered_receber.append(cloned)
 
     return {
         "pedidos": filtered_orders,
@@ -1965,6 +2078,57 @@ async def filtered_data(
             "receber": len(filtered_receber),
         },
     }
+
+
+@router.get("/centro-custo")
+async def get_centro_custo(
+    companyId: str | None = Query(None, description="ID da empresa"),
+    buildingId: str | None = Query(None, description="ID da obra"),
+    current_user: AppUser = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> list[dict]:
+    """
+    Retorna dados do Relatório Financeiro de Obras (Centro de Custo).
+    
+    Os dados são mantidos sincronizados com o Sienge e armazenados
+    localmente no banco de dados.
+    
+    Retorna:
+        Lista de dict com dados de centro de custo de cada obra
+    """
+    return get_financial_reports(db, company_id=companyId, building_id=buildingId)
+
+
+@router.post("/centro-custo/sync")
+async def sync_centro_custo(
+    current_user: AppUser = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> dict:
+    """
+    Sincroniza dados do Relatório Financeiro de Obras com o Sienge.
+    
+    Retorna:
+        dict com estatísticas de sincronização
+    """
+    return await sync_financial_reports(db)
+
+
+@router.post("/centro-custo/cleanup")
+async def cleanup_centro_custo(
+    from_year: int = Query(2026, ge=2000, le=2100, description="Manter dados a partir deste ano"),
+    current_user: AppUser = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> dict:
+    """
+    Remove dados de Centro de Custo anteriores a um ano específico.
+    
+    Args:
+        from_year: Ano a partir do qual manter dados (padrão: 2026)
+    
+    Retorna:
+        dict com estatísticas da limpeza
+    """
+    return cleanup_old_financial_reports(db, keep_from_year=from_year)
 
 
 @router.get("/mc-by-building")
@@ -2200,3 +2364,92 @@ async def fetch_quotations(
         return {key: value for key, value in quotations_map.items() if key in target_ids}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e)) from e
+
+
+@router.post("/sync-receivable-titles")
+async def sync_receivable_titles(
+    start_date: str | None = None,
+    end_date: str | None = None,
+    company_id: str | None = None,
+    building_id: str | None = None,
+    current_user: AppUser = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> dict[str, Any]:
+    """
+    Sincroniza títulos a receber com cache inteligente.
+    
+    Fluxo:
+    1. Busca últimas horas do SIENGE (se não houver datas, usa últimas 48h)
+    2. Faz merge com dados locais
+    3. Salva em banco de dados (snapshot)
+    4. Repopula arquivo local (data/receber.json) para próximas vezes
+    
+    Query params:
+      - start_date: ISO date (2026-01-01, opcional)
+      - end_date: ISO date (2026-12-31, opcional)
+      - company_id: ID da empresa (opcional)
+      - building_id: ID da obra (opcional)
+    """
+    try:
+        result = await sync_and_repopulate_cache(
+            db,
+            start_date=start_date,
+            end_date=end_date,
+            company_id=company_id,
+            building_id=building_id,
+        )
+        
+        # Adiciona estatísticas de cache
+        cache_stats = get_cache_stats(db)
+        result["cache_stats"] = cache_stats
+        
+        return {
+            "status": result.get("status", "ok"),
+            **result,
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Erro ao sincronizar: {str(e)}") from e
+
+
+@router.post("/validate-receivable-titles")
+async def validate_receivable(
+    start_date: str | None = None,
+    end_date: str | None = None,
+    current_user: AppUser = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> dict[str, Any]:
+    """
+    Valida se valores de títulos a receber batem entre banco local e SIENGE.
+    """
+    try:
+        result = await validate_receivable_titles(db, start_date=start_date, end_date=end_date)
+        return {
+            "status": "ok" if result["matches"] else "warning",
+            **result,
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Erro ao validar: {str(e)}") from e
+
+
+@router.get("/cache-stats")
+async def get_cache_status(
+    current_user: AppUser = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> dict[str, Any]:
+    """
+    Retorna estatísticas de cache local e banco de dados.
+    
+    Mostra:
+    - Quantidade de registros em cache
+    - Data da última atualização
+    - Status dos arquivos locais (data/*.json)
+    """
+    try:
+        stats = get_cache_stats(db)
+        return {
+            "status": "ok",
+            "cache_stats": stats,
+            "message": f"Cache local: {stats['total_records']} registros",
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Erro ao obter cache stats: {str(e)}") from e

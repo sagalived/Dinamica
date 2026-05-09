@@ -1,25 +1,28 @@
-/**
- * LEANDRO — Subaba de Fluxo de Caixa
- * - Exibe dados financeiros do Sienge (entradas, saídas, por obra)
+﻿/**
+ * LEANDRO â€” Subaba de Fluxo de Caixa
+ * - Exibe dados financeiros do Sienge (entradas, saÃ­das, por obra)
  * - Permite upload de CSV / XLSX / PDF para popular os dados manualmente
  */
 
-import React, { useState, useCallback, useMemo, useRef } from 'react';
+import React, { useEffect, useState, useCallback, useMemo, useRef } from 'react';
 import { motion } from 'motion/react';
 import {
   Upload, RefreshCw, TrendingUp, TrendingDown, DollarSign,
-  FileText, Building2, X, CheckCircle2, AlertCircle, Download, Calendar as CalendarIcon, Printer
+  FileText, X, CheckCircle2, AlertCircle, Download, Calendar as CalendarIcon, Printer
 } from 'lucide-react';
 import { addMonths, endOfDay, format, isValid, parse, startOfDay } from 'date-fns';
 import { cn } from '../../lib/utils';
 import * as XLSX from 'xlsx';
 import { useSienge } from '../../contexts/SiengeContext';
 import { useTheme } from '../../contexts/ThemeContext';
+import { api } from '../../lib/api';
+import { BuildingIdFilter } from '../../components/BuildingIdFilter';
+import { CompanyIdFilter } from '../../components/CompanyIdFilter';
 import { INTERNAL_BANK_ACCOUNTS, extractBankAccountCode } from './leandroLogic';
 
 import type { LeandroPeriod, LeandroProps, LeandroRow } from './types';
 
-// ─── Helpers ─────────────────────────────────────────────────────────────────
+// â”€â”€â”€ Helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 const fmt = (v: number) =>
   new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(v);
@@ -51,14 +54,14 @@ function parseDateFlexible(raw: string | undefined): number {
   return date ? date.getTime() : 0;
 }
 
-function formatDateSafe(raw: string | undefined, fallback = '—'): string {
+function formatDateSafe(raw: string | undefined, fallback = 'â€”'): string {
   const date = parseDateSafe(raw);
   return date ? format(date, 'dd/MM/yyyy') : fallback;
 }
 
 function normalizeDocument(raw: string | undefined): string {
   const text = String(raw || '').trim();
-  if (!text || text === '—') return '';
+  if (!text || text === 'â€”') return '';
 
   const upper = text.toUpperCase();
   const ppc = upper.match(/PPC\D*(\d+)/);
@@ -84,7 +87,7 @@ function normalizeDocument(raw: string | undefined): string {
 }
 
 function getDocumentParts(raw: string | undefined): { original: string; treated: string } {
-  const original = String(raw || '').trim() || '—';
+  const original = String(raw || '').trim() || 'â€”';
   const treated = normalizeDocument(raw);
   return {
     original,
@@ -95,9 +98,9 @@ function getDocumentParts(raw: string | undefined): { original: string; treated:
 function buildEntityLabel(name: string | undefined, doc: string | number | undefined, fallback: string) {
   const safeName = String(name || '').trim();
   const safeDoc = String(doc || '').trim();
-  if (safeName && safeDoc) return `${safeName} • ${safeDoc}`;
+  if (safeName && safeDoc) return `${safeName} â€¢ ${safeDoc}`;
   if (safeName) return safeName;
-  if (safeDoc) return `${fallback} • ${safeDoc}`;
+  if (safeDoc) return `${fallback} â€¢ ${safeDoc}`;
   return fallback;
 }
 
@@ -132,7 +135,7 @@ function parseCsvText(text: string): LeandroRow[] {
   }).filter(r => r.data || r.historico);
 }
 
-// ─── Componente Principal ─────────────────────────────────────────────────────
+// â”€â”€â”€ Componente Principal â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export function LeandroTab() {
   const { isDark } = useTheme();
@@ -142,6 +145,7 @@ export function LeandroTab() {
     orders,
     buildings,
     companies,
+    dataRevision,
     loading: syncing,
     refresh: syncSienge,
     startDate, setStartDate,
@@ -159,8 +163,41 @@ export function LeandroTab() {
   const [activeSource, setActiveSource] = useState<'sienge' | 'arquivo'>('sienge');
   const [applyTick, setApplyTick] = useState(0);
   const [detailLimit, setDetailLimit] = useState(500);
+  const [rawContasPagarRows, setRawContasPagarRows] = useState<any[]>([]);
+  const [rawContasReceberRows, setRawContasReceberRows] = useState<any[]>([]);
+  const [rawTitulosReceberRows, setRawTitulosReceberRows] = useState<any[]>([]);
+  const [selectedYear, setSelectedYear] = useState<string>(String(new Date().getFullYear()));
 
-  // ── Dados do Sienge ────────────────────────────────────────────────────────
+  useEffect(() => {
+    let cancelled = false;
+
+    const run = async () => {
+      try {
+        const [cp, cr, tr] = await Promise.all([
+          api.get('/sienge-raw/contas-pagar-empresas'),
+          api.get('/sienge-raw/contas-receber-empresas'),
+          api.get('/sienge-raw/titulos-receber-empresas'),
+        ]);
+
+        if (cancelled) return;
+        setRawContasPagarRows(Array.isArray(cp?.data?.rows) ? cp.data.rows : []);
+        setRawContasReceberRows(Array.isArray(cr?.data?.rows) ? cr.data.rows : []);
+        setRawTitulosReceberRows(Array.isArray(tr?.data?.rows) ? tr.data.rows : []);
+      } catch {
+        if (cancelled) return;
+        setRawContasPagarRows([]);
+        setRawContasReceberRows([]);
+        setRawTitulosReceberRows([]);
+      }
+    };
+
+    run();
+    return () => {
+      cancelled = true;
+    };
+  }, [dataRevision]);
+
+  // â”€â”€ Dados do Sienge â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   const buildingMap = useMemo(() => {
     const m: Record<string, string> = {};
@@ -174,7 +211,8 @@ export function LeandroTab() {
     return m;
   }, [buildings]);
 
-  const defaultStartDate = useMemo(() => startOfDay(new Date(new Date().getFullYear(), new Date().getMonth(), 1)), []);
+  const defaultStartDate = useMemo(() => startOfDay(addMonths(new Date(), -3)), []);
+  const defaultStartDateYear = useMemo(() => startOfDay(new Date(new Date().getFullYear(), 0, 1)), []);
 
   const getTitleDateRaw = useCallback((value: any): string => {
     return String(
@@ -255,19 +293,27 @@ export function LeandroTab() {
   }, [allFinancialTitles, allReceivableTitles, getTitleDateRaw, passesBuilding, passesCompany]);
 
   const defaultEndDate = useMemo(() => {
-    return maxAvailableSiengeDate || endOfDay(addMonths(new Date(), 5));
+    return maxAvailableSiengeDate || endOfDay(new Date());
   }, [maxAvailableSiengeDate]);
 
-  const effectiveStartDate = startDate || (periodMode === 'last6m' ? defaultStartDate : undefined);
-  const effectiveEndDate = endDate || (periodMode === 'last6m' ? defaultEndDate : undefined);
+  const effectiveStartDate = startDate || (periodMode === 'last3m' ? defaultStartDate : (periodMode === 'lastYear' ? defaultStartDateYear : undefined));
+  const effectiveEndDate = endDate || (periodMode === 'last3m' ? defaultEndDate : (periodMode === 'lastYear' ? defaultEndDate : undefined));
+
+  const passesYearFilter = useCallback((value: any): boolean => {
+    const currentDate = parseDateSafe(getTitleDateRaw(value));
+    if (!currentDate) return false;
+    const selectedYearNum = parseInt(selectedYear, 10);
+    return currentDate.getFullYear() === selectedYearNum;
+  }, [getTitleDateRaw, selectedYear]);
 
   const isInDateRange = useCallback((value: any): boolean => {
+    if (!effectiveStartDate && !effectiveEndDate) return passesYearFilter(value);
     const currentTimestamp = parseDateFlexible(getTitleDateRaw(value));
     if (!currentTimestamp) return false;
     if (effectiveStartDate && currentTimestamp < startOfDay(effectiveStartDate).getTime()) return false;
     if (effectiveEndDate && currentTimestamp > endOfDay(effectiveEndDate).getTime()) return false;
-    return true;
-  }, [effectiveEndDate, effectiveStartDate, getTitleDateRaw]);
+    return passesYearFilter(value);
+  }, [effectiveEndDate, effectiveStartDate, getTitleDateRaw, passesYearFilter]);
 
   const applySiengeFilters = useCallback((value: any): boolean => (
     isInDateRange(value) &&
@@ -352,8 +398,8 @@ export function LeandroTab() {
         companyId: String(t.companyId ?? ''),
         historico: buildEntityLabel(clientName || t.clientName, t.documentNumber || t.id, 'Extrato/Cliente'),
         clienteFornecedor: clientName || 'Extrato/Cliente',
-        tituloParcela: String(t.installmentNumber != null ? `${t.id}/${t.installmentNumber}` : (t.id || '—')),
-        documento: String(t.documentNumber || t.documentId || t.id || '—'),
+        tituloParcela: String(t.installmentNumber != null ? `${t.id}/${t.installmentNumber}` : (t.id || 'â€”')),
+        documento: String(t.documentNumber || t.documentId || t.id || 'â€”'),
         obra: resolveObraLabel(t),
         obraId: String(t.buildingCode || t.buildingId || ''),
         entrada: isExpense ? 0 : valor,
@@ -376,8 +422,8 @@ export function LeandroTab() {
         companyId: String(t.companyId ?? ''),
         historico: buildEntityLabel(creditorName || t.creditorName, t.documentNumber || t.id, 'Pagamento/Credor'),
         clienteFornecedor: creditorName || 'Credor sem nome',
-        tituloParcela: String(t.installmentNumber != null ? `${t.id}/${t.installmentNumber}` : (t.id || '—')),
-        documento: String(t.documentNumber || t.documentId || t.id || '—'),
+        tituloParcela: String(t.installmentNumber != null ? `${t.id}/${t.installmentNumber}` : (t.id || 'â€”')),
+        documento: String(t.documentNumber || t.documentId || t.id || 'â€”'),
         obra: resolveObraLabel(t),
         obraId: String(t.buildingCode || t.buildingId || ''),
         entrada: 0,
@@ -414,13 +460,76 @@ export function LeandroTab() {
     return detailedRows.slice(0, detailLimit);
   }, [detailLimit, detailedRows]);
 
-  // ── KPIs ──────────────────────────────────────────────────────────────────
+  // â”€â”€ KPIs â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-  const totalEntradas = activeRows.reduce((s, r) => s + r.entrada, 0);
-  const totalSaidas   = activeRows.reduce((s, r) => s + r.saida,   0);
-  const saldoFinal    = activeRows.length > 0 ? activeRows[activeRows.length - 1].saldo : 0;
+  const effectiveCompanyId = useMemo(() => {
+    if (selectedCompany !== 'all') return selectedCompany;
+    if (selectedBuilding === 'all') return 'all';
+    const building = buildingById[selectedBuilding];
+    const cid = (building as any)?.companyId ?? (building as any)?.company_id ?? (building as any)?.idCompany;
+    return cid != null ? String(cid) : 'all';
+  }, [buildingById, selectedBuilding, selectedCompany]);
 
-  // ── Resumo por mês ────────────────────────────────────────────────────────
+  const selectedCompanyName = useMemo(() => {
+    if (effectiveCompanyId === 'all') return '';
+    const found = companies.find((c: any) => String(c.id) === String(effectiveCompanyId));
+    return String(found?.name || '').trim().toLowerCase();
+  }, [companies, effectiveCompanyId]);
+
+  const rawTotals = useMemo(() => {
+    const startTs = effectiveStartDate ? startOfDay(effectiveStartDate).getTime() : null;
+    const endTs = effectiveEndDate ? endOfDay(effectiveEndDate).getTime() : null;
+
+    const matchesCompany = (row: any): boolean => {
+      if (effectiveCompanyId === 'all') return true;
+      const cid = row?.companyId;
+      if (cid != null && String(cid) === String(effectiveCompanyId)) return true;
+      const cname = String(row?.companyName || row?.company || row?.empresa || '').trim().toLowerCase();
+      if (!cname || !selectedCompanyName) return false;
+      return cname.includes(selectedCompanyName) || selectedCompanyName.includes(cname);
+    };
+
+    const inRange = (row: any): boolean => {
+      if (!startTs && !endTs) return true;
+      const raw = String(row?.dueDate || '').trim();
+      if (!raw) return false;
+      const ts = parseDateFlexible(raw);
+      if (!ts) return false;
+      if (startTs && ts < startTs) return false;
+      if (endTs && ts > endTs) return false;
+      return true;
+    };
+
+    const sumTotals = (rows: any[]) => rows.reduce((acc, r) => acc + (Number(r?.total) || 0), 0);
+
+    const contasPagar = rawContasPagarRows.filter((r) => matchesCompany(r) && inRange(r));
+    const contasReceber = rawContasReceberRows.filter((r) => matchesCompany(r) && inRange(r));
+    const titulosReceber = rawTitulosReceberRows.filter((r) => matchesCompany(r) && inRange(r));
+
+    return {
+      contasPagarCount: contasPagar.length,
+      contasPagarTotal: sumTotals(contasPagar),
+      contasReceberCount: contasReceber.length,
+      contasReceberTotal: sumTotals(contasReceber),
+      titulosReceberCount: titulosReceber.length,
+      titulosReceberTotal: sumTotals(titulosReceber),
+    };
+  }, [
+    applyTick,
+    effectiveEndDate,
+    effectiveStartDate,
+    effectiveCompanyId,
+    rawContasPagarRows,
+    rawContasReceberRows,
+    rawTitulosReceberRows,
+    selectedCompanyName,
+  ]);
+
+  const totalEntradas = rawTotals.contasReceberTotal;
+  const totalSaidas = rawTotals.contasPagarTotal;
+  const saldoFinal = totalEntradas - totalSaidas;
+
+  // â”€â”€ Resumo por mÃªs â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   const periodos = useMemo((): LeandroPeriod[] => {
     const map: Record<string, { entradas: number; saidas: number }> = {};
@@ -440,7 +549,7 @@ export function LeandroTab() {
     });
   }, [activeRows]);
 
-  // ── Resumo por obra ───────────────────────────────────────────────────────
+  // â”€â”€ Resumo por obra â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   const porObra = useMemo(() => {
     const map: Record<string, { obra: string; entradas: number; saidas: number }> = {};
@@ -514,25 +623,13 @@ export function LeandroTab() {
       .slice(0, 10);
   }, [activeRows]);
 
-  const totalObrasFiltradas = useMemo(() => {
-    if (selectedBuilding !== 'all') return 1;
-    if (availableBuildings.length > 0) return availableBuildings.length;
-
-    const unique = new Set<string>();
-    activeRows.forEach((r) => {
-      const key = String(r.obra || r.obraId || '').trim();
-      if (key) unique.add(key);
-    });
-    return unique.size;
-  }, [activeRows, availableBuildings.length, selectedBuilding]);
-
   const periodLabel = useMemo(() => {
     const start = effectiveStartDate || defaultStartDate;
     const end = effectiveEndDate || defaultEndDate;
-    return `${format(start, 'dd/MM/yyyy')} até ${format(end, 'dd/MM/yyyy')}`;
+    return `${format(start, 'dd/MM/yyyy')} atÃ© ${format(end, 'dd/MM/yyyy')}`;
   }, [defaultEndDate, defaultStartDate, effectiveEndDate, effectiveStartDate]);
 
-  // ── Upload ────────────────────────────────────────────────────────────────
+  // â”€â”€ Upload â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   const handleFile = useCallback(async (file: File) => {
     setUploadError('');
@@ -571,13 +668,13 @@ export function LeandroTab() {
             saldo: parseNum(get(['saldo', 'balance'])),
           };
         }).filter(r => r.data || r.historico);
-        if (rows.length === 0) throw new Error('Nenhum dado mapeado. Verifique os cabeçalhos do arquivo.');
+        if (rows.length === 0) throw new Error('Nenhum dado mapeado. Verifique os cabeÃ§alhos do arquivo.');
         setUploadedRows(rows);
         setActiveSource('arquivo');
       } else if (ext === 'pdf') {
-        throw new Error('Leitura de PDF não suportada automaticamente. Por favor, exporte como CSV ou XLSX.');
+        throw new Error('Leitura de PDF nÃ£o suportada automaticamente. Por favor, exporte como CSV ou XLSX.');
       } else {
-        throw new Error(`Formato ".${ext}" não suportado. Use CSV ou XLSX.`);
+        throw new Error(`Formato ".${ext}" nÃ£o suportado. Use CSV ou XLSX.`);
       }
     } catch (e: any) {
       setUploadError(e.message || 'Erro ao processar arquivo.');
@@ -606,11 +703,12 @@ export function LeandroTab() {
   };
 
   const clearFilters = () => {
-    setPeriodMode('last6m');
+    setPeriodMode('lastYear');
     setStartDate(undefined);
     setEndDate(undefined);
     setSelectedCompany('all');
     setSelectedBuilding('all');
+    setSelectedYear(String(new Date().getFullYear()));
     setHideInternal(true);
     setDetailLimit(500);
   };
@@ -618,14 +716,14 @@ export function LeandroTab() {
   const handlePrintDetalhamento = useCallback(() => {
     const printableRows = detailedRows.map((row) => {
       const baixa = row.baixa ? formatDateSafe(row.baixa, row.baixa) : '00/00/0000';
-      const vencto = (row.vencto || row.data) ? formatDateSafe(row.vencto || row.data, String(row.vencto || row.data)) : '—';
+      const vencto = (row.vencto || row.data) ? formatDateSafe(row.vencto || row.data, String(row.vencto || row.data)) : 'â€”';
       const doc = getDocumentParts(row.documento);
       return `
         <tr>
           <td>${baixa}</td>
           <td>${vencto}</td>
-          <td>${row.clienteFornecedor || row.historico || '—'}</td>
-          <td>${row.tituloParcela || '—'}</td>
+          <td>${row.clienteFornecedor || row.historico || 'â€”'}</td>
+          <td>${row.tituloParcela || 'â€”'}</td>
           <td>${doc.original}${doc.treated ? ` (${doc.treated})` : ''}</td>
           <td style="text-align:right;color:#0f9d58;">${fmt(row.entrada || 0)}</td>
           <td style="text-align:right;color:#d93025;">${fmt(row.saida || 0)}</td>
@@ -681,7 +779,7 @@ export function LeandroTab() {
     XLSX.writeFile(wb, 'template_leandro.xlsx');
   };
 
-  // ── Render ────────────────────────────────────────────────────────────────
+  // â”€â”€ Render â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   const card = 'bg-[#161618] border border-white/5 rounded-2xl shadow-xl';
   const th = 'text-[10px] font-black uppercase tracking-widest text-gray-500 px-3 py-2 text-left whitespace-nowrap';
@@ -695,21 +793,21 @@ export function LeandroTab() {
       exit={{ opacity: 0, y: -16 }}
       className="space-y-6"
     >
-      {/* ── Header ─────────────────────────────────────────────── */}
+      {/* â”€â”€ Header â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h2 className="text-2xl font-black text-white flex items-center gap-3">
             <DollarSign className="text-emerald-500" size={26} />
-            Relatório Leandro — Fluxo de Caixa
+            RelatÃ³rio Leandro â€” Fluxo de Caixa
           </h2>
           <p className="text-xs text-gray-500 mt-1">
             {activeSource === 'arquivo'
-              ? `📂 Dados do arquivo: ${uploadFileName}`
-              : '🔗 Dados sincronizados do Sienge'}
+              ? `ðŸ“‚ Dados do arquivo: ${uploadFileName}`
+              : 'ðŸ”— Dados sincronizados do Sienge'}
           </p>
         </div>
 
-        {/* Botões de ação */}
+        {/* BotÃµes de aÃ§Ã£o */}
         <div className="flex flex-wrap items-center gap-2">
           {/* Fonte de dados */}
           <div className="flex items-center bg-black/30 border border-white/10 rounded-xl p-1">
@@ -754,154 +852,7 @@ export function LeandroTab() {
         </div>
       </div>
 
-      <div className="bg-[#161618] border border-white/5 p-4 rounded-2xl shadow-2xl relative z-10 flex flex-wrap gap-4 items-end">
-        <div className="space-y-2 flex-1 min-w-[260px]">
-          <label className="text-[10px] font-black uppercase tracking-widest text-orange-500">Período</label>
-          <div className="flex items-center gap-2 bg-black/30 border border-white/10 rounded-xl p-1 h-11">
-            <button
-              onClick={() => {
-                setPeriodMode('last6m');
-                setStartDate(undefined);
-                setEndDate(undefined);
-              }}
-              className={cn(
-                'h-9 px-3 rounded-lg text-[11px] font-black uppercase tracking-wide transition-all',
-                periodMode === 'last6m'
-                  ? 'bg-orange-600 text-white'
-                  : 'text-gray-300 hover:text-white hover:bg-white/10'
-              )}
-            >
-              Últimos 6 meses
-            </button>
-            <button
-              onClick={() => {
-                setPeriodMode('all');
-                setStartDate(undefined);
-                setEndDate(undefined);
-              }}
-              className={cn(
-                'h-9 px-3 rounded-lg text-[11px] font-black uppercase tracking-wide transition-all',
-                periodMode === 'all'
-                  ? 'bg-sky-600 text-white'
-                  : 'text-gray-300 hover:text-white hover:bg-white/10'
-              )}
-            >
-              Período total
-            </button>
-          </div>
-        </div>
-
-        <div className="space-y-2 flex-1 min-w-[200px]">
-          <label className="text-[10px] font-black uppercase tracking-widest text-orange-500">Data Inicial</label>
-          <div className="relative">
-            <CalendarIcon className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" size={14} />
-            <input
-              type="date"
-              value={(startDate || (periodMode === 'last6m' ? defaultStartDate : undefined)) ? format(startDate || defaultStartDate, 'yyyy-MM-dd') : ''}
-              onChange={(e) => {
-                const value = e.target.value ? parse(e.target.value, 'yyyy-MM-dd', new Date()) : undefined;
-                setPeriodMode('last6m');
-                setStartDate(value);
-              }}
-              className="w-full h-11 pl-9 pr-3 rounded-xl bg-black/40 border border-white/10 text-white font-bold focus:outline-none focus:border-orange-500/50"
-            />
-          </div>
-        </div>
-
-        <div className="space-y-2 flex-1 min-w-[200px]">
-          <label className="text-[10px] font-black uppercase tracking-widest text-orange-500">Data Final</label>
-          <div className="relative">
-            <CalendarIcon className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" size={14} />
-            <input
-              type="date"
-              value={(endDate || (periodMode === 'last6m' ? defaultEndDate : undefined)) ? format(endDate || defaultEndDate, 'yyyy-MM-dd') : ''}
-              onChange={(e) => {
-                const value = e.target.value ? endOfDay(parse(e.target.value, 'yyyy-MM-dd', new Date())) : undefined;
-                setPeriodMode('last6m');
-                setEndDate(value);
-              }}
-              className="w-full h-11 pl-9 pr-3 rounded-xl bg-black/40 border border-white/10 text-white font-bold focus:outline-none focus:border-orange-500/50"
-            />
-          </div>
-          {maxAvailableSiengeDate && (
-            <p className="text-[10px] text-gray-500 mt-1">
-              Data maxima disponivel no Sienge: {format(maxAvailableSiengeDate, 'dd/MM/yyyy')}
-            </p>
-          )}
-        </div>
-
-        <div className="space-y-2 flex-1 min-w-[220px]">
-          <label className="text-[10px] font-black uppercase tracking-widest text-orange-500">Empresa (Sienge)</label>
-          <select
-            value={selectedCompany}
-            onChange={(e) => {
-              const value = e.target.value;
-              setSelectedCompany(value);
-              setSelectedBuilding('all');
-            }}
-            className="w-full h-11 rounded-xl bg-black/40 border border-white/10 text-white font-bold px-3 focus:outline-none focus:border-orange-500/50"
-          >
-            <option value="all">Todas as Empresas</option>
-            {companies.map((c: any) => (
-              <option key={`leandro-company-${c.id}`} value={String(c.id)}>
-                {c.name} (ID: {c.id})
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div className="space-y-2 flex-1 min-w-[220px]">
-          <label className="text-[10px] font-black uppercase tracking-widest text-orange-500">Obras</label>
-          <select
-            value={selectedBuilding}
-            onChange={(e) => setSelectedBuilding(e.target.value)}
-            className="w-full h-11 rounded-xl bg-black/40 border border-white/10 text-white font-bold px-3 focus:outline-none focus:border-orange-500/50"
-          >
-            <option value="all">Todas as Obras</option>
-            {availableBuildings.map((b: any) => (
-              <option key={`leandro-building-${b.id}`} value={String(b.id)}>
-                {b.name} (ID: {b.id})
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div className="space-y-2 flex-1 min-w-[200px]">
-          <label className="text-[10px] font-black uppercase tracking-widest text-orange-500">Transf. Internas</label>
-          <button
-            onClick={() => setHideInternal((prev) => !prev)}
-            className={cn(
-              'w-full h-11 rounded-xl justify-center font-bold transition-all border',
-              hideInternal
-                ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/20'
-                : 'bg-black/40 border-white/10 text-gray-400 hover:bg-white/5 hover:text-white'
-            )}
-          >
-            {hideInternal ? 'Ocultas' : 'Visíveis'}
-          </button>
-        </div>
-
-        <div className="flex items-end gap-2 min-w-[220px]">
-          <button
-            onClick={clearFilters}
-            className="h-11 px-4 rounded-xl border border-white/10 bg-black/30 text-gray-300 hover:bg-white/10 hover:text-white font-bold text-sm"
-          >
-            Limpar Filtros
-          </button>
-          <button
-            onClick={() => setApplyTick((prev) => prev + 1)}
-            disabled={syncing}
-            className="h-11 px-4 rounded-xl font-bold bg-[#1B3C58] hover:bg-[#234b6e] text-white text-sm disabled:opacity-70"
-          >
-            <span className="inline-flex items-center">
-              <CheckCircle2 size={15} className='mr-2' />
-              {syncing ? 'Filtrando...' : 'Filtrar'}
-            </span>
-          </button>
-        </div>
-      </div>
-
-      {/* ── Upload Zone ───────────────────────────────────────────── */}
+      {/* â”€â”€ Upload Zone â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       <div
         onDrop={onDrop}
         onDragOver={e => e.preventDefault()}
@@ -946,7 +897,7 @@ export function LeandroTab() {
                 Importar arquivo financeiro
               </p>
               <p className="text-xs text-gray-500">
-                Arraste um arquivo ou{' '}
+                Arraste um arquivo ou
                 <button
                   onClick={() => fileInputRef.current?.click()}
                   className="text-blue-400 hover:text-blue-300 font-bold underline transition-colors"
@@ -974,7 +925,7 @@ export function LeandroTab() {
         )}
       </div>
 
-      {/* ── KPI Cards ─────────────────────────────────────────────── */}
+      {/* â”€â”€ KPI Cards â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         {[
           {
@@ -982,28 +933,28 @@ export function LeandroTab() {
             value: fmt(totalEntradas),
             icon: TrendingUp,
             color: 'emerald',
-            sub: `${activeRows.filter(r => r.entrada > 0).length} registros`,
+            sub: `${rawTotals.contasReceberCount} registros`,
           },
           {
-            label: 'Total Saídas',
+            label: 'Total SaÃ­das',
             value: fmt(totalSaidas),
             icon: TrendingDown,
             color: 'red',
-            sub: `${activeRows.filter(r => r.saida > 0).length} registros`,
+            sub: `${rawTotals.contasPagarCount} registros`,
           },
           {
-            label: 'Saldo do Período',
+            label: 'Saldo do PerÃ­odo',
             value: fmt(saldoFinal),
             icon: DollarSign,
             color: saldoFinal >= 0 ? 'emerald' : 'red',
-            sub: 'Acumulado',
+            sub: 'Entradas - SaÃ­das',
           },
           {
-            label: 'Total de Obras',
-            value: totalObrasFiltradas,
-            icon: Building2,
+            label: 'TÃ­tulos a Receber',
+            value: rawTotals.titulosReceberCount,
+            icon: FileText,
             color: 'blue',
-            sub: 'Baseado no filtro',
+            sub: `${rawTotals.titulosReceberCount} tÃ­tulos â€¢ ${fmt(rawTotals.titulosReceberTotal)}`,
           },
         ].map((kpi, i) => (
           <div key={i} className={card + ' p-4 relative overflow-hidden group'}>
@@ -1021,20 +972,20 @@ export function LeandroTab() {
         ))}
       </div>
 
-      {/* ── Resumo por Mês e por Obra ──────────────────────────────── */}
+      {/* â”€â”€ Resumo por MÃªs e por Obra â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        {/* Por Mês */}
+        {/* Por MÃªs */}
         <div className={card + ' flex flex-col'}>
           <div className="p-4 border-b border-white/5">
             <h3 className="font-black uppercase tracking-tight text-white text-sm">
-              Movimentação Mensal
+              MovimentaÃ§Ã£o Mensal
             </h3>
           </div>
           <div className="overflow-auto max-h-60 custom-scrollbar">
             <table className="w-full">
               <thead className="bg-black/60 sticky top-0">
                 <tr>
-                  {['Mês', 'Entradas', 'Saídas', 'Saldo'].map(h => (
+                  {['MÃªs', 'Entradas', 'SaÃ­das', 'Saldo'].map(h => (
                     <th key={h} className={th}>{h}</th>
                   ))}
                 </tr>
@@ -1068,7 +1019,7 @@ export function LeandroTab() {
             <table className="w-full">
               <thead className="bg-black/60 sticky top-0">
                 <tr>
-                  {['Obra', 'Entradas', 'Saídas', 'Saldo'].map(h => (
+                  {['Obra', 'Entradas', 'SaÃ­das', 'Saldo'].map(h => (
                     <th key={h} className={th}>{h}</th>
                   ))}
                 </tr>
@@ -1113,12 +1064,14 @@ export function LeandroTab() {
                 <tr><td colSpan={6} className="text-center py-6 text-gray-600 text-xs">Sem dados</td></tr>
               ) : ultimasMovimentacoes.map((r, idx) => (
                 <tr key={`ult-${idx}`} className="border-t border-white/5 hover:bg-white/[0.03]">
-                  <td className={td + ' text-gray-300 whitespace-nowrap'}>{formatDateSafe(r.data || r.vencto || r.baixa, r.data || '—')}</td>
-                  <td className={td + ' text-gray-200 truncate max-w-[360px]'} title={r.clienteFornecedor || r.historico}>{r.clienteFornecedor || r.historico || '—'}</td>
-                  <td className={td + ' text-gray-400 truncate max-w-[260px]'} title={r.obra}>{r.obra || '—'}</td>
+                  <td className={td + ' text-gray-300 whitespace-nowrap'}>{formatDateSafe(r.data || r.vencto || r.baixa, r.data || 'â€”')}</td>
+                  <td className={td + ' text-gray-200 truncate max-w-[360px]'} title={r.clienteFornecedor || r.historico}>{r.clienteFornecedor || r.historico || 'â€”'}</td>
+                  <td className={td + ' text-gray-400 truncate max-w-[260px]'} title={r.obra}>{r.obra || 'â€”'}</td>
                   <td className={td + ' text-right text-emerald-400 font-mono'}>{fmt(r.entrada || 0)}</td>
                   <td className={td + ' text-right text-red-400 font-mono'}>{fmt(r.saida || 0)}</td>
-                  <td className={cn(td, 'text-right font-black font-mono', r.saldo >= 0 ? 'text-emerald-400' : 'text-red-400')}>{fmt(r.saldo)}</td>
+                  <td className={cn(td, 'text-right font-mono font-black whitespace-nowrap', r.saldo >= 0 ? 'text-emerald-400' : 'text-red-400')}>
+                    {fmt(r.saldo)}
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -1126,12 +1079,12 @@ export function LeandroTab() {
         </div>
       </div>
 
-      {/* ── Tabela Detalhada ───────────────────────────────────────── */}
+      {/* â”€â”€ Tabela Detalhada â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       <div className={card + ' flex flex-col'}>
         <div className="p-4 border-b border-white/5 flex items-center justify-between">
           <h3 className="font-black uppercase tracking-tight text-white text-sm flex items-center gap-2">
             <FileText size={16} className="text-orange-500" />
-            Detalhamento — {activeRows.length.toLocaleString('pt-BR')} registros
+            Detalhamento â€” {activeRows.length.toLocaleString('pt-BR')} registros
           </h3>
           <div className="flex items-center gap-2">
             <button
@@ -1142,23 +1095,11 @@ export function LeandroTab() {
             </button>
             {activeRows.length > 0 && (
               <span className="text-[10px] font-bold bg-orange-500/10 text-orange-400 px-2 py-1 rounded-full border border-orange-500/20">
-                {activeSource === 'arquivo' ? '📂 Arquivo' : '🔗 Sienge'}
+                {activeSource === 'arquivo' ? 'ðŸ“‚ Arquivo' : 'ðŸ”— Sienge'}
               </span>
             )}
           </div>
         </div>
-        <div className="px-4 py-3 border-b border-white/5 text-xs text-gray-300 space-y-1 bg-black/20">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
-            <div><span className="font-black text-gray-400">Periodo:</span> {periodLabel}</div>
-            <div><span className="font-black text-gray-400">Selecao por:</span> Data de vencimento/pagamento</div>
-            <div><span className="font-black text-gray-400">Tipo de analise:</span> A realizar</div>
-          </div>
-          <div><span className="font-black text-gray-400">Valores corrigidos por:</span> REAL <span className="ml-3 font-black text-gray-400">Valores apresentados em:</span> REAL</div>
-          <div><span className="font-black text-gray-400">Empresa:</span> {selectedCompanyLabel}</div>
-          <div><span className="font-black text-gray-400">Area de negocio:</span> {selectedBuildingLabel}</div>
-          <div><span className="font-black text-gray-400">Centro de custo:</span> 28 - ALMOXARIFADO DINAMICA</div>
-        </div>
-
         <div className="overflow-auto max-h-[560px] custom-scrollbar">
           <table className="w-full min-w-[1450px] table-fixed border-separate border-spacing-0">
             <thead className="bg-black/60 sticky top-0 z-10">
@@ -1166,10 +1107,10 @@ export function LeandroTab() {
                 <th className={th + ' w-[130px]'}>Baixa</th>
                 <th className={th + ' w-[130px]'}>Vencto</th>
                 <th className={th + ' w-[420px]'}>Cliente/Fornecedor/Com</th>
-                <th className={th + ' w-[140px]'}>Título/Par</th>
+                <th className={th + ' w-[140px]'}>TÃ­tulo/Par</th>
                 <th className={th + ' w-[190px]'}>Documento</th>
-                <th className={th + ' w-[150px] text-right'}>Crédito</th>
-                <th className={th + ' w-[150px] text-right'}>Débito</th>
+                <th className={th + ' w-[150px] text-right'}>CrÃ©dito</th>
+                <th className={th + ' w-[150px] text-right'}>DÃ©bito</th>
                 <th className={th + ' w-[150px] text-right'}>Saldo</th>
               </tr>
             </thead>
@@ -1178,7 +1119,7 @@ export function LeandroTab() {
                 <tr>
                   <td colSpan={8} className="text-center py-12 text-gray-600 font-bold text-sm">
                     {activeSource === 'sienge'
-                      ? 'Nenhuma movimentação encontrada para os filtros selecionados. Ajuste os filtros ou importe um arquivo.'
+                      ? 'Nenhuma movimentaÃ§Ã£o encontrada para os filtros selecionados. Ajuste os filtros ou importe um arquivo.'
                       : 'Nenhum dado no arquivo importado.'}
                   </td>
                 </tr>
@@ -1194,13 +1135,13 @@ export function LeandroTab() {
                     {row.baixa ? formatDateSafe(row.baixa, row.baixa) : '00/00/0000'}
                   </td>
                   <td className={td + ' text-gray-400 whitespace-nowrap'}>
-                    {(row.vencto || row.data) ? formatDateSafe(row.vencto || row.data, String(row.vencto || row.data)) : '—'}
+                    {(row.vencto || row.data) ? formatDateSafe(row.vencto || row.data, String(row.vencto || row.data)) : 'â€”'}
                   </td>
                   <td className={td + ' font-bold text-gray-200 truncate'} title={row.clienteFornecedor || row.historico}>
-                    {row.clienteFornecedor || row.historico || '—'}
+                    {row.clienteFornecedor || row.historico || 'â€”'}
                   </td>
                   <td className={td + ' text-gray-300 font-mono whitespace-nowrap'} title={row.tituloParcela}>
-                    {row.tituloParcela || '—'}
+                    {row.tituloParcela || 'â€”'}
                   </td>
                   <td className={td + ' text-gray-400 font-mono whitespace-nowrap truncate'} title={row.documento}>
                     {(() => {
@@ -1250,3 +1191,4 @@ export function LeandroTab() {
     </motion.div>
   );
 }
+

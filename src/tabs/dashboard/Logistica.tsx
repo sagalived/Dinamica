@@ -1,16 +1,31 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'motion/react';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
 import {
   ResponsiveContainer, CartesianGrid, XAxis, YAxis, Tooltip, Legend,
   PieChart, Pie, Cell, BarChart, Bar
 } from 'recharts';
+import { useSienge } from '../../contexts/SiengeContext';
+import { FilterBar, FilterState } from '../../components/FilterBar';
 
 import type { DashboardLogisticaProps } from './types';
 
 export function DashboardLogistica({ supplierData, paymentMethodData }: DashboardLogisticaProps) {
+  const [currentFilters, setCurrentFilters] = useState<FilterState | null>(null);
+
+  const handleFilterApply = (filters: FilterState) => {
+    setCurrentFilters(filters);
+  };
+
+  const handleFilterClear = () => {
+    setCurrentFilters(null);
+  };
+
   return (
     <motion.div key="db-log" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="space-y-8">
+      {/* Filtros */}
+      <FilterBar onFilter={handleFilterApply} onClear={handleFilterClear} />
+
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-8">
         <Card className="bg-[#161618] border-white/5 shadow-2xl">
           <CardHeader><CardTitle className="text-lg font-black uppercase tracking-tight text-white">Top Fornecedores (Valores)</CardTitle></CardHeader>

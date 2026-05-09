@@ -1,0 +1,15 @@
+﻿EMPRESA: POTENCIAL NEGOCIOS E PARTICIPACOES S.A
+ID_EMPRESA: 5
+PERIODO: 2019-08-13 ate 2026-05-30
+Fonte: Sienge API REST ao vivo (/accounts-receivable/receivable-bills), sem uso do banco local.
+Observacao: Ind., Dias, Acrescimo e Desconto ficam em branco/R$ 0,00 quando o endpoint principal do Sienge nao retorna esses campos.
+Registros: companies=10; works=347; titles=1488.
+
+OBRAS ADMINISTRADAS
+ID_OBRA;OBRA
+50001;ESCRITORIO POTENCIAL
+
+CONTAS_A_RECEBER
+Credor;Documento;Lançamento;Qt.;Ind.;Dias;Valor no vencto;Acréscimo;Desconto;Total
+
+TOTAL;;;;;R$ 0,00;R$ 0,00;R$ 0,00;R$ 0,00

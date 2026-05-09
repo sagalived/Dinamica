@@ -10,8 +10,9 @@ import {
   PieChart, Pie, Cell
 } from 'recharts';
 import { useSienge } from '../../contexts/SiengeContext';
-import { addMonths, format, parseISO } from 'date-fns';
+import { addMonths, format, parseISO, startOfDay, endOfDay } from 'date-fns';
 import { toMoney, translateStatusLabel } from '../financeiro/logic';
+import { FilterBar, FilterState } from '../../components/FilterBar';
 
 type OperationalSeriesRow = {
   month: string; // YYYY-MM
@@ -67,6 +68,19 @@ export function DashboardGeral() {
   } = useSienge();
 
   const [activeBuildingsModalOpen, setActiveBuildingsModalOpen] = useState(false);
+
+  // Estado dos filtros
+  const [currentFilters, setCurrentFilters] = useState<FilterState | null>(null);
+
+  const handleFilterApply = (filters: FilterState) => {
+    setCurrentFilters(filters);
+    console.log('Filtros aplicados:', filters);
+  };
+
+  const handleFilterClear = () => {
+    setCurrentFilters(null);
+    console.log('Filtros limpos');
+  };
 
   const toNumberSafe = (value: any): number => {
     if (typeof value === 'number') return Number.isFinite(value) ? value : NaN;
@@ -552,6 +566,10 @@ export function DashboardGeral() {
 
   return (
     <motion.div key="db-geral" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="space-y-8">
+      {/* Filtros */}
+      <FilterBar onFilter={handleFilterApply} onClear={handleFilterClear} />
+
+      {/* KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
         {[
           {

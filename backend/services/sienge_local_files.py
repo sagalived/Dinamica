@@ -3,7 +3,7 @@ from __future__ import annotations
 import csv
 import hashlib
 import json
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -318,6 +318,49 @@ def _pending_items(dataset: str) -> list[dict[str, Any]]:
             continue
         rows.extend(_collection_from_payload(payload.get("payload")))
     return rows
+
+
+def list_pending_payload_records(
+    dataset: str | None = None,
+    *,
+    created_after: datetime | None = None,
+) -> list[dict[str, Any]]:
+    if not PENDING_ROOT.exists():
+        return []
+
+    records: list[dict[str, Any]] = []
+    for path in sorted(PENDING_ROOT.glob("*.txt")):
+        try:
+            stat = path.stat()
+        except OSError:
+            continue
+
+        file_dt = datetime.fromtimestamp(stat.st_mtime, tz=timezone.utc)
+        if created_after is not None and file_dt < created_after:
+            continue
+
+        payload = _read_json(path, {})
+        if not isinstance(payload, dict):
+            continue
+
+        payload_dataset = str(payload.get("dataset") or "").strip()
+        if dataset is not None and payload_dataset != dataset:
+            continue
+
+        records.append(
+            {
+                "file_name": path.name,
+                "dataset": payload_dataset or dataset or "",
+                "reason": payload.get("reason"),
+                "start_date": payload.get("start_date"),
+                "end_date": payload.get("end_date"),
+                "created_at": payload.get("created_at"),
+                "mtime": file_dt.isoformat(),
+                "path": str(path),
+            }
+        )
+
+    return records
 
 
 def append_pending_payload(dataset: str, payload: Any, *, reason: str, start_date: str | None = None, end_date: str | None = None) -> Path | None:

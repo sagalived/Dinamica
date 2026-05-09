@@ -1,0 +1,14 @@
+﻿C:\Users\dinam\OneDrive\Documentos\GitHub\Dinamica\assets\camada APiteste\json\data_cache\clientes.json
+C:\Users\dinam\OneDrive\Documentos\GitHub\Dinamica\assets\camada APiteste\json\data_cache\credores.json
+C:\Users\dinam\OneDrive\Documentos\GitHub\Dinamica\assets\camada APiteste\json\data_cache\empresas.json
+C:\Users\dinam\OneDrive\Documentos\GitHub\Dinamica\assets\camada APiteste\json\data_cache\obras.json
+C:\Users\dinam\OneDrive\Documentos\GitHub\Dinamica\assets\camada APiteste\json\data_cache\obras_by_code.json
+C:\Users\dinam\OneDrive\Documentos\GitHub\Dinamica\assets\camada APiteste\json\data_cache\obras_meta.json
+C:\Users\dinam\OneDrive\Documentos\GitHub\Dinamica\assets\camada APiteste\json\data_cache\sienge_sync_meta.json
+C:\Users\dinam\OneDrive\Documentos\GitHub\Dinamica\assets\camada APiteste\json\data_cache\solicitantes-cache.json
+C:\Users\dinam\OneDrive\Documentos\GitHub\Dinamica\assets\camada APiteste\json\data_cache\units-of-measure.json
+C:\Users\dinam\OneDrive\Documentos\GitHub\Dinamica\assets\camada APiteste\json\data_cache\usuarios.json
+C:\Users\dinam\OneDrive\Documentos\GitHub\Dinamica\assets\camada APiteste\json\openapi_backend.json
+C:\Users\dinam\OneDrive\Documentos\GitHub\Dinamica\assets\camada APiteste\json\openapi_backend_paths.txt
+C:\Users\dinam\OneDrive\Documentos\GitHub\Dinamica\assets\camada APiteste\json\samples_filtered_all_all_2025-12-01_2026-05-04.json
+C:\Users\dinam\OneDrive\Documentos\GitHub\Dinamica\assets\camada APiteste\json\samples_mc_by_building_company_1_all_2025-12-01_2026-05-04.json

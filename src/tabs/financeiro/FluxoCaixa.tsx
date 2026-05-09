@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Label } from '../../components/ui/label';
 import { Button } from '../../components/ui/button';
@@ -16,6 +16,7 @@ import { useSienge } from '../../contexts/SiengeContext';
 import { useTheme } from '../../contexts/ThemeContext';
 import { calcularFluxoCaixa } from './leandroLogic';
 import { safeFormat } from '../dashboard/logic';
+import { FilterBar, FilterState } from '../../components/FilterBar';
 
 export function FinanceiroFluxoTab() {
   const {
@@ -32,6 +33,17 @@ export function FinanceiroFluxoTab() {
   } = useSienge();
   
   const { isDark } = useTheme();
+
+  // Estado dos filtros
+  const [currentFilters, setCurrentFilters] = useState<FilterState | null>(null);
+
+  const handleFilterApply = (filters: FilterState) => {
+    setCurrentFilters(filters);
+  };
+
+  const handleFilterClear = () => {
+    setCurrentFilters(null);
+  };
 
   const fcSelectedCompanyName = companies.find((c: any) => String(c.id) === fcSelectedCompany)?.name || '';
   const buildingMap = useMemo(() => {
@@ -97,6 +109,8 @@ export function FinanceiroFluxoTab() {
       exit={{ opacity: 0, y: -20 }}
       className="space-y-6"
     >
+      {/* Filtros */}
+      <FilterBar onFilter={handleFilterApply} onClear={handleFilterClear} />
       {/* Filtros Exclusivos do Fluxo de Caixa */}
       <div className="bg-[#161618] border border-white/5 p-4 rounded-2xl shadow-2xl relative z-10 flex flex-wrap gap-4 items-end">
         <div className="space-y-2 flex-1 min-w-[260px]">

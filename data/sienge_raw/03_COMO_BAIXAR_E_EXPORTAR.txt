@@ -1,0 +1,28 @@
+COMO BAIXAR / EXPORTAR PARA OUTRO SISTEMA
+
+1) Usando o cache local (mais simples)
+- Copie os JSONs em json/data_cache/*.json (obras/empresas/usuários/credores etc).
+- Para recortes por período, use os samples em json/samples_filtered_*.json.
+
+2) Consumindo a API do backend (recomendado para recortes)
+- GET /filtered com start_date/end_date e filtros.
+- GET /mc-by-building para margens por obra (com rateio).
+
+Exemplo (pseudo-cURL; NÃO cole token aqui):
+- curl -H "Authorization: Bearer <TOKEN>" \
+  "http://127.0.0.1:8000/filtered?company_id=all&building_id=all&start_date=2026-01-01&end_date=2026-05-04"
+
+- curl -H "Authorization: Bearer <TOKEN>" \
+  "http://127.0.0.1:8000/mc-by-building?company_id=1&building_id=all&start_date=2025-12-01&end_date=2026-05-04"
+
+3) Direto do SIENGE (quando você quiser bypass do backend)
+- O sistema usa endpoints do SIENGE como:
+  - /companies, /enterprises, /users, /creditors
+  - /purchase-orders, /purchase-orders/{id}/items
+  - /bills, /bills/{billId}/buildings-cost
+  - /accounts-statements
+  - /nfe/documents
+
+Obs.
+- O rateio por obra depende do /bills/{billId}/buildings-cost.
+- Se um billId não tiver rateio (404), o sistema usa fallback por obra quando possível.

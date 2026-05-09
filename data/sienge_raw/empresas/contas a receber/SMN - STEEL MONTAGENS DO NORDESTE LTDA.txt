@@ -1,0 +1,25 @@
+﻿EMPRESA: SMN - STEEL MONTAGENS DO NORDESTE LTDA
+ID_EMPRESA: 8
+PERIODO: 2019-08-13 ate 2026-05-30
+Fonte: Sienge API REST ao vivo (/accounts-receivable/receivable-bills), sem uso do banco local.
+Observacao: Ind., Dias, Acrescimo e Desconto ficam em branco/R$ 0,00 quando o endpoint principal do Sienge nao retorna esses campos.
+Registros: companies=10; works=347; titles=1488.
+
+OBRAS ADMINISTRADAS
+ID_OBRA;OBRA
+80011;CENTRO DE GESTÃO INTEGRADA - CGI MUNICIPIO DE TAUA
+80001;ESCRITÓRIO SMN
+80002;OBRA GENESIS
+80007;OBRA IFCE BATURITE
+80008;OBRA IFCE CAMOCIM
+80003;OBRA IFCE CAUCAIA
+80004;OBRA IFCE HORIZONTE
+80006;OBRA IFCE MORADA NOVA
+80005;OBRA IFCE PARACURU
+80009;OBRA IFCE TIANGUÁ
+80010;OBRA UBAJARA
+
+CONTAS_A_RECEBER
+Credor;Documento;Lançamento;Qt.;Ind.;Dias;Valor no vencto;Acréscimo;Desconto;Total
+
+TOTAL;;;;;R$ 0,00;R$ 0,00;R$ 0,00;R$ 0,00

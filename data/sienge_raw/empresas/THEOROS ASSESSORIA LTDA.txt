@@ -1,0 +1,11 @@
+﻿EMPRESA: THEOROS ASSESSORIA LTDA
+ID_EMPRESA: 4
+PERIODO: 2019-01-01 ate 2026-05-06
+Fonte: Sienge API REST ao vivo (accounts-statements, bills, bill budget-categories e cost-centers), sem uso do banco local. Arquivo atualizado incrementalmente de 20 em 20 registros.
+Formula: Margem = MC / Receita. MC = Receita - Custos/Despesas.
+Registros: accounts-statements=38; statements-applied=1; bills=7; bills-applied=7; bill-categories=7; cost-centers=1; batches-written=34.
+
+OBRA;ID_OBRA;RECEITA;CUSTOS_DESPESAS;MC;MARGEM
+ESCRITORIO THEOROS;40001;R$ 0,01;R$ 14.848,25;R$ -14.848,24;-148482400,00%
+
+TOTAL;4;R$ 0,01;R$ 14.848,25;R$ -14.848,24;-148482400,00%

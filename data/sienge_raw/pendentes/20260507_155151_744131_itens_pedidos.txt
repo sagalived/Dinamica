@@ -1,0 +1,71 @@
+{
+  "dataset": "itens_pedidos",
+  "reason": "itens de pedido ausentes no banco",
+  "start_date": "15442",
+  "end_date": "15442",
+  "created_at": "2026-05-07T18:51:51.744166+00:00",
+  "payload": {
+    "15442": [
+      {
+        "itemNumber": 2,
+        "buildingCostDatabaseId": 291001,
+        "resourceId": 36725,
+        "resourceDescription": "FURADEIRA DE IMPACTO PROFISSIONAL 650W",
+        "resourceCode": "",
+        "resourceReference": null,
+        "detailId": null,
+        "detailDescription": "",
+        "trademarkId": null,
+        "trademarkDescription": "",
+        "unitOfMeasure": "un",
+        "quantity": 1.0,
+        "unitPrice": 698.0,
+        "netPrice": 698.0,
+        "freightUnitPrice": 0.0,
+        "discount": 0.0,
+        "discountPercentage": 0.0,
+        "increasePercentage": 0.0,
+        "icmsTaxPercentage": 0.0,
+        "ipiTaxPercentage": 0.0,
+        "issTaxPercentage": 0.0,
+        "notes": "SERVIÇO PONTUAL, PODE SER UM ALUGUEL DE 1 SEMANA",
+        "purchaseQuotations": [
+          {
+            "purchaseQuotationId": 4395,
+            "purchaseQuotationItemId": 1
+          }
+        ]
+      },
+      {
+        "itemNumber": 1,
+        "buildingCostDatabaseId": 291001,
+        "resourceId": 37866,
+        "resourceDescription": "ESMERILHADEIRA ANGULAR 4.1/2 POL. 650W",
+        "resourceCode": "",
+        "resourceReference": null,
+        "detailId": null,
+        "detailDescription": "",
+        "trademarkId": null,
+        "trademarkDescription": "",
+        "unitOfMeasure": "un",
+        "quantity": 1.0,
+        "unitPrice": 690.0,
+        "netPrice": 690.0,
+        "freightUnitPrice": 0.0,
+        "discount": 0.0,
+        "discountPercentage": 0.0,
+        "increasePercentage": 0.0,
+        "icmsTaxPercentage": 0.0,
+        "ipiTaxPercentage": 0.0,
+        "issTaxPercentage": 0.0,
+        "notes": "SERVIÇO PONTUAL, PODE SER UM ALUGUEL DE 1 SEMANA",
+        "purchaseQuotations": [
+          {
+            "purchaseQuotationId": 4395,
+            "purchaseQuotationItemId": 2
+          }
+        ]
+      }
+    ]
+  }
+}

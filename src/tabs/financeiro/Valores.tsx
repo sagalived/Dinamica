@@ -10,6 +10,8 @@ import { useSienge } from '../../contexts/SiengeContext';
 import { safeFormat } from '../dashboard/logic';
 import { isSettledFinancialStatus, translateStatusLabel, toMoney } from './logic';
 import { useMemo, useState } from 'react';
+import { FilterBar, FilterState } from '../../components/FilterBar';
+import { parse, endOfDay } from 'date-fns';
 
 export function FinanceiroValores() {
   const { financialTitles, receivableTitles, bankBalance: saldoBancario, orders } = useSienge();
@@ -17,6 +19,19 @@ export function FinanceiroValores() {
   const [financeLimit, setFinanceLimit] = useState<number>(50);
   const [reportType, setReportType] = useState<string>('compras');
   const [selectedOverdueTitle, setSelectedOverdueTitle] = useState<any>(null);
+
+  // Estado dos filtros
+  const [currentFilters, setCurrentFilters] = useState<FilterState | null>(null);
+
+  const handleFilterApply = (filters: FilterState) => {
+    setCurrentFilters(filters);
+    console.log('Filtros aplicados:', filters);
+  };
+
+  const handleFilterClear = () => {
+    setCurrentFilters(null);
+    console.log('Filtros limpos');
+  };
 
   const todayStart = useMemo(() => {
     const now = new Date();
@@ -93,6 +108,9 @@ export function FinanceiroValores() {
               exit={{ opacity: 0, y: -20 }}
               className="space-y-8"
             >
+              {/* Filtros */}
+              <FilterBar onFilter={handleFilterApply} onClear={handleFilterClear} />
+
               {(() => {
                 const openPayables = financialTitles.filter(t => !isSettledFinancialStatus(t.status)).sort((a,b) => (a.dueDateNumeric || 0) - (b.dueDateNumeric || 0));
                 const openReceivables = receivableTitles.filter(t => !isSettledFinancialStatus(t.status)).sort((a,b) => (a.dueDateNumeric || 0) - (b.dueDateNumeric || 0));

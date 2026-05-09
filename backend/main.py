@@ -15,9 +15,11 @@ from sqlalchemy.orm import Session
 from backend.config import APP_NAME, BASE_DIR, SIENGE_SYNC_INTERVAL_MINUTES
 from backend.database import Base, SessionLocal, engine
 from backend.routers import admin, auth, catalog, core, dashboard, kanban, logistics, sienge, operational
+from backend.routers import sienge_raw
 from backend.routers.sienge import run_sync_once
 from backend.services.bootstrap import ensure_seed_data
 from backend.services.db_migrations import ensure_sqlite_schema
+# from backend.services.scheduler import init_scheduler, stop_scheduler  # Requer apscheduler
 
 # Load environment variables from project-root .env (independente do cwd)
 load_dotenv(dotenv_path=Path(__file__).resolve().parent.parent / ".env", override=False)
@@ -35,6 +37,7 @@ app.include_router(sienge.router)
 app.include_router(operational.router)
 app.include_router(kanban.router)
 app.include_router(logistics.router)
+app.include_router(sienge_raw.router)
 
 app.add_middleware(
     CORSMiddleware,
@@ -103,6 +106,14 @@ async def on_startup() -> None:
             daemon=True,
         ).start()
         app.state.sienge_scheduler_task = asyncio.create_task(_run_sienge_scheduler())
+        
+        # Inicializa scheduler automático de sincronização (opcional: APScheduler)
+        # try:
+        #     init_scheduler()
+        #     logger.info("✓ Scheduler de sincronização de títulos a receber inicializado")
+        # except Exception as e:
+        #     logger.warning(f"Falha ao inicializar scheduler: {e}")
+        
     except Exception as exc:
         app.state.database_error = str(exc)
         logger.error("Erro critico no startup: %s", exc, exc_info=True)
@@ -110,6 +121,12 @@ async def on_startup() -> None:
 
 @app.on_event("shutdown")
 async def on_shutdown() -> None:
+    # Para scheduler de sincronização
+    try:
+        stop_scheduler()
+    except Exception:
+        pass
+    
     scheduler_task = getattr(app.state, "sienge_scheduler_task", None)
     if scheduler_task is not None:
         scheduler_task.cancel()

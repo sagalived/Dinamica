@@ -1,0 +1,21 @@
+﻿EMPRESA: AGORA NEGOCIOS IMOBILIARIOS E PARTICIPACOES LTDA
+ID_EMPRESA: 6
+PERIODO: 2019-08-13 ate 2026-05-30
+Fonte: Sienge API REST ao vivo (/accounts-receivable/receivable-bills), sem uso do banco local.
+Observacao: Ind., Dias, Acrescimo e Desconto ficam em branco/R$ 0,00 quando o endpoint principal do Sienge nao retorna esses campos.
+Registros: companies=10; works=347; titles=1488.
+
+OBRAS ADMINISTRADAS
+ID_OBRA;OBRA
+60004;BRASILIDADE URBANISMO - LARGO DOS VENTOS
+60002;CASACOR - BANGALÔ REFÚGIO
+60003;CASACOR - LOFT
+60006;CASAS DUPLEX DE 132,00 M² - TAPUIO
+60001;ESCRITORIO AGORA NEGOCIOS IMOBILIARIOS E PARTICIPACOES LTDA
+60005;VILLA SANTORINI
+
+CONTAS_A_RECEBER
+Credor;Documento;Lançamento;Qt.;Ind.;Dias;Valor no vencto;Acréscimo;Desconto;Total
+AJUSTE DE CAIXA;REC 1;05/11/2024;1;;;R$ 1.158,03;R$ 0,00;R$ 0,00;R$ 1.158,03
+
+TOTAL;;;;;R$ 1.158,03;R$ 0,00;R$ 0,00;R$ 1.158,03

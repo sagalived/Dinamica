@@ -1,0 +1,16 @@
+﻿EMPRESA: BRASIL STEEL COMPANY REPRESENTACOES LTDA
+ID_EMPRESA: 9
+PERIODO: 2019-01-01 ate 2026-05-30
+Fonte: Sienge API REST ao vivo (/accounts-receivable/receivable-bills e installments), sem uso do banco local.
+Observacao: SPC, Serasa, taxa administrativa e seguro ficam como Nao/R$ 0,00 quando o endpoint do Sienge nao retorna esses campos.
+Atualizado ate o mes processado: 2026-05
+Registros: companies=10; customers=134; works=347; titles=1488; installments=1488; months-written=89.
+
+OBRAS ADMINISTRADAS
+ID_OBRA;OBRA
+90001;ESCRITORIO BRASIL STEEL
+
+TITULOS_A_RECEBER
+Título;Cód. empresa;Empresa;Documento;Nº documento;Data emissão;Cód. cliente;Cliente;Origem;Inadimplente;SPC;Serasa;Subjudice;Taxa administrativa;Seguro;Valor a receber;Valor baixado;Valor líquido;Valor total;Observação
+
+TOTAL;9;BRASIL STEEL COMPANY REPRESENTACOES LTDA;;;;;;;;;;;R$ 0,00;R$ 0,00;R$ 0,00;R$ 0,00;R$ 0,00;R$ 0,00;

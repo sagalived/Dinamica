@@ -1,0 +1,19 @@
+﻿EMPRESA: GENESIS EMPREENDIMENTOS SPE LTDA
+ID_EMPRESA: 7
+PERIODO: 2019-08-13 ate 2026-05-30
+Fonte: Sienge API REST ao vivo (/accounts-receivable/receivable-bills), sem uso do banco local.
+Observacao: Ind., Dias, Acrescimo e Desconto ficam em branco/R$ 0,00 quando o endpoint principal do Sienge nao retorna esses campos.
+Registros: companies=10; works=347; titles=1488.
+
+OBRAS ADMINISTRADAS
+ID_OBRA;OBRA
+70003;CONDOMINIO GENESIS
+70002;CONDOMINIO RESIDENCIAL EM AQUIRAZ DE 152 UNIDADES CASAS - GENESIS
+70001;ESCRITORIO GENESIS EMPREENDIMENTOS SPE LTDA
+
+CONTAS_A_RECEBER
+Credor;Documento;Lançamento;Qt.;Ind.;Dias;Valor no vencto;Acréscimo;Desconto;Total
+ANTÔNIO VITORINO VICENTE RAMALHO;CT 87 F4N;23/07/2025;1;;;R$ 399.900,00;R$ 0,00;R$ 0,00;R$ 399.900,00
+Carlos Breno Barroso Calixto;CT 1;04/09/2025;1;;;R$ 439.989,00;R$ 0,00;R$ 0,00;R$ 439.989,00
+
+TOTAL;;;;;R$ 839.889,00;R$ 0,00;R$ 0,00;R$ 839.889,00

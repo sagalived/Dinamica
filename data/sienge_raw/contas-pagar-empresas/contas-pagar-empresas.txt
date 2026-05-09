@@ -1,0 +1,2 @@
+CATEGORIA;DESCRICAO;VALOR
+# Arquivo de template para 'contas-pagar-empresas' — preencha os dados abaixo

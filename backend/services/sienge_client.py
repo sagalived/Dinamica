@@ -563,5 +563,49 @@ class SiengeClient:
                 income += value
         return income - expense
 
+    async def fetch_receivable_titles(
+        self,
+        start_date: str | None = None,
+        end_date: str | None = None,
+        company_id: str | None = None,
+        building_id: str | None = None,
+    ) -> list[dict]:
+        """
+        Busca títulos a receber do SIENGE com suporte a filtros.
+        
+        Args:
+            start_date: ISO date (2026-01-01)
+            end_date: ISO date (2026-12-31)
+            company_id: ID da empresa (str)
+            building_id: ID da obra (str)
+        
+        Returns:
+            Lista de títulos a receber
+        """
+        if not start_date or not end_date:
+            start_date, end_date = self._sync_date_range()
+        
+        # Busca dados base
+        titles = await self.fetch_receber_range(start_date, end_date)
+        
+        # Aplica filtros cliente-side se necessário
+        if company_id or building_id:
+            filtered = []
+            for title in titles:
+                if company_id:
+                    title_company = str(title.get("companyId") or "").strip()
+                    if title_company and title_company != str(company_id):
+                        continue
+                
+                if building_id:
+                    title_building = str(title.get("idObra") or title.get("buildingId") or "").strip()
+                    if title_building and title_building != str(building_id):
+                        continue
+                
+                filtered.append(title)
+            return filtered
+        
+        return titles
+
 
 sienge_client = SiengeClient()

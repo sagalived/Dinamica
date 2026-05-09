@@ -1,0 +1,71 @@
+{
+  "dataset": "itens_pedidos",
+  "reason": "itens de pedido ausentes no banco",
+  "start_date": "15689",
+  "end_date": "15689",
+  "created_at": "2026-05-07T18:46:37.817872+00:00",
+  "payload": {
+    "15689": [
+      {
+        "itemNumber": 2,
+        "buildingCostDatabaseId": 291001,
+        "resourceId": 16438,
+        "resourceDescription": "NIPLE DE FERRO GALVANIZADO, COM ROSCA BSP, DE 2 1/2\"",
+        "resourceCode": "4208",
+        "resourceReference": null,
+        "detailId": null,
+        "detailDescription": "",
+        "trademarkId": null,
+        "trademarkDescription": "",
+        "unitOfMeasure": "un",
+        "quantity": 2.0,
+        "unitPrice": 47.43,
+        "netPrice": 60.11520995,
+        "freightUnitPrice": 0.0,
+        "discount": 0.0,
+        "discountPercentage": 0.0,
+        "increasePercentage": 0.0,
+        "icmsTaxPercentage": 0.0,
+        "ipiTaxPercentage": 0.0,
+        "issTaxPercentage": 0.0,
+        "notes": "",
+        "purchaseQuotations": [
+          {
+            "purchaseQuotationId": 4589,
+            "purchaseQuotationItemId": 2
+          }
+        ]
+      },
+      {
+        "itemNumber": 1,
+        "buildingCostDatabaseId": 291001,
+        "resourceId": 12977,
+        "resourceDescription": "VALVULA DE RETENCAO VERTICAL, DE BRONZE (PN-16), 2 1/2\", 200 PSI, EXTREMIDADES COM ROSCA",
+        "resourceCode": "12657",
+        "resourceReference": null,
+        "detailId": null,
+        "detailDescription": "",
+        "trademarkId": null,
+        "trademarkDescription": "",
+        "unitOfMeasure": "un",
+        "quantity": 1.0,
+        "unitPrice": 465.99,
+        "netPrice": 590.6195801,
+        "freightUnitPrice": 0.0,
+        "discount": 0.0,
+        "discountPercentage": 0.0,
+        "increasePercentage": 0.0,
+        "icmsTaxPercentage": 0.0,
+        "ipiTaxPercentage": 0.0,
+        "issTaxPercentage": 0.0,
+        "notes": "",
+        "purchaseQuotations": [
+          {
+            "purchaseQuotationId": 4589,
+            "purchaseQuotationItemId": 1
+          }
+        ]
+      }
+    ]
+  }
+}

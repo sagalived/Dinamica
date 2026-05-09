@@ -1,0 +1,11 @@
+EMPRESA: Sem empresa identificada
+ID_EMPRESA: 0
+Fonte: Sienge API ao vivo, sem uso do banco local.
+Valores em Real (BRL). Margem = MC / Receita. MC = Receita - (Custos + Despesas).
+Gerado em: 2026-05-06
+
+OBRA;ID_OBRA;RECEITA;CUSTOS;DESPESAS;TOTAL_VARIAVEIS;MC;MARGEM
+Sem obra;0;R$ 159.144.977,43;R$ 188.754.402,35;R$ 139.027.409,33;R$ 327.781.811,68;R$ -168.636.834,25;-105,96%
+Espólios de demolição / Reciclagem;164;R$ 0,00;R$ 0,00;R$ 0,00;R$ 0,00;R$ 0,00;0,00%
+
+TOTAL;0;R$ 159.144.977,43;R$ 188.754.402,35;R$ 139.027.409,33;R$ 327.781.811,68;R$ -168.636.834,25;-105,96%

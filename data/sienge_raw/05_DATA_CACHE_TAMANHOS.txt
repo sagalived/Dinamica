@@ -1,0 +1,16 @@
+﻿
+Name                     Length
+----                     ------
+clientes.json             75604
+credores.json           4140076
+empresas.json              1415
+obras.json               219426
+obras_by_code.json        40267
+obras_meta.json              47
+sienge_sync_meta.json       428
+solicitantes-cache.json  101536
+units-of-measure.json     17769
+usuarios.json             57135
+
+
+

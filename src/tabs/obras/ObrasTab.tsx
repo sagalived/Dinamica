@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { kanbanApi as api } from '../../lib/api';
 import { cn } from '../../lib/utils';
+import { FilterBar, FilterState } from '../../components/FilterBar';
 import {
   COLUMNS,
   PRIORITIES,
@@ -594,6 +595,15 @@ export function DiarioObras() {
   const [dragOver, setDragOver] = useState<CardStatus | null>(null);
   const [activeBuildingId, setActiveBuildingId] = useState(buildingId);
   const [activeBuildingName, setActiveBuildingName] = useState(buildingName);
+  const [currentFilters, setCurrentFilters] = useState<FilterState | null>(null);
+
+  const handleFilterApply = (filters: FilterState) => {
+    setCurrentFilters(filters);
+  };
+
+  const handleFilterClear = () => {
+    setCurrentFilters(null);
+  };
 
   // Sync when parent prop changes
   useEffect(() => {
@@ -721,6 +731,9 @@ export function DiarioObras() {
 
   return (
     <div className="flex flex-col gap-6 w-full pb-10">
+      {/* Filtros */}
+      <FilterBar onFilter={handleFilterApply} onClear={handleFilterClear} />
+
       {/* ── Header ── */}
       <div className="bg-[#161618] rounded-2xl border border-white/5 shadow-xl p-5 sm:p-6">
         <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">

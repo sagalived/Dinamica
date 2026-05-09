@@ -1,0 +1,41 @@
+{
+  "dataset": "itens_pedidos",
+  "reason": "itens de pedido ausentes no banco",
+  "start_date": "15603",
+  "end_date": "15603",
+  "created_at": "2026-05-07T18:46:41.688485+00:00",
+  "payload": {
+    "15603": [
+      {
+        "itemNumber": 1,
+        "buildingCostDatabaseId": 291001,
+        "resourceId": 13224,
+        "resourceDescription": "SELANTE ELASTICO MONOCOMPONENTE A BASE DE POLIURETANO PARA JUNTAS DIVERSAS",
+        "resourceCode": "142",
+        "resourceReference": null,
+        "detailId": null,
+        "detailDescription": "",
+        "trademarkId": null,
+        "trademarkDescription": "",
+        "unitOfMeasure": "un",
+        "quantity": 50.0,
+        "unitPrice": 16.0,
+        "netPrice": 16.0,
+        "freightUnitPrice": 0.0,
+        "discount": 0.0,
+        "discountPercentage": 0.0,
+        "increasePercentage": 0.0,
+        "icmsTaxPercentage": 0.0,
+        "ipiTaxPercentage": 0.0,
+        "issTaxPercentage": 0.0,
+        "notes": "PATA FINALIZAÇÃO DAS INSTALAÇÕES DAS CALHAS",
+        "purchaseQuotations": [
+          {
+            "purchaseQuotationId": 4540,
+            "purchaseQuotationItemId": 1
+          }
+        ]
+      }
+    ]
+  }
+}

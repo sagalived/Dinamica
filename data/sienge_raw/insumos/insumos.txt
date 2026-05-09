@@ -1,0 +1,2 @@
+CATEGORIA;DESCRICAO;VALOR
+# Arquivo de template para 'insumos' — preencha os dados abaixo

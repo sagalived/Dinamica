@@ -1,0 +1,20 @@
+﻿EMPRESA: GENESIS EMPREENDIMENTOS SPE LTDA
+ID_EMPRESA: 7
+PERIODO: 2019-01-01 ate 2026-05-30
+Fonte: Sienge API REST ao vivo (/accounts-receivable/receivable-bills e installments), sem uso do banco local.
+Observacao: SPC, Serasa, taxa administrativa e seguro ficam como Nao/R$ 0,00 quando o endpoint do Sienge nao retorna esses campos.
+Atualizado ate o mes processado: 2026-05
+Registros: companies=10; customers=134; works=347; titles=1488; installments=1488; months-written=89.
+
+OBRAS ADMINISTRADAS
+ID_OBRA;OBRA
+70003;CONDOMINIO GENESIS
+70002;CONDOMINIO RESIDENCIAL EM AQUIRAZ DE 152 UNIDADES CASAS - GENESIS
+70001;ESCRITORIO GENESIS EMPREENDIMENTOS SPE LTDA
+
+TITULOS_A_RECEBER
+Título;Cód. empresa;Empresa;Documento;Nº documento;Data emissão;Cód. cliente;Cliente;Origem;Inadimplente;SPC;Serasa;Subjudice;Taxa administrativa;Seguro;Valor a receber;Valor baixado;Valor líquido;Valor total;Observação
+1596;7;GENESIS EMPREENDIMENTOS SPE LTDA;CT;87 F4N;23/07/2025;164;ANTÔNIO VITORINO VICENTE RAMALHO;CR;Não;Não;Não;Não;R$ 0,00;R$ 0,00;R$ 399.900,00;R$ 0,00;R$ 399.900,00;R$ 399.900,00;
+1565;7;GENESIS EMPREENDIMENTOS SPE LTDA;CT;1;04/09/2025;162;Carlos Breno Barroso Calixto;CR;Não;Não;Não;Não;R$ 0,00;R$ 0,00;R$ 439.989,00;R$ 0,00;R$ 439.989,00;R$ 439.989,00;
+
+TOTAL;7;GENESIS EMPREENDIMENTOS SPE LTDA;;;;;;;;;;;R$ 0,00;R$ 0,00;R$ 839.889,00;R$ 0,00;R$ 839.889,00;R$ 839.889,00;

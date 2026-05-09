@@ -20,6 +20,7 @@ import { LeandroTab } from '../tabs/financeiro/Leandro';
 import { FinanceiroValores } from '../tabs/financeiro/Valores';
 import { FinanceiroAlerta } from '../tabs/financeiro/Alerta';
 import { FinanceiroFluxoTab } from '../tabs/financeiro/FluxoCaixa';
+import { CentroDeCustoTab } from '../tabs/financeiro/CentroDeCusto';
 import { DashboardGeral } from '../tabs/dashboard/Geral';
 import { DashboardFinanceiro } from '../tabs/dashboard/Financeiro';
 import { DashboardObras } from '../tabs/dashboard/Obras';
@@ -298,7 +299,7 @@ export function SiengeProvider({ children }: { children: React.ReactNode }) {
   const [selectedCompany, setSelectedCompany] = useState<string>('all');
   const [selectedUser, setSelectedUser] = useState<string>('all');
   const [selectedRequester, setSelectedRequester] = useState<string>('all');
-  const [globalPeriodMode, setGlobalPeriodMode] = useState<'last6m' | 'all'>('last6m');
+  const [globalPeriodMode, setGlobalPeriodMode] = useState<'last3m' | 'all'>('last3m');
   const migratedLegacyDateFilterRef = useRef(false);
 
   useEffect(() => {
@@ -395,7 +396,7 @@ export function SiengeProvider({ children }: { children: React.ReactNode }) {
       latitude: typeof b.latitude === 'number' ? b.latitude : undefined,
       longitude: typeof b.longitude === 'number' ? b.longitude : undefined,
       address: fixText(b.endereco || b.address || b.adress),
-      companyId: b.idCompany || b.companyId,
+      companyId: b.idCompany ?? b.companyId ?? b.company_id ?? undefined,
       engineer: fixText(b.engineer || b.responsavel || b.nomeResponsavel || b.gerente || b.engenheiro || b.responsavelTecnico || 'Aguardando Avaliação'),
     }));
 
@@ -930,7 +931,7 @@ export function SiengeProvider({ children }: { children: React.ReactNode }) {
     // Ex: hoje 05/05 → start 01/06 do ano anterior (12 meses incluindo o mês atual).
     const today = new Date();
     const end = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-    const start = new Date(end.getFullYear(), end.getMonth() - 11, 1);
+    const start = new Date(end.getFullYear(), end.getMonth() - 2, 1); // Últimos 3 meses
     return { start, end };
   }, []);
 
@@ -1882,6 +1883,7 @@ export function SiengeProvider({ children }: { children: React.ReactNode }) {
 
   const contextValue = {
     loading, syncing, syncProgress, dataRevision, apiStatus, saldoBancario, lastUpdate, syncInfo,
+    refreshData,
     startDate, setStartDate, endDate, setEndDate,
     fcStartDate, setFcStartDate, fcEndDate, setFcEndDate, fcPeriodMode, setFcPeriodMode,
     fcSelectedCompany, setFcSelectedCompany, fcSelectedBuilding, setFcSelectedBuilding, fcHideInternal, setFcHideInternal,

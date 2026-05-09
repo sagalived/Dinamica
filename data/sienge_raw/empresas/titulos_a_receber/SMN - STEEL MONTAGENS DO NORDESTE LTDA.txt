@@ -1,0 +1,26 @@
+﻿EMPRESA: SMN - STEEL MONTAGENS DO NORDESTE LTDA
+ID_EMPRESA: 8
+PERIODO: 2019-01-01 ate 2026-05-30
+Fonte: Sienge API REST ao vivo (/accounts-receivable/receivable-bills e installments), sem uso do banco local.
+Observacao: SPC, Serasa, taxa administrativa e seguro ficam como Nao/R$ 0,00 quando o endpoint do Sienge nao retorna esses campos.
+Atualizado ate o mes processado: 2026-05
+Registros: companies=10; customers=134; works=347; titles=1488; installments=1488; months-written=89.
+
+OBRAS ADMINISTRADAS
+ID_OBRA;OBRA
+80011;CENTRO DE GESTÃO INTEGRADA - CGI MUNICIPIO DE TAUA
+80001;ESCRITÓRIO SMN
+80002;OBRA GENESIS
+80007;OBRA IFCE BATURITE
+80008;OBRA IFCE CAMOCIM
+80003;OBRA IFCE CAUCAIA
+80004;OBRA IFCE HORIZONTE
+80006;OBRA IFCE MORADA NOVA
+80005;OBRA IFCE PARACURU
+80009;OBRA IFCE TIANGUÁ
+80010;OBRA UBAJARA
+
+TITULOS_A_RECEBER
+Título;Cód. empresa;Empresa;Documento;Nº documento;Data emissão;Cód. cliente;Cliente;Origem;Inadimplente;SPC;Serasa;Subjudice;Taxa administrativa;Seguro;Valor a receber;Valor baixado;Valor líquido;Valor total;Observação
+
+TOTAL;8;SMN - STEEL MONTAGENS DO NORDESTE LTDA;;;;;;;;;;;R$ 0,00;R$ 0,00;R$ 0,00;R$ 0,00;R$ 0,00;R$ 0,00;
