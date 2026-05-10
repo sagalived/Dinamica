@@ -15,6 +15,12 @@ import { Button } from './ui/button';
 import logoWordmark from '../assets/dinamica-wordmark.svg';
 import logoWordmarkDark from '../assets/dinamica-wordmark-dark.svg';
 import ModalComponent from '@/components/Modal';
+import {
+  filtrarListaPorTexto,
+  MAPA_ROTAS_POR_ABA,
+  obterAbaAtivaPorRota,
+  obterOpcoesObraPorEmpresa,
+} from './layout-principal/layoutprincipalhelpers';
 
 export function LayoutPrincipal() {
   const { isDark, toggleThemeMode, themeMode } = useTheme();
@@ -53,7 +59,7 @@ export function LayoutPrincipal() {
   const showBuyerRequesterFilters = path === '/financeiro/alerta';
   const latestSyncLabel = syncInfo?.finished_at || syncInfo?.started_at
     ? new Date(syncInfo.finished_at || syncInfo.started_at).toLocaleString('pt-BR')
-    : 'Sem sincronizaÃ§Ã£o registrada';
+    : 'Sem sincronização registrada';
   const updatedFiles = (syncInfo as any)?.updated_files || [];
 
   useEffect(() => {
@@ -65,7 +71,7 @@ export function LayoutPrincipal() {
   }, [setEndDate, setGlobalPeriodMode, setStartDate]);
 
   useEffect(() => {
-    // Na aba Dashboard/Geral esses filtros nÃ£o sÃ£o usados.
+    // Na aba Dashboard/Geral esses filtros não são usados.
     if (!isDashboardGeral) return;
     if (selectedUser !== 'all') setSelectedUser('all');
     if (selectedRequester !== 'all') setSelectedRequester('all');
@@ -77,46 +83,15 @@ export function LayoutPrincipal() {
     if (selectedRequester !== 'all') setSelectedRequester('all');
   }, [selectedRequester, selectedUser, setSelectedRequester, setSelectedUser, showBuyerRequesterFilters]);
 
-  const availableTabs = useMemo(() => (
-    isRestrictedUser
-      ? [{ id: '/logistica', label: 'LogÃ­stica', icon: Truck }]
-      : [
-          { id: '/', label: 'Dashboard', icon: LayoutDashboard },
-          { id: '/financeiro', label: 'Financeiro', icon: DollarSign },
-          { id: '/financeiro/alerta', label: 'Alertas', icon: Bell },
-          { id: '/obras/mapa', label: 'Mapa de Obras', icon: MapIcon },
-          { id: '/logistica', label: 'LogÃ­stica', icon: Truck },
-          { id: '/acessos', label: 'Acessos', icon: UserIcon },
-        ]
-  ), [isRestrictedUser]);
-
-  // Map route to activeTab for NavigationMenu
-  const activeTab = path.startsWith('/dashboard/financeiro') ? 'dashboard-financeiro' :
-                    path.startsWith('/financeiro') ? 'finance' : 
-                    path.startsWith('/logistica') ? 'logistics' :
-                    path.startsWith('/acessos') ? 'access' :
-                    path.startsWith('/obras') ? 'map' : 'dashboard';
+  const activeTab = useMemo(() => obterAbaAtivaPorRota(path), [path]);
 
   const setActiveTab = (id: string) => {
-    const routeMap: Record<string, string> = {
-      'dashboard': '/',
-      'dashboard-financeiro': '/dashboard/financeiro',
-      'finance': '/financeiro',
-      'alerts': '/financeiro/alerta',
-      'map': '/obras/mapa',
-      'logistics': '/logistica',
-      'access': '/acessos',
-      'obras-diario': '/obras/diario',
-      'financeiro-fluxo': '/financeiro/fluxo',
-      'financeiro-leandro': '/financeiro/leandro',
-      'financeiro-centro-custo': '/financeiro/centro-custo'
-    };
-    if (routeMap[id]) navigate(routeMap[id]);
+    const nextPath = MAPA_ROTAS_POR_ABA[id];
+    if (nextPath) navigate(nextPath);
   };
 
   const buildingFilterOptions = useMemo(() => {
-    if (selectedCompany === 'all') return buildings;
-    return (buildings || []).filter((b: any) => String(b?.companyId) === String(selectedCompany));
+    return obterOpcoesObraPorEmpresa(buildings, selectedCompany);
   }, [buildings, selectedCompany]);
 
   const yearOptions = useMemo(() => {
@@ -129,44 +104,19 @@ export function LayoutPrincipal() {
   }, []);
 
   const filteredCompanies = useMemo(() => {
-    const term = companySearch.trim().toLowerCase();
-    if (!term) return companies || [];
-    return (companies || []).filter((c: any) => {
-      const name = String(c?.name || '').toLowerCase();
-      const id = String(c?.id || '');
-      return name.includes(term) || id.includes(term);
-    });
+    return filtrarListaPorTexto(companies || [], companySearch, ['name', 'id']);
   }, [companies, companySearch]);
 
   const filteredBuildings = useMemo(() => {
-    const term = buildingSearch.trim().toLowerCase();
-    if (!term) return buildingFilterOptions || [];
-    return (buildingFilterOptions || []).filter((b: any) => {
-      const name = String(b?.name || '').toLowerCase();
-      const id = String(b?.id || '');
-      const code = String(b?.code || '');
-      return name.includes(term) || id.includes(term) || code.includes(term);
-    });
+    return filtrarListaPorTexto(buildingFilterOptions || [], buildingSearch, ['name', 'id', 'code']);
   }, [buildingFilterOptions, buildingSearch]);
 
   const filteredUsers = useMemo(() => {
-    const term = buyerSearch.trim().toLowerCase();
-    if (!term) return users || [];
-    return (users || []).filter((u: any) => {
-      const name = String(u?.name || '').toLowerCase();
-      const id = String(u?.id || '');
-      return name.includes(term) || id.includes(term);
-    });
+    return filtrarListaPorTexto(users || [], buyerSearch, ['name', 'id']);
   }, [buyerSearch, users]);
 
   const filteredRequesters = useMemo(() => {
-    const term = requesterSearch.trim().toLowerCase();
-    if (!term) return requesters || [];
-    return (requesters || []).filter((r: any) => {
-      const name = String(r?.name || '').toLowerCase();
-      const id = String(r?.id || '');
-      return name.includes(term) || id.includes(term);
-    });
+    return filtrarListaPorTexto(requesters || [], requesterSearch, ['name', 'id']);
   }, [requesterSearch, requesters]);
 
   useEffect(() => {
@@ -227,7 +177,7 @@ export function LayoutPrincipal() {
 
   const downloadData = () => {
     // Moved to Context or we can re-implement here later
-    alert("FunÃ§Ã£o de download movida temporariamente");
+    alert("Função de download movida temporariamente");
   };
 
   const clearFilters = () => {
@@ -260,13 +210,13 @@ export function LayoutPrincipal() {
             <div className="flex items-center gap-2 sm:gap-3 shrink min-w-0">
               <img
                 src={isDark ? logoWordmarkDark : logoWordmark}
-                alt="DinÃ¢mica Empreendimentos"
+                alt="Dinâmica Empreendimentos"
                 className={cn(
                   "w-auto",
                   isDark ? "h-9 sm:h-10" : "h-8 sm:h-10"
                 )}
               />
-              <h1 className="hidden">DinÃ¢mica</h1>
+              <h1 className="hidden">Dinâmica</h1>
             </div>
 
             {/* Desktop Actions */}
@@ -379,7 +329,7 @@ export function LayoutPrincipal() {
                 )}
                 style={{ marginBottom: '0px', marginTop: '0px' }}
               >
-                Detalhar AtualizaÃ§Ã£o
+                Detalhar Atualização
               </button>
             </div>
           </div>
@@ -404,20 +354,20 @@ export function LayoutPrincipal() {
           >
             <div className={cn("flex items-start justify-between gap-4 border-b px-5 py-4", isDark ? "border-slate-800" : "border-slate-200") }>
               <div>
-                <div className="text-[11px] uppercase tracking-[0.24em] text-[#4CB232] font-black">Detalhamento da atualizaÃ§Ã£o</div>
-                <div className={cn("mt-1 text-sm", isDark ? "text-slate-300" : "text-slate-600")}>{syncInfo?.message || 'SincronizaÃ§Ã£o concluÃ­da'}</div>
+                <div className="text-[11px] uppercase tracking-[0.24em] text-[#4CB232] font-black">Detalhamento da atualização</div>
+                <div className={cn("mt-1 text-sm", isDark ? "text-slate-300" : "text-slate-600")}>{syncInfo?.message || 'Sincronização concluída'}</div>
               </div>
               <Button variant="ghost" onClick={() => setSyncDetailsOpen(false)}>Fechar</Button>
             </div>
             <div className="p-5 space-y-4 max-h-[70vh] overflow-auto custom-scrollbar">
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
                 <div className={cn("rounded-xl border p-3", isDark ? "border-slate-800 bg-white/[0.03]" : "border-slate-200 bg-slate-50")}>
-                  <div className="text-[10px] uppercase tracking-wider text-slate-400">InÃ­cio</div>
-                  <div className={cn("mt-1 text-sm font-semibold", isDark ? "text-white" : "text-slate-900")}>{syncInfo?.started_at ? new Date(syncInfo.started_at).toLocaleString('pt-BR') : 'â€”'}</div>
+                  <div className="text-[10px] uppercase tracking-wider text-slate-400">Início</div>
+                  <div className={cn("mt-1 text-sm font-semibold", isDark ? "text-white" : "text-slate-900")}>{syncInfo?.started_at ? new Date(syncInfo.started_at).toLocaleString('pt-BR') : '-'}</div>
                 </div>
                 <div className={cn("rounded-xl border p-3", isDark ? "border-slate-800 bg-white/[0.03]" : "border-slate-200 bg-slate-50")}>
                   <div className="text-[10px] uppercase tracking-wider text-slate-400">Fim</div>
-                  <div className={cn("mt-1 text-sm font-semibold", isDark ? "text-white" : "text-slate-900")}>{syncInfo?.finished_at ? new Date(syncInfo.finished_at).toLocaleString('pt-BR') : 'â€”'}</div>
+                  <div className={cn("mt-1 text-sm font-semibold", isDark ? "text-white" : "text-slate-900")}>{syncInfo?.finished_at ? new Date(syncInfo.finished_at).toLocaleString('pt-BR') : '-'}</div>
                 </div>
                 <div className={cn("rounded-xl border p-3", isDark ? "border-slate-800 bg-white/[0.03]" : "border-slate-200 bg-slate-50")}>
                   <div className="text-[10px] uppercase tracking-wider text-slate-400">Arquivos atualizados</div>
@@ -426,7 +376,7 @@ export function LayoutPrincipal() {
               </div>
 
               <div className={cn("rounded-xl border p-3 text-sm", isDark ? "border-slate-800 bg-white/[0.02] text-slate-300" : "border-slate-200 bg-slate-50 text-slate-700")}>
-                <div className="text-[10px] uppercase tracking-wider text-slate-400">Ãšltima atualizaÃ§Ã£o</div>
+                <div className="text-[10px] uppercase tracking-wider text-slate-400">Última atualização</div>
                 <div className="mt-1 font-medium">{latestSyncLabel}</div>
               </div>
 
@@ -438,7 +388,7 @@ export function LayoutPrincipal() {
                         <th className="px-3 py-2 text-left text-[11px] uppercase tracking-wider">Arquivo</th>
                         <th className="px-3 py-2 text-left text-[11px] uppercase tracking-wider">Dataset</th>
                         <th className="px-3 py-2 text-left text-[11px] uppercase tracking-wider">Motivo</th>
-                        <th className="px-3 py-2 text-left text-[11px] uppercase tracking-wider">PerÃ­odo</th>
+                        <th className="px-3 py-2 text-left text-[11px] uppercase tracking-wider">Período</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -446,8 +396,8 @@ export function LayoutPrincipal() {
                         <tr key={file.file_name} className={cn("border-t", isDark ? "border-slate-800 odd:bg-white/[0.02]" : "border-slate-200 odd:bg-slate-50")}>
                           <td className={cn("px-3 py-2 font-mono text-xs break-all", isDark ? "text-slate-100" : "text-slate-800")}>{file.file_name}</td>
                           <td className={cn("px-3 py-2", isDark ? "text-slate-300" : "text-slate-700")}>{file.dataset}</td>
-                          <td className={cn("px-3 py-2", isDark ? "text-slate-300" : "text-slate-700")}>{file.reason || 'â€”'}</td>
-                          <td className={cn("px-3 py-2 text-xs", isDark ? "text-slate-400" : "text-slate-500")}>{file.start_date || 'â€”'} {file.end_date ? `atÃ© ${file.end_date}` : ''}</td>
+                          <td className={cn("px-3 py-2", isDark ? "text-slate-300" : "text-slate-700")}>{file.reason || '-'}</td>
+                          <td className={cn("px-3 py-2 text-xs", isDark ? "text-slate-400" : "text-slate-500")}>{file.start_date || '-'} {file.end_date ? `até ${file.end_date}` : ''}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -455,7 +405,7 @@ export function LayoutPrincipal() {
                 </div>
               ) : (
                 <div className={cn("rounded-xl border p-4 text-sm", isDark ? "border-slate-800 bg-white/[0.02] text-slate-400" : "border-slate-200 bg-slate-50 text-slate-500")}>
-                  Nenhum arquivo novo foi gerado nesta atualizaÃ§Ã£o.
+                  Nenhum arquivo novo foi gerado nesta atualização.
                 </div>
               )}
             </div>
@@ -478,7 +428,7 @@ export function LayoutPrincipal() {
             <div className={cn("md:block", mobileFiltersOpen ? "block" : "hidden")}>
               <div className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-end gap-4 px-4 sm:px-6 pb-4 sm:pb-6 pt-0">
                 <div className="space-y-2 flex-1 sm:flex-none">
-                  <Label className="text-[10px] font-black uppercase tracking-widest text-orange-500">PerÃ­odo</Label>
+                  <Label className="text-[10px] font-black uppercase tracking-widest text-orange-500">Período</Label>
                   <div className="flex items-center gap-2 bg-black/30 border border-white/10 rounded-xl p-1 h-11">
                     <button
                       onClick={() => {
@@ -491,7 +441,7 @@ export function LayoutPrincipal() {
                           : "text-gray-300 hover:text-white hover:bg-white/10"
                       )}
                     >
-                      Ãšltimos 3 meses
+                      Últimos 3 meses
                     </button>
                     <button
                       onClick={() => {
@@ -504,7 +454,7 @@ export function LayoutPrincipal() {
                           : "text-gray-300 hover:text-white hover:bg-white/10"
                       )}
                     >
-                      PerÃ­odo total
+                      Período total
                     </button>
                   </div>
                 </div>
@@ -525,7 +475,7 @@ export function LayoutPrincipal() {
                     <PopoverTrigger asChild>
                       <Button variant="outline" className={cn("w-full sm:w-[160px] bg-black/40 border-white/10 h-11 rounded-xl justify-start text-left font-bold text-white", !startDate && "text-gray-400")}>
                         <CalendarIcon className="mr-2 h-4 w-4 text-orange-500" />
-                        {startDate ? format(startDate, "dd/MM/yyyy") : <span>InÃ­cio</span>}
+                        {startDate ? format(startDate, "dd/MM/yyyy") : <span>Início</span>}
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-0 bg-[#161618] border-white/10" align="start">

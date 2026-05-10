@@ -53,8 +53,15 @@ export function setSessionUser(user: AuthUser) {
 }
 
 export function getSessionUser(): AuthUser | null {
-  const stored = localStorage.getItem(SESSION_KEY);
-  return stored ? JSON.parse(stored) : null;
+  try {
+    const stored = localStorage.getItem(SESSION_KEY);
+    if (!stored) return null;
+    return JSON.parse(stored);
+  } catch {
+    // Sessao corrompida em localStorage nao deve derrubar a aplicacao.
+    localStorage.removeItem(SESSION_KEY);
+    return null;
+  }
 }
 
 export function clearSessionUser() {

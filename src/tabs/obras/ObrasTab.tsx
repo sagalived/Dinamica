@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useSienge } from '../../contexts/SiengeContext';
 import { useAuth } from '../../contexts/AuthContext';
@@ -9,9 +9,8 @@ import {
   Kanban as LayoutKanban, Layers, Search, Camera, RefreshCw,
   GripVertical, Flag, Paperclip, ZoomIn
 } from 'lucide-react';
-import { kanbanApi as api } from '../../lib/api';
 import { cn } from '../../lib/utils';
-import { FilterBar, FilterState } from '../../components/FilterBar';
+import { FilterBar } from '../../components/FilterBar';
 import {
   COLUMNS,
   PRIORITIES,
@@ -22,83 +21,13 @@ import {
   type CardPriority,
   type CardStatus,
 } from './logic';
+import { SPRINT_COLORS } from './obrasconstants';
+import { AttachmentPreview } from './components/AttachmentPreview';
+import { useKanbanObras } from './hooks/useKanbanObras';
 
 import type { Attachment, CardModalProps, KanbanCard, KanbanSprint } from './types';
 
-// ─── Constants ────────────────────────────────────────────────────────────────
-
-const SPRINT_COLORS = [
-  '#f97316', '#3b82f6', '#8b5cf6', '#10b981', '#ef4444',
-  '#06b6d4', '#f59e0b', '#ec4899', '#14b8a6', '#6366f1',
-];
-
 // ─── Sub-components ───────────────────────────────────────────────────────────
-
-function AttachmentPreview({ att, onDelete }: { att: Attachment; onDelete: () => void }) {
-  const [lightbox, setLightbox] = useState(false);
-  const BASE = import.meta.env.VITE_API_BASE ?? '';
-
-  return (
-    <>
-      <div className="group relative rounded-lg overflow-hidden border border-white/10 bg-black/30">
-        {att.type === 'image' ? (
-          <div
-            className="w-full h-20 cursor-zoom-in relative"
-            onClick={() => setLightbox(true)}
-          >
-            <img
-              src={`${BASE}${att.url}`}
-              alt={att.originalName}
-              className="w-full h-full object-cover hover:scale-105 transition-transform"
-            />
-            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
-              <ZoomIn size={16} className="text-white opacity-0 group-hover:opacity-100 transition-opacity" />
-            </div>
-          </div>
-        ) : att.type === 'video' ? (
-          <video src={`${BASE}${att.url}`} className="w-full h-20 object-cover" controls/>
-        ) : (
-          <a
-            href={`${BASE}${att.url}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-2 p-2 hover:bg-white/5 transition-colors"
-          >
-            <FileText size={18} className="text-orange-400 shrink-0" />
-            <span className="text-xs text-gray-300 truncate">{att.originalName}</span>
-          </a>
-        )}
-        <button
-          onClick={onDelete}
-          className="absolute top-1 right-1 w-5 h-5 rounded-full bg-black/70 text-red-400 hover:text-red-300 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-        >
-          <X size={10} />
-        </button>
-      </div>
-      {/* Lightbox */}
-      {lightbox && (
-        <div
-          className="fixed inset-0 z-[9999] bg-black/95 flex items-center justify-center p-4"
-          onClick={() => setLightbox(false)}
-        >
-          <img
-            src={`${BASE}${att.url}`}
-            alt={att.originalName}
-            className="max-w-full max-h-full object-contain rounded-xl shadow-2xl"
-            onClick={e => e.stopPropagation()}
-          />
-          <button
-            className="absolute top-4 right-4 text-white/60 hover:text-white"
-            onClick={() => setLightbox(false)}
-          >
-            <X size={28} />
-          </button>
-          <p className="absolute bottom-6 text-gray-400 text-sm">{att.originalName}</p>
-        </div>
-      )}
-    </>
-  );
-}
 
 function CardModal({
   card, sprintId, buildingId, sessionUser, onClose, onSave,
@@ -579,155 +508,58 @@ function SprintModal({
 
 export function DiarioObras() {
   const { sessionUser } = useAuth();
-  const { buildings, selectedMapBuilding: buildingId } = useSienge();
-  
+  const { buildings, selectedMapBuilding: buildingId, dataRevision } = useSienge();
+
   const buildingName = buildings.find((b: any) => b.id === buildingId)?.name || '';
+  const {
+    sprints,
+    loading,
+    selectedSprint,
+    setSelectedSprint,
+    cardModal,
+    setCardModal,
+    sprintModal,
+    setSprintModal,
+    search,
+    setSearch,
+    filterStatus,
+    setFilterStatus,
+    dragOver,
+    setDragOver,
+    activeBuildingId,
+    setActiveBuildingId,
+    activeBuildingName,
+    setActiveBuildingName,
+    fetchData,
+    createSprint,
+    updateSprint,
+    deleteSprint,
+    saveCard,
+    deleteCard,
+    handleDragStart,
+    handleDrop,
+    uploadFile,
+    deleteAttachment,
+    currentSprint,
+    filteredCards,
+    totalCards,
+    doneCards,
+    progressPct,
+  } = useKanbanObras({
+    buildingId,
+    buildingName,
+    dataRevision,
+  });
 
-  const [sprints, setSprints] = useState<KanbanSprint[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [selectedSprint, setSelectedSprint] = useState<string | null>(null);
-  const [collapsedSprints, setCollapsedSprints] = useState<Set<string>>(new Set());
-  const [cardModal, setCardModal] = useState<{ card: Partial<KanbanCard> | null; sprintId: string; isNew: boolean } | null>(null);
-  const [sprintModal, setSprintModal] = useState<{ sprint?: KanbanSprint; isNew: boolean } | null>(null);
-  const [search, setSearch] = useState('');
-  const [filterStatus, setFilterStatus] = useState<CardStatus | 'all'>('all');
-  const [dragCard, setDragCard] = useState<{ cardId: string; fromSprintId: string } | null>(null);
-  const [dragOver, setDragOver] = useState<CardStatus | null>(null);
-  const [activeBuildingId, setActiveBuildingId] = useState(buildingId);
-  const [activeBuildingName, setActiveBuildingName] = useState(buildingName);
-  const [currentFilters, setCurrentFilters] = useState<FilterState | null>(null);
+  const [currentFilters, setCurrentFilters] = useState<any>(null);
 
-  const handleFilterApply = (filters: FilterState) => {
+  const handleFilterApply = (filters: any) => {
     setCurrentFilters(filters);
   };
 
   const handleFilterClear = () => {
     setCurrentFilters(null);
   };
-
-  // Sync when parent prop changes
-  useEffect(() => {
-    setActiveBuildingId(buildingId);
-    setActiveBuildingName(buildingName);
-  }, [buildingId, buildingName]);
-
-  const fetchData = useCallback(async () => {
-    if (!activeBuildingId) return;
-    setLoading(true);
-    try {
-      const res = await api.get(`/kanban?building_id=${activeBuildingId}`);
-      const data = res.data?.buildings?.[activeBuildingId] || [];
-      setSprints(data);
-      if (!selectedSprint && data.length > 0) setSelectedSprint(data[0].id);
-    } catch {
-      setSprints([]);
-    } finally {
-      setLoading(false);
-    }
-  }, [activeBuildingId, selectedSprint]);
-
-  useEffect(() => { fetchData(); }, [fetchData]);
-
-  // ── SPRINT CRUD ────────────────────────────────────────────────
-
-  const createSprint = async (data: any) => {
-    await api.post('/kanban/sprint', { ...data, buildingId: activeBuildingId });
-    await fetchData();
-  };
-
-  const updateSprint = async (sprintId: string, data: any) => {
-    await api.patch(`/kanban/sprint/${sprintId}`, data);
-    await fetchData();
-  };
-
-  const deleteSprint = async (sprintId: string) => {
-    await api.delete(`/kanban/sprint/${sprintId}`);
-    setSprints(s => s.filter(x => x.id !== sprintId));
-    if (selectedSprint === sprintId) setSelectedSprint(null);
-  };
-
-  // ── CARD CRUD ──────────────────────────────────────────────────
-
-  const createCard = async (data: Partial<KanbanCard>) => {
-    await api.post('/kanban/card', { ...data, buildingId: activeBuildingId });
-    await fetchData();
-  };
-
-  const updateCard = async (cardId: string, data: Partial<KanbanCard>) => {
-    await api.patch(`/kanban/card/${cardId}`, data);
-    await fetchData();
-  };
-
-  const deleteCard = async (cardId: string) => {
-    await api.delete(`/kanban/card/${cardId}`);
-    setSprints(s => s.map(sp => ({ ...sp, cards: sp.cards.filter(c => c.id !== cardId) })));
-  };
-
-  const saveCard = async (data: Partial<KanbanCard>) => {
-    if (cardModal?.isNew) {
-      await createCard(data);
-    } else if (data.id) {
-      await updateCard(data.id, data);
-    }
-  };
-
-  // ── DRAG & DROP ────────────────────────────────────────────────
-
-  const handleDragStart = (e: React.DragEvent, cardId: string, sprintId: string) => {
-    setDragCard({ cardId, fromSprintId: sprintId });
-    e.dataTransfer.effectAllowed = 'move';
-  };
-
-  const handleDrop = async (e: React.DragEvent, newStatus: CardStatus) => {
-    e.preventDefault();
-    setDragOver(null);
-    if (!dragCard) return;
-    const { cardId } = dragCard;
-    setDragCard(null);
-    // Optimistic update
-    setSprints(s => s.map(sp => ({
-      ...sp,
-      cards: sp.cards.map(c => c.id === cardId ? { ...c, status: newStatus } : c)
-    })));
-    try {
-      await api.patch(`/kanban/card/${cardId}`, { status: newStatus });
-    } catch {
-      await fetchData(); // revert
-    }
-  };
-
-  // ── UPLOAD ─────────────────────────────────────────────────────
-
-  const uploadFile = async (cardId: string, file: File): Promise<Attachment | null> => {
-    const form = new FormData();
-    form.append('file', file);
-    const res = await api.post(`/kanban/upload?card_id=${cardId}`, form, {
-      headers: { 'Content-Type': 'multipart/form-data' }
-    });
-    return res.data?.attachment || null;
-  };
-
-  const deleteAttachment = async (cardId: string, att: Attachment) => {
-    await api.delete(`/kanban/upload?card_id=${cardId}&filename=${att.filename}`);
-  };
-
-  // ── Computed ───────────────────────────────────────────────────
-
-  const currentSprint = selectedSprint ? sprints.find(s => s.id === selectedSprint) : null;
-
-  const filteredCards = (sprintCards: KanbanCard[]): KanbanCard[] => {
-    return sprintCards.filter(c => {
-      const matchSearch = !search || c.title.toLowerCase().includes(search.toLowerCase())
-        || c.description.toLowerCase().includes(search.toLowerCase())
-        || c.responsible.toLowerCase().includes(search.toLowerCase());
-      const matchStatus = filterStatus === 'all' || c.status === filterStatus;
-      return matchSearch && matchStatus;
-    });
-  };
-
-  const totalCards = sprints.reduce((a, s) => a + s.cards.length, 0);
-  const doneCards = sprints.reduce((a, s) => a + s.cards.filter(c => c.status === 'done').length, 0);
-  const progressPct = totalCards > 0 ? Math.round((doneCards / totalCards) * 100) : 0;
 
   return (
     <div className="flex flex-col gap-6 w-full pb-10">

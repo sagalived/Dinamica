@@ -7,6 +7,7 @@ import { Alert, AlertDescription } from '../../components/ui/alert';
 import { useSienge } from '../../contexts/SiengeContext';
 import { format } from 'date-fns';
 import { sienge as api } from '../../lib/api';
+import { formatarMoedaBR } from '../utilitarios/formatacaoptbr';
 
 type BuildingRevenueRow = {
   buildingId: string;
@@ -83,12 +84,7 @@ const monthLabel = (key: string) => {
   return monthName.charAt(0).toUpperCase() + monthName.slice(1);
 };
 
-const fmtBRL = (n: number) => new Intl.NumberFormat('pt-BR', {
-  style: 'currency',
-  currency: 'BRL',
-  minimumFractionDigits: 2,
-  maximumFractionDigits: 2,
-}).format(Number.isFinite(n) ? n : 0);
+const fmtBRL = (n: number) => formatarMoedaBR(n);
 
 export function DashboardFinanceiro() {
   const {
@@ -101,6 +97,7 @@ export function DashboardFinanceiro() {
     companies,
     globalPeriodMode,
     refreshData,
+    dataRevision,
   } = useSienge();
 
   const [syncing, setSyncing] = useState(false);
@@ -226,7 +223,7 @@ export function DashboardFinanceiro() {
       totalRevenue,
       totalTitles,
     };
-  }, [analysisFilter, buildings, endDate, receivableTitles]);
+  }, [analysisFilter, buildings, endDate, receivableTitles, dataRevision]);
 
   const periodText = useMemo(() => {
     if (startDate && endDate) {

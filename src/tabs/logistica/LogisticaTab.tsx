@@ -1,10 +1,11 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { useSienge } from '../../contexts/SiengeContext';
 import { Truck, MapPin, Wrench, Fuel, Plus, Trash2, Calendar, FileText, Route } from 'lucide-react';
 import { format } from 'date-fns';
 import { sienge as api } from '../../lib/api';
 import type { Building, LogisticsLocation } from '../../lib/types';
-import { useSienge } from '../../contexts/SiengeContext';
 import { fixText } from '../../lib/text';
+import { formatarMoedaBR } from '../utilitarios/formatacaoptbr';
 import {
   HQ_OPTION,
   extractCityFromAddress,
@@ -23,7 +24,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import type { LogisticsEntry, RouteEstimate, RouteOption } from './types';
 
 export function LogisticsTab({ readOnly = false }: { readOnly?: boolean }) {
-  const { buildings } = useSienge();
+  const { buildings, dataRevision } = useSienge();
   const [entries, setEntries] = useState<LogisticsEntry[]>([]);
   const [dbLocations, setDbLocations] = useState<LogisticsLocation[]>([]);
   const [activePanel, setActivePanel] = useState<'history' | 'route'>('history');
@@ -155,7 +156,7 @@ export function LogisticsTab({ readOnly = false }: { readOnly?: boolean }) {
       .catch((error) => {
         console.error('Erro ao carregar locais logísticos:', error);
       });
-  }, []);
+  }, [dataRevision]);
 
   useEffect(() => {
     let cancelled = false;
@@ -539,7 +540,7 @@ export function LogisticsTab({ readOnly = false }: { readOnly?: boolean }) {
               <div className="rounded-xl border border-white/10 bg-black/40 px-4 py-2">
                 <p className="mb-1 text-[10px] font-bold uppercase text-gray-500">Custo Acumulado</p>
                 <p className="text-xl font-black text-orange-500">
-                  {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(entries.reduce((acc, curr) => acc + curr.cost, 0))}
+                  {formatarMoedaBR(entries.reduce((acc, curr) => acc + curr.cost, 0))}
                 </p>
               </div>
             </div>
@@ -646,7 +647,7 @@ export function LogisticsTab({ readOnly = false }: { readOnly?: boolean }) {
                         </div>
 
                         <div className="mt-4 text-right text-lg font-black text-orange-500">
-                          {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(entry.cost)}
+                          {formatarMoedaBR(Number(entry.cost || 0))}
                         </div>
                       </div>
                     ))
@@ -703,7 +704,7 @@ export function LogisticsTab({ readOnly = false }: { readOnly?: boolean }) {
                               )}
                             </TableCell>
                             <TableCell className="text-right align-top font-black text-orange-500">
-                              {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(entry.cost)}
+                              {formatarMoedaBR(Number(entry.cost || 0))}
                             </TableCell>
                             <TableCell className="align-top text-center">
                               {!readOnly ? (

@@ -1,0 +1,63 @@
+:root {
+  --cor-fundo: #0b1020;
+  --cor-superficie: #141a2a;
+  --cor-borda: rgba(255, 255, 255, 0.12);
+  --cor-texto: #f3f7ff;
+  --cor-destaque: #36d16f;
+  --espacamento: 16px;
+  --raio: 14px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: radial-gradient(circle at top right, #1a2440, var(--cor-fundo));
+  color: var(--cor-texto);
+  font-family: "Segoe UI", Arial, sans-serif;
+}
+
+.pagina-centrodecusto {
+  width: min(1200px, 92vw);
+  margin: 32px auto;
+  display: grid;
+  gap: var(--espacamento);
+}
+
+.cabecalho-centrodecusto h1 {
+  margin: 0;
+}
+
+.cabecalho-centrodecusto p {
+  margin: 6px 0 0;
+  opacity: 0.82;
+}
+
+.grade-resumo-centrodecusto {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: var(--espacamento);
+}
+
+.cartao-resumo {
+  border: 1px solid var(--cor-borda);
+  background: var(--cor-superficie);
+  border-radius: var(--raio);
+  padding: calc(var(--espacamento) * 0.9);
+}
+
+.cartao-resumo h2 {
+  margin: 0 0 8px;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.8;
+}
+
+.cartao-resumo strong {
+  color: var(--cor-destaque);
+  font-size: 28px;
+}

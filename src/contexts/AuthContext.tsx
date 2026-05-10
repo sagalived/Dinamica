@@ -31,27 +31,39 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const isRestrictedUser = sessionUser?.role === 'user';
 
   const checkAuth = useCallback(async () => {
-    const token = getAuthToken();
-    const storedUser = getStoredSessionUser();
+    const safeLogout = () => {
+      clearAuthToken();
+      clearStoredSessionUser();
+      setSessionUser(null);
+    };
 
-    if (token && storedUser) {
-      try {
-        // Valida o token no backend (se inválido, faz logout)
-        const response = await api.get('/auth/me');
-        const user = (response.data && response.data.user) ? (response.data.user as AuthUser) : null;
-        if (user) {
-          setSessionUser({ ...user, name: (user as any).full_name || (user as any).name });
-        } else {
-          logout();
+    try {
+      const token = getAuthToken();
+      const storedUser = getStoredSessionUser();
+
+      if (token && storedUser) {
+        try {
+          // Valida o token no backend (se inválido, faz logout)
+          const response = await api.get('/auth/me');
+          const user = (response.data && response.data.user) ? (response.data.user as AuthUser) : null;
+          if (user) {
+            setSessionUser({ ...user, name: (user as any).full_name || (user as any).name });
+          } else {
+            safeLogout();
+          }
+        } catch (error) {
+          console.error('Erro ao verificar sessão:', error);
+          safeLogout();
         }
-      } catch (error) {
-        console.error('Erro ao verificar sessão:', error);
-        logout();
+      } else {
+        safeLogout();
       }
-    } else {
-      logout();
+    } catch (error) {
+      console.error('Falha ao restaurar sessão:', error);
+      safeLogout();
+    } finally {
+      setAuthReady(true);
     }
-    setAuthReady(true);
   }, []);
 
   useEffect(() => {

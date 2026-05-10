@@ -142,6 +142,8 @@ def get_financial_reports(db: Session, company_id: str | None = None, building_i
     return [
         {
             'id': str(r.id),
+            'companyId': r.company_id,
+            'buildingId': r.building_id,
             'codigoObra': r.building_code or r.building_id,
             'nomeObra': r.building_name,
             'empresa': r.company_name,

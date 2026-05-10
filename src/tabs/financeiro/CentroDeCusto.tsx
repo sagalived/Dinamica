@@ -16,20 +16,9 @@ import { api } from '../../lib/api';
 import { BuildingIdFilter } from '../../components/BuildingIdFilter';
 import { CompanyIdFilter } from '../../components/CompanyIdFilter';
 import { FilterBar, FilterState } from '../../components/FilterBar';
-
-interface CentroCustoRow {
-  id: string;
-  codigoObra: string;
-  nomeObra: string;
-  empresa: string;
-  custoDireto: number;
-  custoIndireto: number;
-  custoTotal: number;
-  receita: number;
-  margem: number;
-  margemPercentual: number;
-  dataAtualizacao: string;
-}
+import { LinhaCentroDeCusto, normalizarCentroDeCusto } from './centro-custo/centrodecustonormalizador';
+import { filtrarLinhasCentroDeCusto } from './centro-custo/centrodecustofiltro';
+import { calcularResumoCentroDeCusto } from './centro-custo/centrodecustoresumo';
 
 const fmt = (v: number) =>
   new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(v);
@@ -46,7 +35,7 @@ export function CentroDeCustoTab() {
     fcSelectedBuilding: selectedBuilding, setFcSelectedBuilding: setSelectedBuilding,
   } = useSienge();
 
-  const [centroCustoData, setCentroCustoData] = useState<CentroCustoRow[]>([]);
+  const [centroCustoData, setCentroCustoData] = useState<LinhaCentroDeCusto[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [startDate, setStartDate] = useState<Date | undefined>(startOfDay(new Date(new Date().getFullYear(), 0, 1)));
@@ -62,7 +51,7 @@ export function CentroDeCustoTab() {
       try {
         const response = await api.get('/sienge/centro-custo');
         if (cancelled) return;
-        setCentroCustoData(Array.isArray(response?.data) ? response.data : []);
+        setCentroCustoData(normalizarCentroDeCusto(response?.data));
       } catch (err: any) {
         if (cancelled) return;
         setError(err.message || 'Erro ao carregar dados de centro de custo');
@@ -80,43 +69,18 @@ export function CentroDeCustoTab() {
 
   // Filter data
   const filteredData = useMemo(() => {
-    return centroCustoData.filter((row) => {
-      // Company filter
-      if (selectedCompany !== 'all') {
-        const buildingMatch = buildings.find((b: any) => String(b.id) === selectedBuilding || String(b.code) === selectedBuilding);
-        if (buildingMatch && String(buildingMatch.companyId ?? buildingMatch.company_id) !== selectedCompany) {
-          return false;
-        }
-      }
-
-      // Building filter
-      if (selectedBuilding !== 'all') {
-        const buildingMatch = buildings.find((b: any) => 
-          String(b.id) === selectedBuilding || 
-          String(b.code) === selectedBuilding ||
-          String(b.code) === row.codigoObra
-        );
-        if (!buildingMatch) return false;
-      }
-
-      return true;
+    return filtrarLinhasCentroDeCusto({
+      linhas: centroCustoData,
+      obras: buildings as any[],
+      empresaSelecionada: selectedCompany,
+      obraSelecionada: selectedBuilding,
     });
   }, [centroCustoData, buildings, selectedCompany, selectedBuilding]);
 
   // Summary calculations
   const summary = useMemo(() => {
-    return {
-      totalCustoDireto: filteredData.reduce((sum, r) => sum + r.custoDireto, 0),
-      totalCustoIndireto: filteredData.reduce((sum, r) => sum + r.custoIndireto, 0),
-      totalCusto: filteredData.reduce((sum, r) => sum + r.custoTotal, 0),
-      totalReceita: filteredData.reduce((sum, r) => sum + r.receita, 0),
-      totalMargem: filteredData.reduce((sum, r) => sum + r.margem, 0),
-    };
+    return calcularResumoCentroDeCusto(filteredData);
   }, [filteredData]);
-
-  const margemPercentualGeral = summary.totalReceita > 0 
-    ? ((summary.totalMargem / summary.totalReceita) * 100) 
-    : 0;
 
   return (
     <motion.div key="centro-custo-tab" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="space-y-8">
@@ -178,7 +142,7 @@ export function CentroDeCustoTab() {
         </div>
         <div className="bg-[#161618] border border-white/5 p-4 rounded-2xl shadow-2xl">
           <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2">Margem</p>
-          <p className="text-2xl font-black text-orange-400">{margemPercentualGeral.toFixed(1)}%</p>
+          <p className="text-2xl font-black text-orange-400">{summary.margemPercentualGeral.toFixed(1)}%</p>
         </div>
       </div>
 

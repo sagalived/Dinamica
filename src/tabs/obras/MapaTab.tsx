@@ -7,6 +7,7 @@ import { Map as MapIcon, Search, User as UserIcon } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { sienge as api } from '../../lib/api';
 import { FilterBar, FilterState } from '../../components/FilterBar';
+import { formatarNumeroBR } from '../utilitarios/formatacaoptbr';
 
 export function MapaTab() {
   const { 
@@ -98,7 +99,7 @@ export function MapaTab() {
                       </div>
                       {vol > 0 && (
                         <div className="text-[9px] font-black text-orange-500/70">
-                          R$&nbsp;{vol.toLocaleString('pt-BR', { maximumFractionDigits: 0 })}
+                          R$&nbsp;{formatarNumeroBR(vol, 0)}
                         </div>
                       )}
                     </div>

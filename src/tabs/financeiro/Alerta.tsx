@@ -13,6 +13,7 @@ import { ResponsiveContainer, LineChart, Line } from 'recharts';
 import { useState, useMemo } from 'react';
 import { format } from 'date-fns';
 import { FilterBar, FilterState } from '../../components/FilterBar';
+import { formatarMoedaBR } from '../utilitarios/formatacaoptbr';
 
 export function FinanceiroAlerta() {
   const { 
@@ -132,7 +133,7 @@ export function FinanceiroAlerta() {
                         <CardContent className="p-4">
                           <p className="text-emerald-400 text-xs font-bold uppercase mb-1">{p.creditorName}</p>
                           <h3 className="text-white font-black text-lg">
-                            {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(p.amount)}
+                            {formatarMoedaBR(Number(p.amount || 0))}
                           </h3>
                           <p className="text-gray-400 text-[10px] mt-1">{p.description} (Obra: {resolveBuildingName(p)})</p>
                         </CardContent>
@@ -156,7 +157,7 @@ export function FinanceiroAlerta() {
                             <div className="flex flex-col flex-1">
                               <p className="text-gray-500 text-[9px] font-bold tracking-widest uppercase mb-1">Anterior</p>
                               <h3 className="text-xs sm:text-sm font-bold text-gray-400 decoration-red-500/30">
-                                {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(alert.oldPrice)}
+                                {formatarMoedaBR(Number(alert.oldPrice || 0))}
                               </h3>
                               <p className="text-[#666] text-[8px] font-bold mt-0.5">{safeFormat(alert.oldDate)}</p>
                             </div>
@@ -166,7 +167,7 @@ export function FinanceiroAlerta() {
                             <div className="flex flex-col flex-1">
                               <p className="text-orange-500 text-[9px] font-bold tracking-widest uppercase mb-1">Atual</p>
                               <h3 className="text-sm sm:text-base font-black text-white">
-                                {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(alert.newPrice)}
+                                {formatarMoedaBR(Number(alert.newPrice || 0))}
                               </h3>
                               <p className="text-orange-600/50 text-[8px] font-bold mt-0.5">{safeFormat(alert.newDate)}</p>
                             </div>

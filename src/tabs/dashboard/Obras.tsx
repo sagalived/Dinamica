@@ -7,6 +7,7 @@ import {
 } from 'recharts';
 import { useSienge } from '../../contexts/SiengeContext';
 import { FilterBar, FilterState } from '../../components/FilterBar';
+import { formatarMoedaBR } from '../utilitarios/formatacaoptbr';
 
 import type { DashboardObrasProps } from './types';
 
@@ -35,7 +36,7 @@ export function DashboardObras({ buildingCostData }: DashboardObrasProps) {
                 <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#ffffff05" />
                 <XAxis type="number" hide />
                 <YAxis dataKey="name" type="category" axisLine={false} tickLine={false} tick={{fill: '#fff', fontSize: 10}} width={120} />
-                <Tooltip cursor={{fill: '#ffffff05'}} formatter={(value: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value)} contentStyle={{ backgroundColor: '#161618', border: 'none' }} />
+                <Tooltip cursor={{fill: '#ffffff05'}} formatter={(value: number) => formatarMoedaBR(Number(value))} contentStyle={{ backgroundColor: '#161618', border: 'none' }} />
                 <Bar dataKey="gasto" name="Gasto Total" fill="#f97316" radius={[0, 4, 4, 0]} barSize={20} />
               </BarChart>
             </ResponsiveContainer>
@@ -49,7 +50,7 @@ export function DashboardObras({ buildingCostData }: DashboardObrasProps) {
                 <Pie data={buildingCostData} cx="50%" cy="50%" innerRadius={60} outerRadius={100} paddingAngle={2} dataKey="gasto">
                    {buildingCostData.map((e, index) => <Cell key={index} fill={['#f97316', '#3b82f6', '#10b981', '#ef4444', '#8b5cf6', '#6366f1', '#14b8a6'][index % 7]} />)}
                 </Pie>
-                <Tooltip formatter={(value: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value)} contentStyle={{ backgroundColor: '#161618', border: 'none' }} />
+                <Tooltip formatter={(value: number) => formatarMoedaBR(Number(value))} contentStyle={{ backgroundColor: '#161618', border: 'none' }} />
                 <Legend />
               </PieChart>
             </ResponsiveContainer>

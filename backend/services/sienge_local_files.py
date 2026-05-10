@@ -274,7 +274,12 @@ def parse_company_margin_csv() -> list[dict[str, Any]]:
     return rows
 
 
-def _upsert_by_identity(existing: list[dict[str, Any]], incoming: list[dict[str, Any]]) -> list[dict[str, Any]]:
+def _upsert_by_identity(
+    existing: list[dict[str, Any]],
+    incoming: list[dict[str, Any]],
+    *,
+    incoming_overrides: bool = True,
+) -> list[dict[str, Any]]:
     merged: dict[str, dict[str, Any]] = {}
 
     def identity(item: dict[str, Any]) -> str:
@@ -290,7 +295,11 @@ def _upsert_by_identity(existing: list[dict[str, Any]], incoming: list[dict[str,
     for item in incoming:
         if isinstance(item, dict):
             key = identity(item)
-            merged[key] = {**merged.get(key, {}), **item}
+            if key not in merged:
+                merged[key] = item
+                continue
+            if incoming_overrides:
+                merged[key] = {**merged.get(key, {}), **item}
     return list(merged.values())
 
 
@@ -402,9 +411,13 @@ def load_local_file_cache(db: Session, *, include_transactions: bool = True, for
     for dataset, filename in CATALOG_FILES.items():
         payload = _read_json(JSON_CACHE_ROOT / filename, [])
         if isinstance(payload, list):
-            catalogs[dataset] = [item for item in payload if isinstance(item, dict)]
-            if catalogs[dataset]:
-                write_snapshot(db, f"{dataset}.json", catalogs[dataset])
+            file_rows = [item for item in payload if isinstance(item, dict)]
+            db_rows = read_snapshot(db, f"{dataset}.json", default=[]) or []
+            db_rows = [item for item in db_rows if isinstance(item, dict)]
+            merged_rows = _upsert_by_identity(db_rows, file_rows, incoming_overrides=False)
+            catalogs[dataset] = merged_rows
+            if merged_rows:
+                write_snapshot(db, f"{dataset}.json", merged_rows)
 
     if any(catalogs.values()):
         upsert_catalog_from_sienge(
@@ -417,12 +430,20 @@ def load_local_file_cache(db: Session, *, include_transactions: bool = True, for
 
     if include_transactions:
         financeiro_txt = parse_accounts_payable_txt()
-        if financeiro_txt:
-            write_snapshot(db, "financeiro.json", _upsert_by_identity(financeiro_txt, _pending_items("financeiro")))
+        financeiro_db = read_snapshot(db, "financeiro.json", default=[]) or []
+        financeiro_db = [item for item in financeiro_db if isinstance(item, dict)]
+        financeiro_merged = _upsert_by_identity(financeiro_db, financeiro_txt, incoming_overrides=False)
+        financeiro_merged = _upsert_by_identity(financeiro_merged, _pending_items("financeiro"), incoming_overrides=False)
+        if financeiro_merged:
+            write_snapshot(db, "financeiro.json", financeiro_merged)
 
         receber_txt = parse_receivable_titles_txt()
-        if receber_txt:
-            write_snapshot(db, "receber.json", _upsert_by_identity(receber_txt, _pending_items("receber")))
+        receber_db = read_snapshot(db, "receber.json", default=[]) or []
+        receber_db = [item for item in receber_db if isinstance(item, dict)]
+        receber_merged = _upsert_by_identity(receber_db, receber_txt, incoming_overrides=False)
+        receber_merged = _upsert_by_identity(receber_merged, _pending_items("receber"), incoming_overrides=False)
+        if receber_merged:
+            write_snapshot(db, "receber.json", receber_merged)
 
     margin_rows = parse_company_margin_csv()
     if margin_rows:

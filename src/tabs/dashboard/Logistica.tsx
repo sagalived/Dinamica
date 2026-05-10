@@ -7,6 +7,7 @@ import {
 } from 'recharts';
 import { useSienge } from '../../contexts/SiengeContext';
 import { FilterBar, FilterState } from '../../components/FilterBar';
+import { formatarMoedaBR } from '../utilitarios/formatacaoptbr';
 
 import type { DashboardLogisticaProps } from './types';
 
@@ -35,7 +36,7 @@ export function DashboardLogistica({ supplierData, paymentMethodData }: Dashboar
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#ffffff05" />
                 <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#666', fontSize: 10}} angle={-45} textAnchor="end" />
                 <YAxis axisLine={false} tickLine={false} tick={{fill: '#666', fontSize: 12}} tickFormatter={(v) => `R$${v/1000}k`} />
-                <Tooltip cursor={{fill: '#ffffff05'}} formatter={(value: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value)} contentStyle={{ backgroundColor: '#161618', border: 'none' }} />
+                <Tooltip cursor={{fill: '#ffffff05'}} formatter={(value: number) => formatarMoedaBR(Number(value))} contentStyle={{ backgroundColor: '#161618', border: 'none' }} />
                 <Bar dataKey="value" name="Volume Comprado" fill="#3b82f6" radius={[4, 4, 0, 0]} maxBarSize={60} />
               </BarChart>
             </ResponsiveContainer>
@@ -49,7 +50,7 @@ export function DashboardLogistica({ supplierData, paymentMethodData }: Dashboar
                 <Pie data={paymentMethodData} cx="50%" cy="50%" innerRadius={0} outerRadius={110} dataKey="value">
                    {paymentMethodData.map((e, index) => <Cell key={index} fill={['#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ef4444'][index % 5]} />)}
                 </Pie>
-                <Tooltip formatter={(value: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value)} contentStyle={{ backgroundColor: '#161618', border: 'none' }} />
+                <Tooltip formatter={(value: number) => formatarMoedaBR(Number(value))} contentStyle={{ backgroundColor: '#161618', border: 'none' }} />
                 <Legend />
               </PieChart>
             </ResponsiveContainer>

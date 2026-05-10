@@ -13,6 +13,7 @@ import { useSienge } from '../../contexts/SiengeContext';
 import { addMonths, format, parseISO, startOfDay, endOfDay } from 'date-fns';
 import { toMoney, translateStatusLabel } from '../financeiro/logic';
 import { FilterBar, FilterState } from '../../components/FilterBar';
+import { formatarMoedaBR } from '../utilitarios/formatacaoptbr';
 
 type OperationalSeriesRow = {
   month: string; // YYYY-MM
@@ -197,12 +198,7 @@ export function DashboardGeral() {
     return `${month}/${year}`;
   };
 
-  const fmtBRL = (n: number) => new Intl.NumberFormat('pt-BR', {
-    style: 'currency',
-    currency: 'BRL',
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  }).format(Number.isFinite(n) ? n : 0);
+  const fmtBRL = (n: number) => formatarMoedaBR(n);
 
   const [operationalSeries, setOperationalSeries] = useState<OperationalSeriesResponse>({
     range: { start: '', end: '' },

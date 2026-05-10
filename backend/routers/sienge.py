@@ -16,6 +16,12 @@ from sqlalchemy.orm import Session
 
 from backend.database import get_db
 from backend.dependencies import get_current_user
+from backend.controllers.centro_custo_controller import (
+    limpar_centro_custo,
+    listar_centro_custo,
+    sincronizar_centro_custo,
+)
+from backend.dtos.centro_custo_dto import CentroCustoFiltrosDTO
 from backend.models import AppUser, Building, Company, Creditor, DirectoryUser, SiengeNfeDocument
 from backend.schemas import BootstrapResponse, FetchItemsRequest, FetchQuotationsRequest
 from backend.config import SIENGE_SYNC_INTERVAL_MINUTES
@@ -1033,6 +1039,7 @@ def _legacy_bootstrap_payload(db: Session, include_transactions: bool = True, st
                     "valor": float(row["valor"] or 0),
                     "descricao": row["descricao"] or "Título a Receber",
                     "situacao": row["situacao"] or "Pendente",
+                    "status": row["situacao"] or "Pendente",
                     "clientName": row["client_name"] or f"Cliente {row['client_id']}",
                     "nomeCliente": row["client_name"] or f"Cliente {row['client_id']}",
                     "nomeObra": row["nome_obra"] or f"Obra {row['building_id']}",
@@ -1911,6 +1918,7 @@ async def filtered_data(
         return amount > 0
 
     filtered_financial = []
+    filtered_receber = []
     if building_aliases is None:
         for item in financeiro:
             date_numeric = _to_date_number(_transaction_filter_date(item))
@@ -1919,6 +1927,16 @@ async def filtered_data(
             if company_id != "all" and financial_company(item) != company_id:
                 continue
             filtered_financial.append(item)
+
+        for item in receber:
+            if not _is_receivable_revenue(item):
+                continue
+            date_numeric = _to_date_number(_transaction_filter_date(item))
+            if not _in_range(date_numeric, start_ms, end_exclusive_ms):
+                continue
+            if company_id != "all" and financial_company(item) != company_id:
+                continue
+            filtered_receber.append(item)
     else:
         # Rateio por obra via buildings-cost (bills geralmente não têm obra direta).
         bill_ids: list[str] = []
@@ -1937,28 +1955,6 @@ async def filtered_data(
         await _ensure_buildings_cost_cached(bill_ids)
 
         for item in financeiro:
-            date_numeric = _to_date_number(_transaction_filter_date(item))
-            if not _in_range(date_numeric, start_ms, end_exclusive_ms):
-                continue
-            if company_id != "all" and financial_company(item) != company_id:
-                continue
-            bill_id = str(item.get("id") or item.get("billId") or item.get("bill_id") or "").strip()
-            amount = _safe_float(item.get("valor") or item.get("amount") or item.get("value") or 0)
-            for alloc_building, alloc_amount in _select_allocations(bill_id, amount):
-                if alloc_building not in building_aliases:
-                    continue
-                cloned = dict(item)
-                cloned["buildingId"] = int(alloc_building) if alloc_building.isdigit() else 0
-                cloned["idObra"] = int(alloc_building) if alloc_building.isdigit() else 0
-                cloned["codigoObra"] = alloc_building
-                cloned["valor"] = alloc_amount
-                filtered_financial.append(cloned)
-
-    filtered_receber = []
-    if building_aliases is None:
-        bill_ids: list[str] = []
-        seen_bill_ids: set[str] = set()
-        for item in receber:
             if not _is_receivable_revenue(item):
                 continue
             date_numeric = _to_date_number(_transaction_filter_date(item))
@@ -1966,53 +1962,33 @@ async def filtered_data(
                 continue
             if company_id != "all" and financial_company(item) != company_id:
                 continue
-            bill_id = str(item.get("billId") or item.get("bill_id") or "").strip()
-            if bill_id and bill_id not in seen_bill_ids:
-                seen_bill_ids.add(bill_id)
-                bill_ids.append(bill_id)
-
-        # Mesmo sem filtro de obra, tenta alocar por rateio para refletir o print por obra.
-        await _ensure_buildings_cost_cached(
-            bill_ids,
-            max_concurrency=10,
-            time_budget_s=45,
-            max_fetch=5000,
-        )
-
-        for item in receber:
-            if not _is_receivable_revenue(item):
-                continue
-            date_numeric = _to_date_number(_transaction_filter_date(item))
-            if not _in_range(date_numeric, start_ms, end_exclusive_ms):
-                continue
-            if company_id != "all" and financial_company(item) != company_id:
-                continue
-
             bill_id = str(item.get("billId") or item.get("bill_id") or "").strip()
             raw_value = _safe_float(item.get("rawValue") if item.get("rawValue") is not None else item.get("valor") or item.get("amount") or 0)
             allocations = _select_allocations(bill_id, raw_value)
             if allocations:
                 for alloc_building, alloc_amount in allocations:
+                    if alloc_building not in building_aliases:
+                        continue
                     cloned = dict(item)
-                    cloned["buildingId"] = int(alloc_building) if alloc_building.isdigit() else alloc_building
-                    cloned["idObra"] = int(alloc_building) if alloc_building.isdigit() else alloc_building
+                    cloned["buildingId"] = int(alloc_building) if alloc_building.isdigit() else 0
+                    cloned["idObra"] = int(alloc_building) if alloc_building.isdigit() else 0
                     cloned["codigoObra"] = alloc_building
                     cloned["rawValue"] = alloc_amount
                     cloned["valor"] = abs(alloc_amount)
-                    filtered_receber.append(cloned)
+                    filtered_financial.append(cloned)
                 continue
 
             # Sem rateio: inclui apenas quando existir obra direta no próprio item.
             direct_building = _item_building_id(item)
-            if direct_building:
+            if direct_building and direct_building in building_aliases:
                 cloned = dict(item)
                 cloned["buildingId"] = int(direct_building) if direct_building.isdigit() else direct_building
                 cloned["idObra"] = int(direct_building) if direct_building.isdigit() else direct_building
                 cloned["codigoObra"] = direct_building
-                filtered_receber.append(cloned)
-    else:
-        bill_ids: list[str] = []
-        seen_bill_ids: set[str] = set()
+                filtered_financial.append(cloned)
+
+        bill_ids = []
+        seen_bill_ids = set()
         for item in receber:
             if not _is_receivable_revenue(item):
                 continue
@@ -2021,7 +1997,7 @@ async def filtered_data(
                 continue
             if company_id != "all" and financial_company(item) != company_id:
                 continue
-            bid = str(item.get("billId") or item.get("bill_id") or "").strip()
+            bid = str(item.get("id") or item.get("billId") or item.get("bill_id") or "").strip()
             if bid and bid not in seen_bill_ids:
                 seen_bill_ids.add(bid)
                 bill_ids.append(bid)
@@ -2082,11 +2058,12 @@ async def filtered_data(
 
 @router.get("/centro-custo")
 async def get_centro_custo(
-    companyId: str | None = Query(None, description="ID da empresa"),
-    buildingId: str | None = Query(None, description="ID da obra"),
-    current_user: AppUser = Depends(get_current_user),
+    company_id: str | None = Query(None),
+    building_id: str | None = Query(None),
+    companyId: str | None = Query(None),
+    buildingId: str | None = Query(None),
     db: Session = Depends(get_db),
-) -> list[dict]:
+) -> list[dict[str, Any]]:
     """
     Retorna dados do Relatório Financeiro de Obras (Centro de Custo).
     
@@ -2096,7 +2073,13 @@ async def get_centro_custo(
     Retorna:
         Lista de dict com dados de centro de custo de cada obra
     """
-    return get_financial_reports(db, company_id=companyId, building_id=buildingId)
+    filtros = CentroCustoFiltrosDTO(
+        company_id=company_id,
+        building_id=building_id,
+        company_id_alias=companyId,
+        building_id_alias=buildingId,
+    )
+    return listar_centro_custo(db, filtros)
 
 
 @router.post("/centro-custo/sync")
@@ -2110,7 +2093,7 @@ async def sync_centro_custo(
     Retorna:
         dict com estatísticas de sincronização
     """
-    return await sync_financial_reports(db)
+    return await sincronizar_centro_custo(db)
 
 
 @router.post("/centro-custo/cleanup")
@@ -2128,7 +2111,7 @@ async def cleanup_centro_custo(
     Retorna:
         dict com estatísticas da limpeza
     """
-    return cleanup_old_financial_reports(db, keep_from_year=from_year)
+    return limpar_centro_custo(db, from_year=from_year)
 
 
 @router.get("/mc-by-building")

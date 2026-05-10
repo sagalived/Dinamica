@@ -35,7 +35,7 @@ import { Label } from '@/components/ui/label';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { parseISO, format, addDays, addMonths, subMonths } from 'date-fns';
+import { parseISO, format, addMonths, subMonths } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { 
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, 
@@ -48,6 +48,19 @@ import { cn } from '../lib/utils';
 import { fixText } from '../lib/text';
 import { calcularFluxoCaixa } from '../tabs/financeiro/leandroLogic';
 import { safeFormat } from '../tabs/dashboard/logic';
+import {
+  filtrarBuildingOptionsPorAtividade,
+  calcularDateRangeSienge,
+  correspondeDateRangeSienge,
+} from './sienge/siengefiltroshelpers';
+import { baixarCsv, gerarCsvPedidosSienge, gerarCsvRelatorioSienge } from './sienge/siengeexporthelpers';
+import { montarAlertasPreco, montarHistoricoGlobalItens } from './sienge/siengeprecohelpers';
+import {
+  deveExecutarAutoSync,
+  montarParametrosFilteredSienge,
+  normalizarProgressoSync,
+  resolverPeriodoEfetivo,
+} from './sienge/siengesynchelpers';
 import {
   isSettledFinancialStatus,
   toMoney,
@@ -135,8 +148,7 @@ export function SiengeProvider({ children }: { children: React.ReactNode }) {
   const isRestrictedUser = sessionUser?.role === 'user';
 
   const setSyncProgressSafe = useCallback((value: number) => {
-    const clamped = Math.max(0, Math.min(100, Math.round(value)));
-    setSyncProgress(clamped);
+    setSyncProgress(normalizarProgressoSync(value));
   }, []);
 
   const clearSyncProgressTimer = useCallback(() => {
@@ -207,83 +219,16 @@ export function SiengeProvider({ children }: { children: React.ReactNode }) {
   const requestedQuotesRef = useRef<Set<string>>(new Set());
   
   const globalItemHistory = useMemo(() => {
-    const historyMap: Record<string, { price: number, date: string, orderId?: number, buyerId?: string, creditorId?: string }[]> = {};
-
-    const addEntry = (name: string, price: number, date: string, orderId?: number, buyerId?: string, creditorId?: string) => {
-      if (!name || !price || price <= 0) return;
-      if (!historyMap[name]) historyMap[name] = [];
-      // Avoid duplicates (same price+date+supplier)
-      const dup = historyMap[name].some(e => e.price === price && e.date === date && e.creditorId === creditorId);
-      if (!dup) historyMap[name].push({ price, date, orderId, buyerId, creditorId });
-    };
-
-    if (orders.length > 0) {
-      orders.forEach(order => {
-        const buyerId = String(order.buyerId || '');
-        const creditorId = String((order as any).supplierId || (order as any).creditorId || '');
-
-        // 1. Items do pedido (preço comprado)
-        const actualItems = itemsDetailsMap[order.id] || order.items;
-        if (actualItems) {
-          actualItems.forEach((item: any) => {
-            const name = item.description || item.resourceDescription || item.descricao;
-            const price = Number(item.unitPrice || item.valorUnitario || item.netPrice || 0);
-            addEntry(name, price, order.date, order.id, buyerId, creditorId);
-          });
-        }
-
-        // 2. Cotações internas (outros fornecedores concorrentes do mesmo pedido)
-        const quotationEntry = quotationsMap[String(order.id)];
-        // Handle both old format (array) and new format ({quotes: [...], ...})
-        const quotesArray: any[] = Array.isArray(quotationEntry)
-          ? quotationEntry
-          : (quotationEntry?.quotes && Array.isArray(quotationEntry.quotes) ? quotationEntry.quotes : []);
-        
-        quotesArray.forEach((quote: any) => {
-          const quoteOrderId = quote.orderId || order.id;
-          // Use the quote's own supplierId and date (each competitor has its own order)
-          const quoteSupplierId = String(quote.supplierId || quote.creditorId || quote.idFornecedor || '');
-          const quoteDate = quote.date || order.date;
-          const quoteItems = quote.items || quote.itens || [];
-          quoteItems.forEach((qi: any) => {
-            const name = qi.description || qi.descricao || qi.resourceDescription;
-            const price = Number(qi.unitPrice || qi.valorUnitario || qi.netPrice || 0);
-            addEntry(name, price, quoteDate, quoteOrderId, buyerId, quoteSupplierId);
-          });
-        });
-      });
-    }
-    return historyMap;
+    return montarHistoricoGlobalItens({
+      orders,
+      itemsDetailsMap,
+      quotationsMap,
+    });
   }, [orders, itemsDetailsMap, quotationsMap]);
 
   // Reactivity: Auto-update price alerts whenever itemsDetailsMap or orders change
   useEffect(() => {
-    if (Object.keys(globalItemHistory).length > 0) {
-      const alerts: PriceAlert[] = [];
-
-      Object.keys(globalItemHistory).forEach(name => {
-        const history = globalItemHistory[name].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-        if (history.length >= 2) {
-          const latest = history[0];
-          const previous = history[1];
-          const diff = ((latest.price - previous.price) / previous.price) * 100;
-          if (diff > 5) { 
-            alerts.push({
-              item: name,
-              oldPrice: previous.price,
-              newPrice: latest.price,
-              diff: Number(diff.toFixed(1)),
-              oldDate: previous.date,
-              newDate: latest.date,
-              history: history.slice().reverse()
-            });
-          }
-        }
-      });
-      setPriceAlerts(alerts);
-    } else {
-      setPriceAlerts([]);
-    }
+    setPriceAlerts(montarAlertasPreco(globalItemHistory));
   }, [globalItemHistory]);
   
   // Selection State for Map
@@ -673,6 +618,7 @@ export function SiengeProvider({ children }: { children: React.ReactNode }) {
       }
 
       await applyBootstrapData(payload);
+      await refreshMasterDataFromCache();
     } catch (error) {
       console.error('Error fetching initial data:', error);
       setApiStatus('offline');
@@ -791,6 +737,7 @@ export function SiengeProvider({ children }: { children: React.ReactNode }) {
 
       if (payload) {
         await applyBootstrapData(payload);
+        await refreshMasterDataFromCache();
       }
 
       // Fase 2: atualizar dados filtrados para a UI (ou all-time no modo total).
@@ -816,16 +763,14 @@ export function SiengeProvider({ children }: { children: React.ReactNode }) {
     const intervalId = window.setInterval(async () => {
       if (syncing) return;
       if (apiStatus !== 'online') return;
-
-      const last = lastUpdate?.getTime?.() ?? 0;
-      const ageMs = Date.now() - last;
-      if (!Number.isFinite(ageMs) || ageMs < 6 * 60 * 60 * 1000) return;
+      if (!deveExecutarAutoSync(lastUpdate)) return;
 
       try {
         setSyncing(true);
         await api.post('/sync', null, { params: { force: false, source: 'auto' } });
         const refreshed = await api.get('/bootstrap');
         await applyBootstrapData(refreshed.data);
+        await refreshMasterDataFromCache();
       } catch {
         // Silencioso: não derruba a UI.
       } finally {
@@ -870,6 +815,7 @@ export function SiengeProvider({ children }: { children: React.ReactNode }) {
 
       setDataRevision(0);
       await applyBootstrapData(payload);
+      await refreshMasterDataFromCache();
       return true;
     } catch (error) {
       console.error('Error refreshing data:', error);
@@ -922,10 +868,6 @@ export function SiengeProvider({ children }: { children: React.ReactNode }) {
     return m;
   }, [users]);
 
-  const toStartOfDay = useCallback((value: Date) => (
-    new Date(value.getFullYear(), value.getMonth(), value.getDate()).getTime()
-  ), []);
-
   const defaultWindow = useMemo(() => {
     // “Últimos 12 meses” por mês fechado (não ancorado no dia do mês).
     // Ex: hoje 05/05 → start 01/06 do ano anterior (12 meses incluindo o mês atual).
@@ -938,27 +880,18 @@ export function SiengeProvider({ children }: { children: React.ReactNode }) {
   const hasManualDateFilter = useMemo(() => Boolean(startDate || endDate), [endDate, startDate]);
 
   const dateRange = useMemo(() => {
-    const effectiveStartDate = hasManualDateFilter
-      ? (startDate || null)
-      : (globalPeriodMode === 'all' ? null : defaultWindow.start);
-    const start = effectiveStartDate ? toStartOfDay(effectiveStartDate) : null;
-    const effectiveEndDate = hasManualDateFilter
-      ? (endDate || startDate || null)
-      : (globalPeriodMode === 'all' ? null : defaultWindow.end);
-    const endExclusive = effectiveEndDate ? addDays(new Date(
-      effectiveEndDate.getFullYear(),
-      effectiveEndDate.getMonth(),
-      effectiveEndDate.getDate()
-    ), 1).getTime() : null;
-    return { start, endExclusive };
-  }, [defaultWindow.end, defaultWindow.start, endDate, globalPeriodMode, hasManualDateFilter, startDate, toStartOfDay]);
+    return calcularDateRangeSienge({
+      startDate,
+      endDate,
+      hasManualDateFilter,
+      globalPeriodMode,
+      defaultWindowStart: defaultWindow.start,
+      defaultWindowEnd: defaultWindow.end,
+    });
+  }, [defaultWindow.end, defaultWindow.start, endDate, globalPeriodMode, hasManualDateFilter, startDate]);
 
   const matchesDateRange = useCallback((numericValue?: number) => {
-    if (!dateRange.start && !dateRange.endExclusive) return true;
-    if (!numericValue || numericValue === 0) return false;
-    if (dateRange.start !== null && numericValue < dateRange.start) return false;
-    if (dateRange.endExclusive !== null && numericValue >= dateRange.endExclusive) return false;
-    return true;
+    return correspondeDateRangeSienge(numericValue, dateRange);
   }, [dateRange]);
 
   const matchesCompanyFilter = useCallback((buildingId?: string | number, itemCompanyId?: string | number) => {
@@ -982,23 +915,13 @@ export function SiengeProvider({ children }: { children: React.ReactNode }) {
   const buildingOptions = useMemo(() => {
     if (!dateRange.start && !dateRange.endExclusive) return buildings;
 
-    // Bootstrap leve: all* vazios → retorna todas as obras para não mostrar "0 encontradas"
-    if (allOrders.length === 0 && allFinancialTitles.length === 0 && allReceivableTitles.length === 0) {
-      return buildings;
-    }
-
-    const activeIds = new Set<string>();
-    allOrders.forEach(o => {
-      if (matchesDateRange(o.dateNumeric)) activeIds.add(String(o.buildingId));
+    return filtrarBuildingOptionsPorAtividade({
+      allOrders,
+      allFinancialTitles,
+      allReceivableTitles,
+      buildings,
+      matchesDateRange,
     });
-    allFinancialTitles.forEach(f => {
-      if (matchesDateRange(f.dueDateNumeric)) activeIds.add(String(f.buildingId));
-    });
-    allReceivableTitles.forEach(r => {
-      if (matchesDateRange(r.dueDateNumeric)) activeIds.add(String(r.buildingId));
-    });
-
-    return buildings.filter(b => activeIds.has(String(b.id)) || Boolean(b.code && activeIds.has(String(b.code))));
   }, [allFinancialTitles, allOrders, allReceivableTitles, buildings, dateRange.endExclusive, dateRange.start, matchesDateRange]);
 
   const ordersForUserOptions = useMemo(() => {
@@ -1081,7 +1004,12 @@ export function SiengeProvider({ children }: { children: React.ReactNode }) {
     return userMap[String(id)] || fallback || String(id);
   };
 
-  const applyServerFilteredData = useCallback((payload: any) => {
+  const applyServerFilteredData = useCallback((
+    payload: any,
+    options?: { setFiltered?: boolean; setMaster?: boolean }
+  ) => {
+    const setFiltered = options?.setFiltered !== false;
+    const setMaster = options?.setMaster !== false;
     const rawOrdersArray = Array.isArray(payload?.pedidos) ? payload.pedidos : [];
     const fDataRaw = Array.isArray(payload?.financeiro) ? payload.financeiro : [];
     const rDataRaw = Array.isArray(payload?.receber) ? payload.receber : [];
@@ -1120,7 +1048,7 @@ export function SiengeProvider({ children }: { children: React.ReactNode }) {
         createdBy: fixText(o.nomeComprador || o.createdBy || o.criadoPor || ''),
         requesterId: fixText(String(o.solicitante || o.requesterId || o.createdBy || '0')).replace(/^Comprador\s+/i, '').trim(),
       };
-    }).sort((a, b) => (b.dateNumeric || 0) - (a.dateNumeric || 0));
+    }).sort((a: any, b: any) => (b.dateNumeric || 0) - (a.dateNumeric || 0));
 
     const filteredFinancialData = fDataRaw.map((f: any) => {
       const statusText = f.situacao || f.status || 'Pendente';
@@ -1228,23 +1156,32 @@ export function SiengeProvider({ children }: { children: React.ReactNode }) {
       };
     });
 
-    setOrders(filteredOrdersData);
-    setFinancialTitles(filteredFinancialData);
-    setReceivableTitles(filteredReceivableData);
-    // Mantem all* com o maior conjunto ja carregado (evita travar em janelas antigas).
-    if (allOrdersRef.current.length === 0 || filteredOrdersData.length > allOrdersRef.current.length) {
+    if (setFiltered) {
+      setOrders(filteredOrdersData);
+      setFinancialTitles(filteredFinancialData);
+      setReceivableTitles(filteredReceivableData);
+    }
+    if (setMaster) {
       allOrdersRef.current = filteredOrdersData;
       setAllOrders(filteredOrdersData);
-    }
-    if (allFinancialTitlesRef.current.length === 0 || filteredFinancialData.length > allFinancialTitlesRef.current.length) {
       allFinancialTitlesRef.current = filteredFinancialData;
       setAllFinancialTitles(filteredFinancialData);
-    }
-    if (allReceivableTitlesRef.current.length === 0 || filteredReceivableData.length > allReceivableTitlesRef.current.length) {
       allReceivableTitlesRef.current = filteredReceivableData;
       setAllReceivableTitles(filteredReceivableData);
     }
   }, []);
+
+  const refreshMasterDataFromCache = useCallback(async () => {
+    const response = await api.get('/filtered', {
+      params: {
+        company_id: 'all',
+        building_id: 'all',
+        user_id: 'all',
+        requester_id: 'all',
+      },
+    });
+    applyServerFilteredData(response.data, { setFiltered: false, setMaster: true });
+  }, [applyServerFilteredData]);
 
   // Re-resolve creditor names whenever the creditor list loads (fixes the race with refreshData)
   useEffect(() => {
@@ -1294,15 +1231,14 @@ export function SiengeProvider({ children }: { children: React.ReactNode }) {
     let cancelled = false;
 
     const runServerSideFiltering = async () => {
-      const effectiveStart = hasManualDateFilter
-        ? (startDate || null)
-        : (globalPeriodMode === 'all' ? null : defaultWindow.start);
-      const effectiveEnd = hasManualDateFilter
-        ? (endDate || startDate || null)
-        : (globalPeriodMode === 'all' ? null : defaultWindow.end);
-
-      const startDateIso = effectiveStart ? format(effectiveStart, 'yyyy-MM-dd') : undefined;
-      const endDateIso = effectiveEnd ? format(effectiveEnd, 'yyyy-MM-dd') : undefined;
+      const { effectiveStart, effectiveEnd } = resolverPeriodoEfetivo({
+        hasManualDateFilter,
+        startDate,
+        endDate,
+        globalPeriodMode,
+        defaultWindowStart: defaultWindow.start,
+        defaultWindowEnd: defaultWindow.end,
+      });
 
       // O endpoint de NF-e exige startDate/endDate. Em "Periodo total",
       // usa o inicio historico do cache local.
@@ -1313,18 +1249,18 @@ export function SiengeProvider({ children }: { children: React.ReactNode }) {
       // - Bootstrap é leve (não traz transações)
       // - Títulos a pagar/receber nem sempre têm obra direta (backend faz rateio quando necessário)
       try {
-        const params: any = {
-          company_id: selectedCompany,
-          building_id: fcSelectedBuilding,
-          user_id: selectedUser,
-          requester_id: selectedRequester,
-        };
-        if (startDateIso) params.start_date = startDateIso;
-        if (endDateIso) params.end_date = endDateIso;
+        const params = montarParametrosFilteredSienge({
+          selectedCompany,
+          fcSelectedBuilding,
+          selectedUser,
+          selectedRequester,
+          effectiveStart,
+          effectiveEnd,
+        });
 
         const filteredResponse = await api.get('/filtered', { params });
         if (!cancelled) {
-          applyServerFilteredData(filteredResponse.data);
+          applyServerFilteredData(filteredResponse.data, { setFiltered: true, setMaster: false });
         }
       } catch (err) {
         // Fallback: filtragem local quando offline/erro no backend.
@@ -1480,6 +1416,7 @@ export function SiengeProvider({ children }: { children: React.ReactNode }) {
     }
 
     fetchInitialData();
+    applyFilters();
     const syncInterval = setInterval(() => {
       fetchInitialData();
     }, 20 * 60 * 1000);
@@ -1819,65 +1756,27 @@ export function SiengeProvider({ children }: { children: React.ReactNode }) {
   }, [financialTitles, receivableTitles]);
 
   const downloadCSV = () => {
-    const bMap: Record<string, string> = {};
-    buildings.forEach(b => bMap[b.id] = b.name);
-    const uMap: Record<string, string> = {};
-    users.forEach(u => uMap[u.id] = u.name);
-
-    const headers = "ID;Obra;Comprador;Data;Valor;Status\n";
-    const rows = orders.map(o => {
-      const obra = bMap[o.buildingId] || o.buildingId;
-      const user = uMap[o.buyerId] || o.buyerId;
-      const valorStr = String(o.totalAmount || 0).replace('.', ',');
-      return `${o.id};"${obra}";"${user}";${safeFormat(o.date)};${valorStr};${translateStatusLabel(o.status)}`;
-    }).join("\n");
-    // Adiciona BOM (\uFEFF) para forçar o Excel a reconhecer UTF-8
-    const blob = new Blob(["\uFEFF" + headers + rows], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.setAttribute("download", `dinamica_faturamento_${format(new Date(), 'yyyyMMdd')}.csv`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    const csv = gerarCsvPedidosSienge({
+      buildings,
+      users,
+      orders,
+      safeFormat,
+      translateStatusLabel,
+    });
+    baixarCsv(csv, `dinamica_faturamento_${format(new Date(), 'yyyyMMdd')}.csv`);
   };
 
   const downloadData = () => {
-    const bMap: Record<string, string> = {};
-    buildings.forEach(b => bMap[b.id] = b.name);
-    const uMap: Record<string, string> = {};
-    users.forEach(u => uMap[u.id] = u.name);
-
-    const headers = "Tipo;ID;Obra;Comprador/Credor/Cliente;Data;Valor;Status\n";
-    const csvRows: string[] = [];
-
-    orders.forEach(o => {
-      const obra = bMap[o.buildingId] || String(o.buildingId);
-      const user = uMap[o.buyerId] || String(o.buyerId);
-      const valorStr = String(o.totalAmount || 0).replace('.', ',');
-      csvRows.push(`Pedido;${o.id};"${obra}";"${user}";${safeFormat(o.date)};${valorStr};${translateStatusLabel(o.status)}`);
+    const csv = gerarCsvRelatorioSienge({
+      buildings,
+      users,
+      orders,
+      financialTitles,
+      receivableTitles,
+      safeFormat,
+      translateStatusLabel,
     });
-
-    financialTitles.forEach(f => {
-      const obra = bMap[f.buildingId] || String(f.buildingId);
-      const credor = f.creditorName || "S/N";
-      const valorStr = String(f.amount || 0).replace('.', ',');
-      csvRows.push(`A Pagar;${f.id};"${obra}";"${credor}";${safeFormat(f.dueDate)};${valorStr};${translateStatusLabel(f.status)}`);
-    });
-
-    receivableTitles.forEach(r => {
-      const obra = bMap[r.buildingId] || String(r.buildingId);
-      const cliente = r.clientName || "S/N";
-      const valorStr = String(r.amount || 0).replace('.', ',');
-      csvRows.push(`A Receber;${r.id};"${obra}";"${cliente}";${safeFormat(r.dueDate)};${valorStr};${translateStatusLabel(r.status)}`);
-    });
-
-    const blob = new Blob(["\uFEFF" + headers + csvRows.join("\n")], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.setAttribute("download", `dinamica_relatorio_filtrado_${format(new Date(), 'yyyyMMdd')}.csv`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    baixarCsv(csv, `dinamica_relatorio_filtrado_${format(new Date(), 'yyyyMMdd')}.csv`);
   };
 
 

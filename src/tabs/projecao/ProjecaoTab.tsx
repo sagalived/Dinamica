@@ -10,6 +10,7 @@ import {
   parseXlsx,
   toMoney,
 } from './logic';
+import { formatarNumeroBR } from '../utilitarios/formatacaoptbr';
 
 import type { FluxoProjectionProps } from './types';
 
@@ -280,22 +281,22 @@ export function FluxoProjection({
           <tbody>
             <tr className="border-t border-white/5">
               <td className="px-3 py-2 font-black text-white">Entradas</td>
-              {monthly.map((m) => <td key={`in-${m.key}`} className="px-3 py-2 text-right text-emerald-400">{m.entrada.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>)}
-              <td className="px-3 py-2 text-right font-black text-emerald-400">{totalEntrada.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+              {monthly.map((m) => <td key={`in-${m.key}`} className="px-3 py-2 text-right text-emerald-400">{formatarNumeroBR(m.entrada)}</td>)}
+              <td className="px-3 py-2 text-right font-black text-emerald-400">{formatarNumeroBR(totalEntrada)}</td>
             </tr>
             <tr className="border-t border-white/5">
               <td className="px-3 py-2 font-black text-white">Saidas</td>
-              {monthly.map((m) => <td key={`out-${m.key}`} className="px-3 py-2 text-right text-red-400">{m.saida.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>)}
-              <td className="px-3 py-2 text-right font-black text-red-400">{totalSaida.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+              {monthly.map((m) => <td key={`out-${m.key}`} className="px-3 py-2 text-right text-red-400">{formatarNumeroBR(m.saida)}</td>)}
+              <td className="px-3 py-2 text-right font-black text-red-400">{formatarNumeroBR(totalSaida)}</td>
             </tr>
             <tr className="border-t border-white/5">
               <td className="px-3 py-2 font-black text-white">Saldo</td>
               {monthly.map((m) => (
                 <td key={`saldo-${m.key}`} className={`px-3 py-2 text-right font-bold ${m.saldo >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
-                  {m.saldo.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  {formatarNumeroBR(m.saldo)}
                 </td>
               ))}
-              <td className={`px-3 py-2 text-right font-black ${totalSaldo >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>{totalSaldo.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+              <td className={`px-3 py-2 text-right font-black ${totalSaldo >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>{formatarNumeroBR(totalSaldo)}</td>
             </tr>
           </tbody>
         </table>
@@ -319,9 +320,9 @@ export function FluxoProjection({
               <tr key={`proj-${r.obra}`} className="border-t border-white/5">
                 <td className="px-3 py-2 text-gray-300">{selectedCompany === 'all' ? 'Multiplas' : selectedCompany}</td>
                 <td className="px-3 py-2 font-bold text-gray-200">{r.obra}</td>
-                <td className="px-3 py-2 text-right text-emerald-400">{r.entrada.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
-                <td className="px-3 py-2 text-right text-red-400">{r.saida.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
-                <td className={`px-3 py-2 text-right font-black ${r.saldo >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>{r.saldo.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                <td className="px-3 py-2 text-right text-emerald-400">{formatarNumeroBR(r.entrada)}</td>
+                <td className="px-3 py-2 text-right text-red-400">{formatarNumeroBR(r.saida)}</td>
+                <td className={`px-3 py-2 text-right font-black ${r.saldo >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>{formatarNumeroBR(r.saldo)}</td>
               </tr>
             ))}
           </tbody>

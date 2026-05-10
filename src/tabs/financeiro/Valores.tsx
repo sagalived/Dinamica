@@ -12,9 +12,16 @@ import { isSettledFinancialStatus, translateStatusLabel, toMoney } from './logic
 import { useMemo, useState } from 'react';
 import { FilterBar, FilterState } from '../../components/FilterBar';
 import { parse, endOfDay } from 'date-fns';
+import { formatarMoedaBR, formatarNumeroBR } from '../utilitarios/formatacaoptbr';
+import { construirGruposTitulosValores } from './valores/valoresfiltro';
+import {
+  calcularResumoDreValores,
+  calcularResumoFinanceiroValores,
+  calcularTotaisDosGruposValores,
+} from './valores/valoresresumo';
 
 export function FinanceiroValores() {
-  const { financialTitles, receivableTitles, bankBalance: saldoBancario, orders } = useSienge();
+  const { financialTitles, receivableTitles, bankBalance: saldoBancario, orders, dataRevision } = useSienge();
   
   const [financeLimit, setFinanceLimit] = useState<number>(50);
   const [reportType, setReportType] = useState<string>('compras');
@@ -22,6 +29,17 @@ export function FinanceiroValores() {
 
   // Estado dos filtros
   const [currentFilters, setCurrentFilters] = useState<FilterState | null>(null);
+
+  // Carrega dados ao mudar dataRevision
+  React.useEffect(() => {
+    const load = async () => {
+      // Dados já são carregados via contexto, apenas garantir sincronização com dataRevision
+    };
+    load();
+    return () => {
+      // cleanup se necessário
+    };
+  }, [dataRevision, financialTitles, receivableTitles, orders]);
 
   const handleFilterApply = (filters: FilterState) => {
     setCurrentFilters(filters);
@@ -43,9 +61,7 @@ export function FinanceiroValores() {
     return due > 0 && due < todayStart && !isSettledFinancialStatus(title?.status);
   };
 
-  const formatMoney = (value: any) => (
-    Number(value || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-  );
+  const formatMoney = (value: any) => formatarNumeroBR(Number(value || 0));
 
   const getPersonName = (title: any, type: 'payable' | 'receivable') => {
     if (type === 'payable') {
@@ -55,48 +71,30 @@ export function FinanceiroValores() {
   };
 
   const stats = useMemo(() => {
-    const ordersArray = Array.isArray(orders) ? orders : [];
-    const total = ordersArray.reduce((acc, curr) => acc + toMoney(curr.totalAmount), 0);
-    const avg = ordersArray.length > 0 ? total / ordersArray.length : 0;
-    
-    const fTotal = financialTitles.reduce((acc, curr) => acc + toMoney(curr.amount), 0);
-    const rTotal = receivableTitles.reduce((acc, curr) => acc + toMoney(curr.amount), 0);
-    const balance = rTotal - fTotal;
-
-    return { total, avg, fTotal, rTotal, balance };
+    return calcularResumoFinanceiroValores({
+      orders: Array.isArray(orders) ? orders : [],
+      financialTitles,
+      receivableTitles,
+      toMoney,
+    });
   }, [orders, financialTitles, receivableTitles]);
 
   const dreStats = useMemo(() => {
-    const rol = stats.rTotal;
-    const receitaBruta = rol / 0.8836;
-    const deducoes = receitaBruta - rol;
-    const despesasTotais = stats.fTotal;
-    
-    const maoDeObra = despesasTotais * 0.215;
-    const materiais = despesasTotais * 0.557;
-    const servicos = despesasTotais * 0.105;
-    const cspTotal = maoDeObra + materiais + servicos;
-    
-    const despGerais = despesasTotais * 0.051;
-    const despTributarias = despesasTotais * 0.003;
-    const preLabore = despesasTotais * 0.046;
-    const despOperacionaisTotal = despGerais + despTributarias + preLabore;
-    
-    const despFinanceiras = despesasTotais * 0.022;
-    const irCsll = despesasTotais * 0.001;
-
-    const resultadoBruto = rol - cspTotal;
-    const resultadoOperacional = resultadoBruto - despOperacionaisTotal - despFinanceiras;
-    const resultadoLiquido = resultadoOperacional - irCsll;
-
-    return {
-      receitaBruta, deducoes, rol,
-      custos: { maoDeObra, materiais, servicos, total: cspTotal },
-      resultadoBruto,
-      despesas: { gerais: despGerais, tributarias: despTributarias, preLabore, total: despOperacionaisTotal },
-      despFinanceiras, irCsll, resultadoLiquido
-    };
+    return calcularResumoDreValores(stats);
   }, [stats]);
+
+  const gruposTitulos = useMemo(() => {
+    return construirGruposTitulosValores({
+      financialTitles,
+      receivableTitles,
+      isOverdue,
+      isSettledFinancialStatus,
+    });
+  }, [financialTitles, isOverdue, receivableTitles]);
+
+  const totaisTitulos = useMemo(() => {
+    return calcularTotaisDosGruposValores(gruposTitulos);
+  }, [gruposTitulos]);
 
 
   return (
@@ -112,16 +110,19 @@ export function FinanceiroValores() {
               <FilterBar onFilter={handleFilterApply} onClear={handleFilterClear} />
 
               {(() => {
-                const openPayables = financialTitles.filter(t => !isSettledFinancialStatus(t.status)).sort((a,b) => (a.dueDateNumeric || 0) - (b.dueDateNumeric || 0));
-                const openReceivables = receivableTitles.filter(t => !isSettledFinancialStatus(t.status)).sort((a,b) => (a.dueDateNumeric || 0) - (b.dueDateNumeric || 0));
-                const paidPayables = financialTitles.filter(t => isSettledFinancialStatus(t.status)).sort((a,b) => (b.paymentDateNumeric || b.dueDateNumeric || 0) - (a.paymentDateNumeric || a.dueDateNumeric || 0));
-                const overdueReceivables = openReceivables.filter(isOverdue);
-                const overduePayables = openPayables.filter(isOverdue);
-
-                const totalPayable = openPayables.reduce((acc, curr) => acc + (curr.amount || 0), 0);
-                const totalReceivable = openReceivables.reduce((acc, curr) => acc + (curr.amount || 0), 0);
-                const overdueReceivableTotal = overdueReceivables.reduce((acc, curr) => acc + (curr.amount || 0), 0);
-                const overduePayableTotal = overduePayables.reduce((acc, curr) => acc + (curr.amount || 0), 0);
+                const {
+                  openPayables,
+                  openReceivables,
+                  paidPayables,
+                  overdueReceivables,
+                  overduePayables,
+                } = gruposTitulos;
+                const {
+                  totalPayable,
+                  totalReceivable,
+                  overdueReceivableTotal,
+                  overduePayableTotal,
+                } = totaisTitulos;
                 return (
                   <>
                     {/* Demonstração de Resultados (DRE) Projetada */}
@@ -210,7 +211,7 @@ export function FinanceiroValores() {
                               <span className="text-[9px] text-gray-400 font-bold uppercase tracking-widest">Saldo Bancário (Sienge API)</span>
                               {saldoBancario !== null ? (
                                 <span className={cn("text-xl font-black", saldoBancario >= 0 ? "text-green-500" : "text-red-500")}>
-                                  {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(saldoBancario)}
+                                  {formatarMoedaBR(Number(saldoBancario || 0))}
                                 </span>
                               ) : (
                                 <span className="text-xl font-black text-emerald-500 opacity-60">Em Sincronização...</span>
