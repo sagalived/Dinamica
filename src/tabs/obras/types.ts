@@ -27,6 +27,15 @@ export interface KanbanCard {
   createdBy: string;
   createdAt: string;
   updatedAt: string;
+
+  bitrixTaskId?: number | null;
+  bitrixLastPullAt?: string | null;
+
+  bitrixCrmEntityTypeId?: number | null;
+  bitrixCrmCategoryId?: number | null;
+  bitrixCrmItemId?: number | null;
+  bitrixCrmStageId?: string | null;
+  bitrixCrmLastPullAt?: string | null;
 }
 
 export interface KanbanSprint {
@@ -39,6 +48,15 @@ export interface KanbanSprint {
   createdAt: string;
   updatedAt: string;
   cards: KanbanCard[];
+
+  bitrixGroupId?: number | null;
+  bitrixLastPullAt?: string | null;
+
+  bitrixCrmEntityTypeId?: number | null;
+  bitrixCrmCategoryId?: number | null;
+  bitrixCrmLastPullAt?: string | null;
+
+  contractRef?: string | null;
 }
 
 export interface CardModalProps {

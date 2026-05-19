@@ -1,13 +1,15 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useSienge } from '../../contexts/SiengeContext';
 import { useAuth } from '../../contexts/AuthContext';
+import { api as baseApi } from '../../lib/api';
 import {
   Plus, X, Upload, Trash2, Edit3, ChevronDown, ChevronUp,
   Image as ImageIcon, FileText, Video, Calendar, User,
   Tag, AlertTriangle, Clock, CheckCircle2, Loader2,
   Kanban as LayoutKanban, Layers, Search, Camera, RefreshCw,
-  GripVertical, Flag, Paperclip, ZoomIn
+  GripVertical, Flag, Paperclip, ZoomIn, Download,
+  ArrowUpToLine, ArrowDownToLine
 } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { FilterBar } from '../../components/FilterBar';
@@ -89,8 +91,8 @@ function CardModal({
         {/* Header */}
         <div className="flex items-center justify-between p-5 border-b border-white/5">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-orange-500/15 border border-orange-500/25 flex items-center justify-center">
-              {isNew ? <Plus size={16} className="text-orange-400" /> : <Edit3 size={16} className="text-orange-400" />}
+            <div className="w-9 h-9 rounded-xl bg-green-500/15 border border-green-500/25 flex items-center justify-center">
+              {isNew ? <Plus size={16} className="text-green-400" /> : <Edit3 size={16} className="text-green-400" />}
             </div>
             <h2 className="text-lg font-black text-white uppercase tracking-tight">
               {isNew ? 'Nova Demanda' : 'Editar Demanda'}
@@ -104,13 +106,13 @@ function CardModal({
         <div className="p-5 space-y-5 max-h-[80vh] overflow-y-auto custom-scrollbar">
           {/* Title */}
           <div>
-            <label className="text-[10px] font-black uppercase tracking-widest text-orange-500 mb-1.5 block">Título *</label>
+            <label className="text-[10px] font-black uppercase tracking-widest text-green-500 mb-1.5 block">Título *</label>
             <input
               autoFocus
               value={form.title || ''}
               onChange={e => set('title', e.target.value)}
               placeholder="Descreva a demanda ou tarefa..."
-              className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm font-bold placeholder:text-gray-600 focus:outline-none focus:border-orange-500/50 transition-colors"
+              className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm font-bold placeholder:text-gray-600 focus:outline-none focus:border-green-500/50 transition-colors"
             />
           </div>
 
@@ -122,7 +124,7 @@ function CardModal({
               onChange={e => set('description', e.target.value)}
               placeholder="Detalhes, contexto e observações..."
               rows={3}
-              className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-2.5 text-gray-300 text-sm placeholder:text-gray-700 focus:outline-none focus:border-orange-500/50 transition-colors resize-none"
+              className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-2.5 text-gray-300 text-sm placeholder:text-gray-700 focus:outline-none focus:border-green-500/50 transition-colors resize-none"
             />
           </div>
 
@@ -133,7 +135,7 @@ function CardModal({
               <select
                 value={form.status}
                 onChange={e => set('status', e.target.value as CardStatus)}
-                className="w-full bg-black/40 border border-white/10 rounded-xl px-3 py-2.5 text-white text-sm font-bold focus:outline-none focus:border-orange-500/50 transition-colors"
+                className="w-full bg-black/40 border border-white/10 rounded-xl px-3 py-2.5 text-white text-sm font-bold focus:outline-none focus:border-green-500/50 transition-colors"
               >
                 {COLUMNS.map(c => <option key={c.id} value={c.id}>{c.emoji} {c.label}</option>)}
               </select>
@@ -143,7 +145,7 @@ function CardModal({
               <select
                 value={form.priority}
                 onChange={e => set('priority', e.target.value as CardPriority)}
-                className="w-full bg-black/40 border border-white/10 rounded-xl px-3 py-2.5 text-white text-sm font-bold focus:outline-none focus:border-orange-500/50 transition-colors"
+                className="w-full bg-black/40 border border-white/10 rounded-xl px-3 py-2.5 text-white text-sm font-bold focus:outline-none focus:border-green-500/50 transition-colors"
               >
                 {PRIORITIES.map(p => <option key={p.id} value={p.id}>{p.label}</option>)}
               </select>
@@ -160,7 +162,7 @@ function CardModal({
                 value={form.responsible || ''}
                 onChange={e => set('responsible', e.target.value)}
                 placeholder="Nome do responsável"
-                className="w-full bg-black/40 border border-white/10 rounded-xl px-3 py-2.5 text-white text-sm placeholder:text-gray-700 focus:outline-none focus:border-orange-500/50 transition-colors"
+                className="w-full bg-black/40 border border-white/10 rounded-xl px-3 py-2.5 text-white text-sm placeholder:text-gray-700 focus:outline-none focus:border-green-500/50 transition-colors"
               />
             </div>
             <div>
@@ -171,7 +173,7 @@ function CardModal({
                 type="date"
                 value={form.dueDate || ''}
                 onChange={e => set('dueDate', e.target.value)}
-                className="w-full bg-black/40 border border-white/10 rounded-xl px-3 py-2.5 text-white text-sm focus:outline-none focus:border-orange-500/50 transition-colors [color-scheme:dark]"
+                className="w-full bg-black/40 border border-white/10 rounded-xl px-3 py-2.5 text-white text-sm focus:outline-none focus:border-green-500/50 transition-colors [color-scheme:dark]"
               />
             </div>
           </div>
@@ -187,11 +189,11 @@ function CardModal({
                 onChange={e => setTagInput(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), addTag())}
                 placeholder="Digite e pressione Enter"
-                className="flex-1 bg-black/40 border border-white/10 rounded-xl px-3 py-2 text-white text-sm placeholder:text-gray-700 focus:outline-none focus:border-orange-500/50 transition-colors"
+                className="flex-1 bg-black/40 border border-white/10 rounded-xl px-3 py-2 text-white text-sm placeholder:text-gray-700 focus:outline-none focus:border-green-500/50 transition-colors"
               />
               <button
                 onClick={addTag}
-                className="px-4 py-2 bg-orange-600/20 text-orange-400 border border-orange-500/20 rounded-xl text-sm font-bold hover:bg-orange-600/30 transition-colors"
+                className="px-4 py-2 bg-green-600/20 text-green-400 border border-green-500/20 rounded-xl text-sm font-bold hover:bg-green-600/30 transition-colors"
               >
                 Add
               </button>
@@ -201,7 +203,7 @@ function CardModal({
                 {(form.tags || []).map(t => (
                   <span
                     key={t}
-                    className="flex items-center gap-1 px-2.5 py-1 bg-orange-500/10 border border-orange-500/20 text-orange-400 text-xs font-bold rounded-full"
+                    className="flex items-center gap-1 px-2.5 py-1 bg-green-500/10 border border-green-500/20 text-green-400 text-xs font-bold rounded-full"
                   >
                     {t}
                     <button onClick={() => set('tags', (form.tags || []).filter(x => x !== t))}>
@@ -234,7 +236,7 @@ function CardModal({
                 <button
                   onClick={() => fileRef.current?.click()}
                   disabled={uploading}
-                  className="h-20 rounded-lg border-2 border-dashed border-white/10 hover:border-orange-500/40 flex flex-col items-center justify-center gap-1 text-gray-600 hover:text-orange-400 transition-colors"
+                  className="h-20 rounded-lg border-2 border-dashed border-white/10 hover:border-green-500/40 flex flex-col items-center justify-center gap-1 text-gray-600 hover:text-green-400 transition-colors"
                 >
                   {uploading ? (
                     <Loader2 size={18} className="animate-spin" />
@@ -284,7 +286,7 @@ function CardModal({
             <button
               onClick={handleSave}
               disabled={saving || !form.title?.trim()}
-              className="flex items-center gap-2 px-6 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded-xl text-sm font-black transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-orange-600/20"
+              className="flex items-center gap-2 px-6 py-2 bg-green-600 hover:bg-green-700 text-white rounded-xl text-sm font-black transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-green-600/20"
             >
               {saving && <Loader2 size={14} className="animate-spin" />}
               {isNew ? 'Criar Demanda' : 'Salvar Alterações'}
@@ -319,7 +321,7 @@ function KanbanCardComp({
       onClick={onClick}
       className={cn(
         'group relative bg-[#1a1d22] border rounded-xl p-3.5 cursor-pointer',
-        'hover:border-orange-500/30 hover:shadow-lg hover:shadow-orange-500/5',
+        'hover:border-green-500/30 hover:shadow-lg hover:shadow-green-500/5',
         'transition-all duration-200 select-none',
         overdue ? 'border-red-500/30' : 'border-white/8',
       )}
@@ -360,7 +362,7 @@ function KanbanCardComp({
       {card.tags.length > 0 && (
         <div className="flex flex-wrap gap-1 mb-2">
           {card.tags.slice(0, 3).map(t => (
-            <span key={t} className="px-1.5 py-0.5 bg-orange-500/10 text-orange-400/80 text-[9px] font-bold rounded uppercase tracking-wide">
+            <span key={t} className="px-1.5 py-0.5 bg-green-500/10 text-green-400/80 text-[9px] font-bold rounded uppercase tracking-wide">
               {t}
             </span>
           ))}
@@ -372,7 +374,7 @@ function KanbanCardComp({
         <div className="flex items-center gap-2 min-w-0">
           {card.responsible && (
             <div className="flex items-center gap-1">
-              <div className="w-5 h-5 rounded-full bg-gradient-to-br from-orange-500 to-orange-700 flex items-center justify-center text-white text-[8px] font-black shrink-0">
+              <div className="w-5 h-5 rounded-full bg-gradient-to-br from-green-500 to-green-700 flex items-center justify-center text-white text-[8px] font-black shrink-0">
                 {card.responsible.charAt(0).toUpperCase()}
               </div>
               <span className="text-[9px] text-gray-500 truncate max-w-[80px]">{card.responsible}</span>
@@ -421,13 +423,25 @@ function SprintModal({
     endDate: sprint?.endDate || '',
     color: sprint?.color || SPRINT_COLORS[0],
     buildingId,
+    bitrixGroupId: String((sprint as any)?.bitrixGroupId ?? ''),
+    contractRef: String((sprint as any)?.contractRef ?? ''),
   });
   const [saving, setSaving] = useState(false);
 
   const handleSave = async () => {
     if (!form.name.trim()) return;
     setSaving(true);
-    try { await onSave(form); onClose(); }
+    try {
+      const bitrixGroupIdRaw = String(form.bitrixGroupId || '').trim();
+      const contractRefRaw = String(form.contractRef || '').trim();
+      const payload = {
+        ...form,
+        bitrixGroupId: bitrixGroupIdRaw ? Number(bitrixGroupIdRaw) : null,
+        contractRef: contractRefRaw || null,
+      };
+      await onSave(payload);
+      onClose();
+    }
     finally { setSaving(false); }
   };
 
@@ -450,25 +464,25 @@ function SprintModal({
         </div>
         <div className="p-5 space-y-4">
           <div>
-            <label className="text-[10px] font-black uppercase tracking-widest text-orange-500 mb-1.5 block">Nome do Sprint *</label>
+            <label className="text-[10px] font-black uppercase tracking-widest text-green-500 mb-1.5 block">Nome do Sprint *</label>
             <input
               autoFocus
               value={form.name}
               onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
               placeholder="Ex: Sprint 1 — Fundação"
-              className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm font-bold placeholder:text-gray-600 focus:outline-none focus:border-orange-500/50 transition-colors"
+              className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm font-bold placeholder:text-gray-600 focus:outline-none focus:border-green-500/50 transition-colors"
             />
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="text-[10px] font-black uppercase tracking-widest text-gray-500 mb-1.5 block">Início</label>
               <input type="date" value={form.startDate} onChange={e => setForm(f => ({ ...f, startDate: e.target.value }))}
-                className="w-full bg-black/40 border border-white/10 rounded-xl px-3 py-2.5 text-white text-sm focus:outline-none focus:border-orange-500/50 transition-colors [color-scheme:dark]" />
+                className="w-full bg-black/40 border border-white/10 rounded-xl px-3 py-2.5 text-white text-sm focus:outline-none focus:border-green-500/50 transition-colors [color-scheme:dark]" />
             </div>
             <div>
               <label className="text-[10px] font-black uppercase tracking-widest text-gray-500 mb-1.5 block">Fim</label>
               <input type="date" value={form.endDate} onChange={e => setForm(f => ({ ...f, endDate: e.target.value }))}
-                className="w-full bg-black/40 border border-white/10 rounded-xl px-3 py-2.5 text-white text-sm focus:outline-none focus:border-orange-500/50 transition-colors [color-scheme:dark]" />
+                className="w-full bg-black/40 border border-white/10 rounded-xl px-3 py-2.5 text-white text-sm focus:outline-none focus:border-green-500/50 transition-colors [color-scheme:dark]" />
             </div>
           </div>
           <div>
@@ -484,6 +498,33 @@ function SprintModal({
               ))}
             </div>
           </div>
+
+          <div>
+            <label className="text-[10px] font-black uppercase tracking-widest text-gray-500 mb-1.5 block">Bitrix Group ID (opcional)</label>
+            <input
+              value={form.bitrixGroupId}
+              onChange={e => setForm(f => ({ ...f, bitrixGroupId: e.target.value.replace(/[^0-9]/g, '') }))}
+              placeholder="Ex: 12345"
+              inputMode="numeric"
+              className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm font-bold placeholder:text-gray-600 focus:outline-none focus:border-green-500/50 transition-colors"
+            />
+            <p className="mt-1 text-[11px] text-gray-600 font-semibold">
+              Se preencher, o sprint passa a puxar tarefas do grupo/projeto do Bitrix24.
+            </p>
+          </div>
+
+          <div>
+            <label className="text-[10px] font-black uppercase tracking-widest text-gray-500 mb-1.5 block">Contrato (opcional)</label>
+            <input
+              value={form.contractRef}
+              onChange={e => setForm(f => ({ ...f, contractRef: e.target.value }))}
+              placeholder="Ex: CCV-2026-001"
+              className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm font-bold placeholder:text-gray-600 focus:outline-none focus:border-green-500/50 transition-colors"
+            />
+            <p className="mt-1 text-[11px] text-gray-600 font-semibold">
+              Referência livre para vincular o sprint a um contrato.
+            </p>
+          </div>
         </div>
         <div className="flex items-center justify-between p-5 border-t border-white/5">
           {!isNew && onDelete ? (
@@ -495,7 +536,7 @@ function SprintModal({
           <div className="flex gap-3">
             <button onClick={onClose} className="px-4 py-2 text-gray-400 hover:text-white text-sm font-bold transition-colors">Cancelar</button>
             <button onClick={handleSave} disabled={saving || !form.name.trim()}
-              className="flex items-center gap-2 px-6 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded-xl text-sm font-black transition-colors disabled:opacity-50 shadow-lg shadow-orange-600/20">
+              className="flex items-center gap-2 px-6 py-2 bg-green-600 hover:bg-green-700 text-white rounded-xl text-sm font-black transition-colors disabled:opacity-50 shadow-lg shadow-green-600/20">
               {saving && <Loader2 size={14} className="animate-spin" />}
               {isNew ? 'Criar Sprint' : 'Salvar'}
             </button>
@@ -508,9 +549,18 @@ function SprintModal({
 
 export function DiarioObras() {
   const { sessionUser } = useAuth();
-  const { buildings, selectedMapBuilding: buildingId, dataRevision } = useSienge();
+  const {
+    buildings,
+    selectedMapBuilding,
+    fcSelectedBuilding,
+    dataRevision,
+  } = useSienge();
 
-  const buildingName = buildings.find((b: any) => b.id === buildingId)?.name || '';
+  const effectiveBuildingId = (fcSelectedBuilding && fcSelectedBuilding !== 'all')
+    ? Number(fcSelectedBuilding)
+    : selectedMapBuilding;
+
+  const buildingName = buildings.find((b: any) => String(b.id) === String(effectiveBuildingId))?.name || '';
   const {
     sprints,
     loading,
@@ -546,12 +596,55 @@ export function DiarioObras() {
     doneCards,
     progressPct,
   } = useKanbanObras({
-    buildingId,
+    buildingId: effectiveBuildingId,
     buildingName,
     dataRevision,
   });
 
   const [currentFilters, setCurrentFilters] = useState<any>(null);
+  const [exportingBitrix, setExportingBitrix] = useState(false);
+  const [syncingBitrixPush, setSyncingBitrixPush] = useState(false);
+  const [syncingBitrixPull, setSyncingBitrixPull] = useState(false);
+  const [syncingBitrixCrmPush, setSyncingBitrixCrmPush] = useState(false);
+  const [syncingBitrixCrmPull, setSyncingBitrixCrmPull] = useState(false);
+
+  const [bitrixFunnels, setBitrixFunnels] = useState<Array<any> | null>(null);
+  const [loadingBitrixFunnels, setLoadingBitrixFunnels] = useState(false);
+  const [selectedBitrixFunnelId, setSelectedBitrixFunnelId] = useState<string>('');
+  const [bitrixConfigured, setBitrixConfigured] = useState<boolean | null>(null);
+  const [bitrixNotice, setBitrixNotice] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const lastAutoPullSprintIdRef = useRef<string | null>(null);
+
+  // Smart Process (CRM) do Bitrix: link informado pelo usuário
+  // https://dinamicaempreendimentos.bitrix24.com.br/crm/type/1066/kanban/category/0/
+  const BITRIX_CRM_ENTITY_TYPE_ID = 1066;
+
+  const _bitrixDetailFromError = (e: any): string | null => {
+    const detail = e?.response?.data?.detail;
+    if (typeof detail === 'string' && detail.trim()) return detail;
+    return null;
+  };
+
+  const carregarStatusBitrix = async (): Promise<boolean> => {
+    try {
+      const res = await baseApi.get('/bitrix/health');
+      const configured = Boolean(res?.data?.configured);
+      setBitrixConfigured(configured);
+      if (!configured) {
+        setBitrixFunnels([]);
+        setSelectedBitrixFunnelId('');
+        setBitrixNotice({
+          type: 'error',
+          text: 'Bitrix24 não configurado. Defina BITRIX24_WEBHOOK_BASE_URL no .env e reinicie a API.',
+        });
+      }
+      return configured;
+    } catch (e: any) {
+      // Se não conseguir checar health (rede/auth), não bloqueia a UI.
+      setBitrixConfigured(null);
+      return true;
+    }
+  };
 
   const handleFilterApply = (filters: any) => {
     setCurrentFilters(filters);
@@ -560,6 +653,212 @@ export function DiarioObras() {
   const handleFilterClear = () => {
     setCurrentFilters(null);
   };
+
+  const exportarBitrix = async () => {
+    setBitrixNotice(null);
+    if (bitrixConfigured === false) {
+      setBitrixNotice({
+        type: 'error',
+        text: 'Bitrix24 não configurado. Defina BITRIX24_WEBHOOK_BASE_URL no .env e reinicie a API.',
+      });
+      return;
+    }
+    setExportingBitrix(true);
+    try {
+      const categoryId = selectedBitrixFunnelId ? Number(selectedBitrixFunnelId) : 0;
+      const res = await baseApi.get(`/bitrix/crm/type/${BITRIX_CRM_ENTITY_TYPE_ID}/export/kanban`, {
+        responseType: 'blob',
+        params: { category_id: Number.isFinite(categoryId) ? categoryId : 0 },
+      });
+
+      const header = (res.headers?.['content-disposition'] || res.headers?.['Content-Disposition'] || '') as string;
+      const match = /filename="?([^";]+)"?/i.exec(header);
+      const fileName = match?.[1] || `bitrix_diario_obras_${new Date().toISOString().slice(0, 10).replaceAll('-', '')}.json`;
+
+      const blob = new Blob([res.data], { type: 'application/json;charset=utf-8;' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.setAttribute('download', fileName);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(link.href);
+    } catch (e: any) {
+      const detail = _bitrixDetailFromError(e);
+      setBitrixNotice({
+        type: 'error',
+        text: detail || 'Falha ao exportar do Bitrix24 (CRM). Verifique BITRIX24_WEBHOOK_BASE_URL no .env.',
+      });
+    } finally {
+      setExportingBitrix(false);
+    }
+  };
+
+  const carregarPipelinesBitrix = async () => {
+    setBitrixNotice(null);
+    if (bitrixConfigured === false) {
+      setBitrixFunnels([]);
+      return;
+    }
+    setLoadingBitrixFunnels(true);
+    try {
+      const res = await baseApi.get(`/bitrix/crm/type/${BITRIX_CRM_ENTITY_TYPE_ID}/pipelines`);
+      const pipelines = res?.data?.pipelines;
+      setBitrixFunnels(Array.isArray(pipelines) ? pipelines : []);
+    } catch (e: any) {
+      setBitrixFunnels([]);
+      const detail = _bitrixDetailFromError(e);
+      setBitrixNotice({
+        type: 'error',
+        text: detail || 'Falha ao carregar pipelines do Bitrix24 (CRM).',
+      });
+    } finally {
+      setLoadingBitrixFunnels(false);
+    }
+  };
+
+  useEffect(() => {
+    // Carrega na entrada para já aparecer no filtro.
+    (async () => {
+      const configured = await carregarStatusBitrix();
+      if (configured) await carregarPipelinesBitrix();
+    })();
+  }, []);
+
+  const pushSprintParaBitrix = async () => {
+    if (!currentSprint) return;
+    setBitrixNotice(null);
+    if (bitrixConfigured === false) {
+      setBitrixNotice({
+        type: 'error',
+        text: 'Bitrix24 não configurado. Defina BITRIX24_WEBHOOK_BASE_URL no .env e reinicie a API.',
+      });
+      return;
+    }
+    setSyncingBitrixPush(true);
+    try {
+      await baseApi.post(`/bitrix/kanban/sprint/${currentSprint.id}/push`);
+      setBitrixNotice({ type: 'success', text: 'Sprint enviada para o Bitrix24.' });
+      await fetchData();
+    } catch (e: any) {
+      const detail = _bitrixDetailFromError(e);
+      setBitrixNotice({ type: 'error', text: detail || 'Falha ao enviar sprint para o Bitrix24.' });
+    } finally {
+      setSyncingBitrixPush(false);
+    }
+  };
+
+  const pullSprintDoBitrixCrm = async () => {
+    if (!currentSprint) return;
+    setBitrixNotice(null);
+    if (bitrixConfigured === false) {
+      setBitrixNotice({
+        type: 'error',
+        text: 'Bitrix24 não configurado. Defina BITRIX24_WEBHOOK_BASE_URL no .env e reinicie a API.',
+      });
+      return;
+    }
+    setSyncingBitrixCrmPull(true);
+    try {
+      const categoryId = selectedBitrixFunnelId ? Number(selectedBitrixFunnelId) : 0;
+      await baseApi.post(`/bitrix/crm/kanban/sprint/${currentSprint.id}/pull`, null, {
+        params: {
+          entity_type_id: BITRIX_CRM_ENTITY_TYPE_ID,
+          category_id: Number.isFinite(categoryId) ? categoryId : 0,
+        }
+      });
+      setBitrixNotice({ type: 'success', text: 'Importado do Bitrix24 (CRM) para o sprint.' });
+      await fetchData();
+    } catch (e: any) {
+      const detail = _bitrixDetailFromError(e);
+      setBitrixNotice({ type: 'error', text: detail || 'Falha ao importar do Bitrix24 (CRM).' });
+    } finally {
+      setSyncingBitrixCrmPull(false);
+    }
+  };
+
+  const pushSprintParaBitrixCrm = async () => {
+    if (!currentSprint) return;
+    setBitrixNotice(null);
+    if (bitrixConfigured === false) {
+      setBitrixNotice({
+        type: 'error',
+        text: 'Bitrix24 não configurado. Defina BITRIX24_WEBHOOK_BASE_URL no .env e reinicie a API.',
+      });
+      return;
+    }
+    setSyncingBitrixCrmPush(true);
+    try {
+      const categoryId = selectedBitrixFunnelId ? Number(selectedBitrixFunnelId) : 0;
+      await baseApi.post(`/bitrix/crm/kanban/sprint/${currentSprint.id}/push`, null, {
+        params: {
+          entity_type_id: BITRIX_CRM_ENTITY_TYPE_ID,
+          category_id: Number.isFinite(categoryId) ? categoryId : 0,
+        }
+      });
+      setBitrixNotice({ type: 'success', text: 'Projeto enviado para o Bitrix24 (CRM).' });
+      await fetchData();
+    } catch (e: any) {
+      const detail = _bitrixDetailFromError(e);
+      setBitrixNotice({ type: 'error', text: detail || 'Falha ao enviar para o Bitrix24 (CRM).' });
+    } finally {
+      setSyncingBitrixCrmPush(false);
+    }
+  };
+
+  const pullSprintDoBitrix = async () => {
+    if (!currentSprint) return;
+    setBitrixNotice(null);
+    if (bitrixConfigured === false) {
+      setBitrixNotice({
+        type: 'error',
+        text: 'Bitrix24 não configurado. Defina BITRIX24_WEBHOOK_BASE_URL no .env e reinicie a API.',
+      });
+      return;
+    }
+    setSyncingBitrixPull(true);
+    try {
+      await baseApi.post(`/bitrix/kanban/sprint/${currentSprint.id}/pull`);
+      setBitrixNotice({ type: 'success', text: 'Atualizado do Bitrix24 (fonte da verdade).' });
+      await fetchData();
+    } catch (e: any) {
+      const detail = _bitrixDetailFromError(e);
+      setBitrixNotice({ type: 'error', text: detail || 'Falha ao atualizar do Bitrix24.' });
+    } finally {
+      setSyncingBitrixPull(false);
+    }
+  };
+
+  useEffect(() => {
+    const sp: any = currentSprint as any;
+    const sprintId = sp?.id != null ? String(sp.id) : null;
+    const groupId = sp?.bitrixGroupId;
+
+    if (!sprintId) return;
+    if (bitrixConfigured !== true) return;
+    if (!groupId) return;
+    if (syncingBitrixPull) return;
+    if (lastAutoPullSprintIdRef.current === sprintId) return;
+
+    lastAutoPullSprintIdRef.current = sprintId;
+
+    (async () => {
+      setBitrixNotice(null);
+      setSyncingBitrixPull(true);
+      try {
+        await baseApi.post(`/bitrix/kanban/sprint/${sprintId}/pull`);
+        await fetchData();
+      } catch (e: any) {
+        const detail = _bitrixDetailFromError(e);
+        setBitrixNotice({
+          type: 'error',
+          text: detail || 'Falha ao atualizar do Bitrix24.',
+        });
+      } finally {
+        setSyncingBitrixPull(false);
+      }
+    })();
+  }, [currentSprint?.id, (currentSprint as any)?.bitrixGroupId, bitrixConfigured]);
 
   return (
     <div className="flex flex-col gap-6 w-full pb-10">
@@ -570,26 +869,27 @@ export function DiarioObras() {
       <div className="bg-[#161618] rounded-2xl border border-white/5 shadow-xl p-5 sm:p-6">
         <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-orange-500 to-orange-700 flex items-center justify-center shadow-lg shadow-orange-500/20 shrink-0">
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-green-500 to-green-700 flex items-center justify-center shadow-lg shadow-green-500/20 shrink-0">
               <LayoutKanban size={22} className="text-white" />
             </div>
             <div>
               <h1 className="text-xl font-black uppercase tracking-tight text-white">Kanban de Obras</h1>
-              <p className="text-xs text-orange-500 font-bold mt-0.5 tracking-wide">{activeBuildingName}</p>
+              <p className="text-xs text-green-500 font-bold mt-0.5 tracking-wide">{activeBuildingName}</p>
             </div>
           </div>
 
           {/* Building selector if multiple available */}
           {buildings.length > 1 && (
             <select
-              value={activeBuildingId}
+              value={String(activeBuildingId ?? '')}
               onChange={e => {
-                const b = buildings.find(x => String(x.id) === e.target.value);
-                setActiveBuildingId(e.target.value);
+                const nextId = e.target.value ? Number(e.target.value) : null;
+                const b = buildings.find(x => String(x.id) === String(nextId));
+                setActiveBuildingId(nextId);
                 setActiveBuildingName(b?.name || '');
                 setSelectedSprint(null);
               }}
-              className="bg-black/40 border border-white/10 rounded-xl px-3 py-2 text-white text-sm font-bold focus:outline-none focus:border-orange-500/50 transition-colors max-w-xs"
+              className="bg-black/40 border border-white/10 rounded-xl px-3 py-2 text-white text-sm font-bold focus:outline-none focus:border-green-500/50 transition-colors max-w-xs"
             >
               {buildings.map(b => (
                 <option key={b.id} value={String(b.id)}>{b.name}</option>
@@ -603,11 +903,11 @@ export function DiarioObras() {
           <div className="mt-5 space-y-1.5">
             <div className="flex items-center justify-between text-xs font-bold">
               <span className="text-gray-400">{doneCards}/{totalCards} demandas concluídas</span>
-              <span className="text-orange-500">{progressPct}%</span>
+              <span className="text-green-500">{progressPct}%</span>
             </div>
             <div className="h-2 bg-white/5 rounded-full overflow-hidden">
               <div
-                className="h-full bg-gradient-to-r from-orange-500 to-orange-400 rounded-full transition-all duration-500"
+                className="h-full bg-gradient-to-r from-green-500 to-green-400 rounded-full transition-all duration-500"
                 style={{ width: `${progressPct}%` }}
               />
             </div>
@@ -659,7 +959,7 @@ export function DiarioObras() {
           ))}
           <button
             onClick={() => setSprintModal({ isNew: true })}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-black text-gray-500 border border-dashed border-white/10 hover:border-orange-500/30 hover:text-orange-400 transition-all shrink-0"
+            className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-black text-gray-500 border border-dashed border-white/10 hover:border-green-500/30 hover:text-green-400 transition-all shrink-0"
           >
             <Plus size={14} /> Novo Sprint
           </button>
@@ -667,26 +967,121 @@ export function DiarioObras() {
 
         {/* Tools */}
         <div className="flex items-center gap-2 shrink-0">
+          <select
+            value={selectedBitrixFunnelId}
+            onChange={e => setSelectedBitrixFunnelId(e.target.value)}
+            disabled={loadingBitrixFunnels || bitrixConfigured === false}
+            className="bg-[#161618] border border-white/5 rounded-xl px-3 py-2 text-white text-xs font-bold focus:outline-none focus:border-green-500/30 transition-colors max-w-[240px] disabled:opacity-60"
+            title="Pipelines do CRM (Bitrix24)"
+          >
+            <option value="">Pipelines (Bitrix24 CRM)</option>
+            {(bitrixFunnels || []).map((f: any) => {
+              const id = String(f?.id ?? '');
+              const name = String(f?.name ?? id);
+              const stagesCount = Array.isArray(f?.stages) ? f.stages.length : 0;
+              return (
+                <option key={id || name} value={id}>
+                  {name}{stagesCount ? ` (${stagesCount})` : ''}
+                </option>
+              );
+            })}
+          </select>
           <div className="relative">
             <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-600" />
             <input
               value={search}
               onChange={e => setSearch(e.target.value)}
               placeholder="Buscar demanda..."
-              className="bg-[#161618] border border-white/5 rounded-xl pl-9 pr-3 py-2 text-white text-xs placeholder:text-gray-600 focus:outline-none focus:border-orange-500/30 w-44 transition-colors"
+              className="bg-[#161618] border border-white/5 rounded-xl pl-9 pr-3 py-2 text-white text-xs placeholder:text-gray-600 focus:outline-none focus:border-green-500/30 w-44 transition-colors"
             />
           </div>
           <button
             onClick={fetchData}
             disabled={loading}
-            className="w-9 h-9 rounded-xl bg-[#161618] border border-white/5 flex items-center justify-center text-gray-500 hover:text-orange-400 hover:border-orange-500/20 transition-all"
+            className="w-9 h-9 rounded-xl bg-[#161618] border border-white/5 flex items-center justify-center text-gray-500 hover:text-green-400 hover:border-green-500/20 transition-all"
           >
             <RefreshCw size={14} className={cn(loading && 'animate-spin')} />
           </button>
+          <button
+            onClick={carregarPipelinesBitrix}
+            disabled={loadingBitrixFunnels || bitrixConfigured === false}
+            className="w-9 h-9 rounded-xl bg-[#161618] border border-white/5 flex items-center justify-center text-gray-500 hover:text-green-400 hover:border-green-500/20 transition-all disabled:opacity-50"
+            title="Atualizar lista de pipelines do Bitrix24"
+          >
+            <RefreshCw size={14} className={cn(loadingBitrixFunnels && 'animate-spin')} />
+          </button>
+          <button
+            onClick={exportarBitrix}
+            disabled={exportingBitrix || bitrixConfigured === false}
+            className="w-9 h-9 rounded-xl bg-[#161618] border border-white/5 flex items-center justify-center text-gray-500 hover:text-green-400 hover:border-green-500/20 transition-all disabled:opacity-50"
+            title="Exportar kanban do CRM (Bitrix24) (JSON)"
+          >
+            {exportingBitrix ? (
+              <Loader2 size={14} className="animate-spin" />
+            ) : (
+              <Download size={14} />
+            )}
+          </button>
+          {currentSprint && (
+            <button
+              onClick={pushSprintParaBitrix}
+              disabled={syncingBitrixPush || bitrixConfigured === false}
+              className="w-9 h-9 rounded-xl bg-[#161618] border border-white/5 flex items-center justify-center text-gray-500 hover:text-green-400 hover:border-green-500/20 transition-all disabled:opacity-50"
+              title="Enviar sprint atual para o Bitrix24 (cria/atualiza grupo e tarefas)"
+            >
+              {syncingBitrixPush ? (
+                <Loader2 size={14} className="animate-spin" />
+              ) : (
+                <Upload size={14} />
+              )}
+            </button>
+          )}
+          {currentSprint && (
+            <button
+              onClick={pushSprintParaBitrixCrm}
+              disabled={syncingBitrixCrmPush || bitrixConfigured === false}
+              className="w-9 h-9 rounded-xl bg-[#161618] border border-white/5 flex items-center justify-center text-gray-500 hover:text-green-400 hover:border-green-500/20 transition-all disabled:opacity-50"
+              title="Subir projeto para o Bitrix24 (CRM Smart Process / Kanban)"
+            >
+              {syncingBitrixCrmPush ? (
+                <Loader2 size={14} className="animate-spin" />
+              ) : (
+                <ArrowUpToLine size={14} />
+              )}
+            </button>
+          )}
+          {currentSprint && (
+            <button
+              onClick={pullSprintDoBitrix}
+              disabled={syncingBitrixPull || bitrixConfigured === false}
+              className="w-9 h-9 rounded-xl bg-[#161618] border border-white/5 flex items-center justify-center text-gray-500 hover:text-green-400 hover:border-green-500/20 transition-all disabled:opacity-50"
+              title="Atualizar sprint atual do Bitrix24 (sobrescreve cards vinculados)"
+            >
+              {syncingBitrixPull ? (
+                <Loader2 size={14} className="animate-spin" />
+              ) : (
+                <RefreshCw size={14} />
+              )}
+            </button>
+          )}
+          {currentSprint && (
+            <button
+              onClick={pullSprintDoBitrixCrm}
+              disabled={syncingBitrixCrmPull || bitrixConfigured === false}
+              className="w-9 h-9 rounded-xl bg-[#161618] border border-white/5 flex items-center justify-center text-gray-500 hover:text-green-400 hover:border-green-500/20 transition-all disabled:opacity-50"
+              title="Importar do Bitrix24 (CRM) para o sprint (Bitrix manda)"
+            >
+              {syncingBitrixCrmPull ? (
+                <Loader2 size={14} className="animate-spin" />
+              ) : (
+                <ArrowDownToLine size={14} />
+              )}
+            </button>
+          )}
           {currentSprint && (
             <button
               onClick={() => setSprintModal({ sprint: currentSprint, isNew: false })}
-              className="w-9 h-9 rounded-xl bg-[#161618] border border-white/5 flex items-center justify-center text-gray-500 hover:text-orange-400 hover:border-orange-500/20 transition-all"
+              className="w-9 h-9 rounded-xl bg-[#161618] border border-white/5 flex items-center justify-center text-gray-500 hover:text-green-400 hover:border-green-500/20 transition-all"
             >
               <Edit3 size={14} />
             </button>
@@ -694,22 +1089,42 @@ export function DiarioObras() {
         </div>
       </div>
 
+      {bitrixNotice && (
+        <div className="flex items-center justify-between gap-3 rounded-xl border border-white/5 bg-[#161618] px-3 py-2">
+          <div
+            className={cn(
+              'text-[11px] font-bold',
+              bitrixNotice.type === 'error' ? 'text-red-400' : 'text-green-400'
+            )}
+          >
+            {bitrixNotice.text}
+          </div>
+          <button
+            onClick={() => setBitrixNotice(null)}
+            className="text-gray-500 hover:text-white transition-colors p-1 rounded-lg hover:bg-white/5"
+            title="Fechar"
+          >
+            <X size={14} />
+          </button>
+        </div>
+      )}
+
       {/* ── Kanban Board ── */}
       {loading ? (
         <div className="flex items-center justify-center py-20 gap-3">
-          <Loader2 size={24} className="animate-spin text-orange-500" />
+          <Loader2 size={24} className="animate-spin text-green-500" />
           <span className="text-gray-500 font-bold text-sm">Carregando...</span>
         </div>
       ) : sprints.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-20 gap-4 bg-[#161618] rounded-2xl border border-dashed border-white/10">
-          <LayoutKanban size={48} className="text-orange-500/30" />
+          <LayoutKanban size={48} className="text-green-500/30" />
           <div className="text-center">
             <h3 className="text-white font-black text-lg">Nenhum sprint criado</h3>
             <p className="text-gray-500 text-sm mt-1">Crie um sprint para começar a acompanhar as demandas desta obra.</p>
           </div>
           <button
             onClick={() => setSprintModal({ isNew: true })}
-            className="flex items-center gap-2 px-6 py-2.5 bg-orange-600 hover:bg-orange-700 text-white rounded-xl font-black text-sm transition-colors shadow-lg shadow-orange-600/20"
+            className="flex items-center gap-2 px-6 py-2.5 bg-green-600 hover:bg-green-700 text-white rounded-xl font-black text-sm transition-colors shadow-lg shadow-green-600/20"
           >
             <Plus size={16} /> Criar Primeiro Sprint
           </button>
@@ -742,7 +1157,7 @@ export function DiarioObras() {
                     <button
                       onClick={() => setCardModal({ card: null, sprintId: currentSprint.id, isNew: true })}
                       className={cn('w-6 h-6 rounded-lg flex items-center justify-center transition-colors opacity-0 hover:opacity-100 group-hover:opacity-100',
-                        col.id === 'planned' ? 'opacity-100 bg-orange-500/15 text-orange-400 hover:bg-orange-500/25' : 'bg-white/5 text-gray-600 hover:bg-white/10 hover:text-white'
+                        col.id === 'planned' ? 'opacity-100 bg-green-500/15 text-green-400 hover:bg-green-500/25' : 'bg-white/5 text-gray-600 hover:bg-white/10 hover:text-white'
                       )}
                       title="Adicionar demanda"
                     >

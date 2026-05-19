@@ -1,4 +1,4 @@
-export interface LeandroRow {
+export interface CentroDeCustoRow {
   id?: string | number;
   data: string;
   baixa?: string;
@@ -15,20 +15,9 @@ export interface LeandroRow {
   saldo: number;
 }
 
-export interface LeandroPeriod {
+export interface CentroDeCustoPeriod {
   mes: string;
   entradas: number;
   saidas: number;
   saldo: number;
-}
-
-export interface LeandroProps {
-  isDark: boolean;
-  allFinancialTitles: any[];
-  allReceivableTitles: any[];
-  orders: any[];
-  buildings: any[];
-  companies: any[];
-  syncing: boolean;
-  syncSienge: () => Promise<void>;
 }

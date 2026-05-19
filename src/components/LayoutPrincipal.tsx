@@ -55,8 +55,13 @@ export function LayoutPrincipal() {
   const [buildingSearch, setBuildingSearch] = useState('');
   const [buyerSearch, setBuyerSearch] = useState('');
   const [requesterSearch, setRequesterSearch] = useState('');
-  const showFilters = path === '/' || path.startsWith('/financeiro') || path.startsWith('/dashboard/financeiro');
-  const showBuyerRequesterFilters = path === '/financeiro/alerta';
+  const showFilters =
+    path === '/' ||
+    path.startsWith('/financeiro') ||
+    path.startsWith('/obras') ||
+    path.startsWith('/logistica') ||
+    path.startsWith('/acessos');
+  const showBuyerRequesterFilters = path === '/obras/alerta';
   const latestSyncLabel = syncInfo?.finished_at || syncInfo?.started_at
     ? new Date(syncInfo.finished_at || syncInfo.started_at).toLocaleString('pt-BR')
     : 'Sem sincronização registrada';
@@ -136,14 +141,26 @@ export function LayoutPrincipal() {
   }, [allTimeYear, globalPeriodMode, setEndDate, setStartDate, showFilters]);
 
   useEffect(() => {
-    const value = buildingIdInput.trim();
+    const rawValue = buildingIdInput.trim();
+    if (!rawValue) return;
+
+    // Aceita entradas como: "14", "ID: 14", "(ID: 14)", etc.
+    const extracted = rawValue.match(/\d+/)?.[0];
+    const value = String(extracted ?? rawValue).trim();
     if (!value) return;
 
     const matchedBuilding = (buildings || []).find(
       (b: any) => String(b?.id) === value || String(b?.code || '') === value,
     );
 
-    if (!matchedBuilding) return;
+    // Se a obra não estiver no catálogo atual, ainda assim aplica o ID
+    // para o backend conseguir filtrar (e o select mostra "Obra {id}").
+    if (!matchedBuilding) {
+      if (fcSelectedBuilding !== value) {
+        setFcSelectedBuilding(value);
+      }
+      return;
+    }
 
     const nextBuildingId = String(matchedBuilding?.id);
     const nextCompanyId = String(matchedBuilding?.companyId || matchedBuilding?.company_id || '');
@@ -170,7 +187,10 @@ export function LayoutPrincipal() {
     if (selectedCompany === 'all') return;
     if (fcSelectedBuilding === 'all') return;
     const selected = (buildings || []).find((b: any) => String(b?.id) === String(fcSelectedBuilding));
-    if (selected && String(selected?.companyId) !== String(selectedCompany)) {
+    if (!selected) return;
+    const selectedCompanyId = selected?.companyId ?? selected?.company_id;
+    if (selectedCompanyId == null) return;
+    if (String(selectedCompanyId) !== String(selectedCompany)) {
       setFcSelectedBuilding('all');
     }
   }, [buildings, fcSelectedBuilding, selectedCompany, setFcSelectedBuilding, showFilters]);

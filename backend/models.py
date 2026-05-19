@@ -94,6 +94,18 @@ class Sprint(TimestampMixin, Base):
     created_by = Column(String(255), nullable=True)
     is_active = Column(Boolean, default=True, nullable=False)
 
+    # Integração Bitrix24
+    bitrix_group_id = Column(Integer, nullable=True, index=True)
+    bitrix_last_pull_at = Column(DateTime, nullable=True)
+
+    # Integração Bitrix24 CRM (Smart Process / Kanban)
+    bitrix_crm_entity_type_id = Column(Integer, nullable=True, index=True)
+    bitrix_crm_category_id = Column(Integer, nullable=True, index=True)
+    bitrix_crm_last_pull_at = Column(DateTime, nullable=True)
+
+    # Vínculo de contrato (referência livre)
+    contract_ref = Column(String(120), nullable=True, index=True)
+
 
 class Card(TimestampMixin, Base):
     __tablename__ = "cards"
@@ -103,13 +115,24 @@ class Card(TimestampMixin, Base):
     building_id = Column(Integer, nullable=False, index=True)
     title = Column(String(255), nullable=False)
     description = Column(Text, nullable=True)
-    status = Column(String(50), default="todo", nullable=False)
+    status = Column(String(50), default="planned", nullable=False)
     priority = Column(String(20), default="medium", nullable=False)
     responsible = Column(String(255), nullable=True)
     due_date = Column(DateTime, nullable=True)
     tags = Column(String(500), nullable=True)
     created_by = Column(String(255), nullable=False)
     order = Column(Integer, default=0, nullable=False)
+
+    # Integração Bitrix24
+    bitrix_task_id = Column(Integer, nullable=True, index=True)
+    bitrix_last_pull_at = Column(DateTime, nullable=True)
+
+    # Integração Bitrix24 CRM (Smart Process)
+    bitrix_crm_entity_type_id = Column(Integer, nullable=True, index=True)
+    bitrix_crm_category_id = Column(Integer, nullable=True, index=True)
+    bitrix_crm_item_id = Column(Integer, nullable=True, index=True)
+    bitrix_crm_stage_id = Column(String(120), nullable=True)
+    bitrix_crm_last_pull_at = Column(DateTime, nullable=True)
     
     sprint = relationship("Sprint", backref="cards")
 
@@ -126,6 +149,84 @@ class Attachment(TimestampMixin, Base):
     uploaded_by = Column(String(255), nullable=False)
     
     card = relationship("Card", backref="attachments")
+
+
+class Contract(TimestampMixin, Base):
+    __tablename__ = "contracts"
+
+    id = Column(Integer, primary_key=True)
+
+    # Vínculo obrigatório com obra
+    building_id = Column(Integer, nullable=False, index=True)
+
+    # Opcional: rastreabilidade por centro de custo / etapa construtiva
+    cost_center_code = Column(String(80), nullable=True, index=True)
+    stage_label = Column(String(120), nullable=True)
+    enterprise_label = Column(String(160), nullable=True)
+
+    # Identificação
+    contract_number = Column(String(80), nullable=True, index=True)
+    title = Column(String(255), nullable=False)
+
+    # Tipo / origem do contrato
+    # - suprimentos: vem do Sienge (Suprimentos > Contratos)
+    # - medicoes: vem do Sienge (Contratos e Medições)
+    # - privado: cadastrado localmente
+    # - licitacao: cadastrado localmente
+    kind = Column(String(40), nullable=False, default="privado", index=True)
+
+    # Partes
+    owner_legal_name = Column(String(255), nullable=True)
+    owner_cnpj = Column(String(32), nullable=True, index=True)
+    owner_address = Column(String(255), nullable=True)
+    owner_representatives = Column(Text, nullable=True)
+
+    supplier_legal_name = Column(String(255), nullable=True)
+    supplier_cnpj = Column(String(32), nullable=True, index=True)
+    supplier_address = Column(String(255), nullable=True)
+    supplier_representatives = Column(Text, nullable=True)
+
+    # Objeto e vigência
+    object_text = Column(Text, nullable=True)
+    start_date = Column(DateTime, nullable=True)
+    end_date = Column(DateTime, nullable=True)
+
+    # Valores / retenções
+    total_value = Column(Float, nullable=True)
+    retention_percent = Column(Float, nullable=True)
+
+    # Garantias / seguros / status
+    guarantee_text = Column(Text, nullable=True)
+    insurance_text = Column(Text, nullable=True)
+    status = Column(String(40), nullable=False, default="draft", index=True)
+
+    # Observações / auditoria
+    notes = Column(Text, nullable=True)
+    created_by = Column(String(255), nullable=True)
+
+    # Integração com workspace operacional (Kanban sprint)
+    sprint_id = Column(Integer, ForeignKey("sprints.id"), nullable=True, index=True)
+    sprint = relationship("Sprint")
+
+
+class ContractDocument(TimestampMixin, Base):
+    __tablename__ = "contract_documents"
+
+    id = Column(Integer, primary_key=True)
+    contract_id = Column(Integer, ForeignKey("contracts.id"), nullable=False, index=True)
+
+    doc_type = Column(String(80), nullable=False, index=True)
+    title = Column(String(255), nullable=True)
+    filename = Column(String(255), nullable=False)
+    file_path = Column(String(500), nullable=False)
+    file_size = Column(Integer, nullable=True)
+    mime_type = Column(String(100), nullable=True)
+    uploaded_by = Column(String(255), nullable=True)
+
+    # Versionamento simples
+    version = Column(Integer, nullable=False, default=1)
+
+    contract = relationship("Contract", backref="documents")
 
 
 class LogisticsLocation(TimestampMixin, Base):

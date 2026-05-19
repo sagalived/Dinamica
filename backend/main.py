@@ -11,10 +11,11 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
+from sqlalchemy import text
 
 from backend.config import APP_NAME, BASE_DIR, SIENGE_SYNC_INTERVAL_MINUTES
 from backend.database import Base, SessionLocal, engine
-from backend.routers import admin, auth, catalog, core, dashboard, kanban, logistics, sienge, operational
+from backend.routers import admin, auth, bitrix, catalog, core, dashboard, juridico, kanban, logistics, sienge, operational
 from backend.routers import sienge_raw
 from backend.routers.sienge import run_sync_once
 from backend.services.bootstrap import ensure_seed_data
@@ -37,6 +38,8 @@ app.include_router(sienge.router)
 app.include_router(operational.router)
 app.include_router(kanban.router)
 app.include_router(logistics.router)
+app.include_router(juridico.router)
+app.include_router(bitrix.router)
 app.include_router(sienge_raw.router)
 
 app.add_middleware(
@@ -97,6 +100,21 @@ async def on_startup() -> None:
         ensure_sqlite_schema(engine)
         with Session(engine) as db:
             ensure_seed_data(db)
+
+            # Em alguns ambientes o sequence de PK pode ficar fora de sincronia
+            # após seeds/imports. Alinha `buildings.id` para evitar erro 500 no insert.
+            if db.get_bind().dialect.name == "postgresql":
+                try:
+                    db.execute(
+                        text(
+                            "SELECT setval(pg_get_serial_sequence('buildings','id'), "
+                            "COALESCE((SELECT MAX(id) FROM buildings), 1), true)"
+                        )
+                    )
+                    db.commit()
+                except Exception:
+                    db.rollback()
+                    logger.warning("Falha ao sincronizar sequence buildings.id", exc_info=True)
         app.state.database_ready = True
 
         # Nao bloquear o startup: sync inicial roda em background.

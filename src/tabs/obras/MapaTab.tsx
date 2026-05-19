@@ -59,7 +59,7 @@ export function MapaTab() {
               <input 
               type="text" 
               placeholder="Pesquisar obra..." 
-              className="w-full bg-black/40 border border-white/10 rounded-lg py-2 pl-9 pr-3 text-xs text-white placeholder:text-gray-600 focus:outline-none focus:border-orange-500/50"
+              className="w-full bg-black/40 border border-white/10 rounded-lg py-2 pl-9 pr-3 text-xs text-white placeholder:text-gray-600 focus:outline-none focus:border-green-500/50"
               value={buildingSearch}
               onChange={(e) => setBuildingSearch(e.target.value)}
             />
@@ -88,7 +88,7 @@ export function MapaTab() {
                     className={cn(
                       "w-full text-left p-3 rounded-xl transition-all border text-xs font-bold",
                       selectedMapBuilding === b.id
-                        ? "bg-orange-600/20 border-orange-500/50 text-orange-500"
+                        ? "bg-green-600/20 border-green-500/50 text-green-500"
                         : "bg-black/20 border-white/5 text-gray-400 hover:bg-white/5 hover:text-white"
                     )}
                   >
@@ -98,7 +98,7 @@ export function MapaTab() {
                         <MapIcon size={10} /> ID: {b.id}
                       </div>
                       {vol > 0 && (
-                        <div className="text-[9px] font-black text-orange-500/70">
+                        <div className="text-[9px] font-black text-green-500/70">
                           R$&nbsp;{formatarNumeroBR(vol, 0)}
                         </div>
                       )}
@@ -191,8 +191,8 @@ export function MapaTab() {
                     {/* Responsável Técnico */}
                     <div className="bg-black/20 p-4 rounded-xl border border-white/5">
                       <div className="flex items-start gap-3">
-                        <div className="w-9 h-9 rounded-full bg-orange-500/20 flex items-center justify-center shrink-0 mt-0.5">
-                          <UserIcon size={16} className="text-orange-500" />
+                        <div className="w-9 h-9 rounded-full bg-green-500/20 flex items-center justify-center shrink-0 mt-0.5">
+                          <UserIcon size={16} className="text-green-500" />
                         </div>
                         <div className="min-w-0 flex-1">
                           <p className="text-[10px] font-black uppercase text-gray-500 mb-1">Responsável Técnico</p>
@@ -203,14 +203,14 @@ export function MapaTab() {
                                 value={engineerDraft}
                                 onChange={e => setEngineerDraft(e.target.value)}
                                 onKeyDown={e => { if(e.key === 'Enter') saveEngineer(); if(e.key === 'Escape') setEditingEngineer(false); }}
-                                className="bg-black/60 border border-orange-500/40 rounded-lg px-3 py-1.5 text-sm text-white w-full focus:outline-none focus:border-orange-500"
+                                className="bg-black/60 border border-green-500/40 rounded-lg px-3 py-1.5 text-sm text-white w-full focus:outline-none focus:border-green-500"
                                 placeholder="Nome do responsável"
                               />
                               <div className="flex gap-2">
                                 <button
                                   onClick={saveEngineer}
                                   disabled={savingEngineer}
-                                  className="flex-1 bg-orange-600 hover:bg-orange-700 text-white text-xs font-black py-1.5 rounded-lg transition-colors disabled:opacity-50"
+                                  className="flex-1 bg-green-600 hover:bg-green-700 text-white text-xs font-black py-1.5 rounded-lg transition-colors disabled:opacity-50"
                                 >
                                   {savingEngineer ? 'Salvando...' : 'Salvar'}
                                 </button>
@@ -230,7 +230,7 @@ export function MapaTab() {
                               {isAdmin && (
                                 <button
                                   onClick={() => { setEngineerDraft(currentBuilding?.engineer || ''); setEditingEngineer(true); }}
-                                  className="shrink-0 text-[9px] font-black uppercase text-orange-500/70 hover:text-orange-500 border border-orange-500/20 hover:border-orange-500/50 px-2 py-1 rounded-md transition-colors"
+                                  className="shrink-0 text-[9px] font-black uppercase text-green-500/70 hover:text-green-500 border border-green-500/20 hover:border-green-500/50 px-2 py-1 rounded-md transition-colors"
                                 >
                                   Editar
                                 </button>
@@ -242,9 +242,9 @@ export function MapaTab() {
                     </div>
 
                     <div className="space-y-3">
-                      <div className="flex items-center justify-between p-3 rounded-xl bg-orange-600/10 border border-orange-500/20">
-                        <span className="text-xs font-bold text-orange-500">Volume de Compras</span>
-                        <span className="text-sm font-black text-orange-400">
+                      <div className="flex items-center justify-between p-3 rounded-xl bg-green-600/10 border border-green-500/20">
+                        <span className="text-xs font-bold text-green-500">Volume de Compras</span>
+                        <span className="text-sm font-black text-green-400">
                           R$ {totalOrders.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                         </span>
                       </div>

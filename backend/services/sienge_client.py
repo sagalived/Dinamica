@@ -24,7 +24,7 @@ class SiengeClient:
         self._env_mtime: float | None = None
         instance = os.getenv("SIENGE_INSTANCE", "").strip().split(".")[0]
         raw_base_url = os.getenv("SIENGE_BASE_URL", "").strip()
-        if raw_base_url and "api.sienge.com.br" in raw_base_url:
+        if raw_base_url:
             self.base_url = raw_base_url.rstrip("/")
         elif instance:
             self.base_url = f"https://api.sienge.com.br/{instance}"
@@ -74,20 +74,26 @@ class SiengeClient:
                     return None
                 return str(raw).strip()
 
-            instance = (_v("SIENGE_INSTANCE") or os.getenv("SIENGE_INSTANCE", "")).strip().split(".")[0]
-            raw_base_url = _v("SIENGE_BASE_URL") or os.getenv("SIENGE_BASE_URL", "")
-            raw_base_url = (raw_base_url or "").strip()
-            if raw_base_url and "api.sienge.com.br" in raw_base_url:
+            # Preferimos variáveis já presentes no ambiente (os.environ).
+            # Motivo: em dev, tokens podem ser injetados pelo processo/VSCode e o
+            # arquivo .env pode estar desatualizado. O load_dotenv(override=False)
+            # já respeita essa prioridade; aqui mantemos a mesma regra.
+            def _env_or_file(key: str) -> str | None:
+                return (os.getenv(key, "").strip() or (_v(key) or "").strip() or None)
+
+            instance = (_env_or_file("SIENGE_INSTANCE") or "").strip().split(".")[0]
+            raw_base_url = (_env_or_file("SIENGE_BASE_URL") or "").strip()
+            if raw_base_url:
                 self.base_url = raw_base_url.rstrip("/")
             elif instance:
                 self.base_url = f"https://api.sienge.com.br/{instance}"
             elif raw_base_url:
                 self.base_url = raw_base_url.rstrip("/")
 
-            self.username = _v("SIENGE_USERNAME") or self.username
-            self.password = _v("SIENGE_PASSWORD") or self.password
-            self.access_name = _v("SIENGE_ACCESS_NAME") or self.access_name
-            self.token = _v("SIENGE_TOKEN") or self.token
+            self.username = _env_or_file("SIENGE_USERNAME") or self.username
+            self.password = _env_or_file("SIENGE_PASSWORD") or self.password
+            self.access_name = _env_or_file("SIENGE_ACCESS_NAME") or self.access_name
+            self.token = _env_or_file("SIENGE_TOKEN") or self.token
 
             self.has_user_pass = bool(self.username and self.password)
             self.has_access_token = bool(self.access_name and self.token)
@@ -358,6 +364,116 @@ class SiengeClient:
 
     async def fetch_credores(self) -> list[dict]:
         return await self._fetch_all_pages("/creditors")
+
+    async def _discover_first_working_endpoint(
+        self,
+        endpoints: list[str],
+        params: dict[str, Any] | None = None,
+        *,
+        require_non_empty: bool = False,
+    ) -> tuple[str | None, dict[str, Any] | None]:
+        """Retorna o endpoint que responde 200.
+
+        - Se `require_non_empty=True`, tenta preferir um endpoint cujo probe (limit=1)
+          devolva ao menos 1 item. Se nenhum endpoint tiver dados no probe, cai no
+          primeiro 200 mesmo vazio.
+
+        Isso permite suportar variações de nomes entre ambientes/versões da API.
+        """
+        if not self.is_configured:
+            return None, {
+                "ok": False,
+                "endpoint": None,
+                "url": None,
+                "status_code": None,
+                "message": "Sienge credentials not configured",
+                "params": params or {},
+            }
+
+        async with httpx.AsyncClient(timeout=self.timeout) as client:
+            first_ok_endpoint: str | None = None
+            last_err: dict[str, Any] | None = None
+            for ep in endpoints:
+                probe_params = dict(params or {})
+                probe_params.setdefault("limit", 1)
+                probe_params.setdefault("offset", 0)
+                payload, err = await self._get_json_via_client_detailed(client, ep, probe_params)
+                if err is not None:
+                    last_err = err
+                if err is None and payload is not None:
+                    if first_ok_endpoint is None:
+                        first_ok_endpoint = ep
+
+                    if require_non_empty:
+                        sample = self._extract_collection(payload)
+                        if sample:
+                            return ep, None
+                        continue
+
+                    return ep, None
+            # Se nenhum respondeu 200, retorna o último erro
+            if first_ok_endpoint is not None:
+                return first_ok_endpoint, None
+            return None, last_err
+
+    async def fetch_suprimentos_contratos(self) -> tuple[list[dict], dict[str, Any] | None]:
+        """Busca contratos de suprimentos (Sienge: Suprimentos > Contratos).
+
+        Retorna (rows, diagnostic).
+        """
+        candidates = [
+            # Observado: /public/api/v1/contratos-suprimentos/contratos
+            "/contratos-suprimentos/contratos",
+            "/supply-contracts",
+            "/supply/contracts",
+            "/supplies/contracts",
+            "/purchase-contracts",
+            "/contracts",
+        ]
+        endpoint, err = await self._discover_first_working_endpoint(candidates, require_non_empty=True)
+        if err is not None or endpoint is None:
+            if err is None:
+                return [], {"ok": False, "message": "No working endpoint discovered", "candidates": candidates}
+            return [], {"ok": False, **err}
+        try:
+            rows = await self._fetch_all_pages(endpoint)
+            return rows, {
+                "ok": True,
+                "endpoint": endpoint,
+                "base_url": self.base_url,
+                "count": len(rows),
+            }
+        except Exception as exc:
+            self._record_error(endpoint, endpoint, exc)
+            return [], {"ok": False, **(self.last_error or {})}
+
+    async def fetch_medicoes_contratos(self) -> tuple[list[dict], dict[str, Any] | None]:
+        """Busca contratos de medições (Sienge: Contratos e Medições).
+
+        Retorna (rows, diagnostic).
+        """
+        candidates = [
+            "/measurement-contracts",
+            "/contracts-measurements/contracts",
+            "/contracts-measurements",
+            "/contracts/measurements",
+        ]
+        endpoint, err = await self._discover_first_working_endpoint(candidates, require_non_empty=True)
+        if err is not None or endpoint is None:
+            if err is None:
+                return [], {"ok": False, "message": "No working endpoint discovered", "candidates": candidates}
+            return [], {"ok": False, **err}
+        try:
+            rows = await self._fetch_all_pages(endpoint)
+            return rows, {
+                "ok": True,
+                "endpoint": endpoint,
+                "base_url": self.base_url,
+                "count": len(rows),
+            }
+        except Exception as exc:
+            self._record_error(endpoint, endpoint, exc)
+            return [], {"ok": False, **(self.last_error or {})}
 
     def _sync_date_range(self) -> tuple[str, str]:
         """Janela de datas usada no sync periódico.

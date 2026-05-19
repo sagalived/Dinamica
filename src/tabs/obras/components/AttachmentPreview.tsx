@@ -39,7 +39,7 @@ export function AttachmentPreview({
             rel="noopener noreferrer"
             className="flex items-center gap-2 p-2 hover:bg-white/5 transition-colors"
           >
-            <FileText size={18} className="text-orange-400 shrink-0" />
+            <FileText size={18} className="text-green-400 shrink-0" />
             <span className="text-xs text-gray-300 truncate">{att.originalName}</span>
           </a>
         )}

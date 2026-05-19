@@ -21,3 +21,8 @@ JWT_SECRET = os.getenv("JWT_SECRET", "change-this-secret-in-production")
 JWT_ALGORITHM = "HS256"
 JWT_EXPIRE_MINUTES = int(os.getenv("JWT_EXPIRE_MINUTES", "480"))
 SIENGE_SYNC_INTERVAL_MINUTES = int(os.getenv("SIENGE_SYNC_INTERVAL_MINUTES", "360"))
+
+# Bitrix24 (WebHook REST)
+# Exemplo: https://<seu-dominio>.bitrix24.com.br/rest/<userId>/<token>/
+# NUNCA commitar token no repo — use .env local (ja esta no .gitignore).
+BITRIX24_WEBHOOK_BASE_URL = os.getenv("BITRIX24_WEBHOOK_BASE_URL", "")

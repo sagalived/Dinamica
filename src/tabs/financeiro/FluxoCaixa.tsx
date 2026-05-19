@@ -14,66 +14,46 @@ import { format, subMonths } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { useSienge } from '../../contexts/SiengeContext';
 import { useTheme } from '../../contexts/ThemeContext';
-import { calcularFluxoCaixa } from './leandroLogic';
+import { calcularFluxoCaixa } from './fluxoCaixaLogic';
 import { safeFormat } from '../dashboard/logic';
 import { formatarNumeroBR, formatarQuantidadeBR } from '../utilitarios/formatacaoptbr';
 import { calcularResumoFluxoCaixa } from './fluxo-caixa/fluxocaixaresumo';
 
 export function FinanceiroFluxoTab() {
   const {
-    fcPeriodMode, setFcPeriodMode,
-    fcStartDate, setFcStartDate,
-    fcEndDate, setFcEndDate,
-    fcSelectedCompany, setFcSelectedCompany,
-    fcSelectedBuilding, setFcSelectedBuilding,
     fcHideInternal, setFcHideInternal,
-    loading, companies, buildings,
-    allFinancialTitles, allReceivableTitles,
+    startDate,
+    endDate,
+    selectedCompany,
+    fcSelectedBuilding,
+    buildings,
+    financialTitles,
+    receivableTitles,
     nfeDocuments,
-    setDataRevision
   } = useSienge();
   
   const { isDark } = useTheme();
-
-
-
-  const fcSelectedCompanyName = companies.find((c: any) => String(c.id) === fcSelectedCompany)?.name || '';
   const buildingMap = useMemo(() => {
     const map: Record<string, string> = {};
     buildings.forEach((b: any) => map[b.id] = b.name);
     return map;
   }, [buildings]);
 
-  const fcBuildingOptions = useMemo(() => {
-    if (fcSelectedCompany === 'all') return buildings;
-    return buildings.filter((b: any) => String(b.companyId) === fcSelectedCompany);
-  }, [buildings, fcSelectedCompany]);
-
-  const defaultWindow = useMemo(() => {
-    const end = new Date();
-    const start = subMonths(end, 6);
-    return { start, end };
-  }, []);
-
   const { rows: fluxoDeCaixaData, saldoAnterior: fluxoDeCaixaSaldoAnterior } = useMemo(() => {
-    const fcHasManualDate = Boolean(fcStartDate || fcEndDate);
-    const fcEffectiveStart = fcHasManualDate
-      ? (fcStartDate || null)
-      : (fcPeriodMode === 'last6m' ? defaultWindow.start : null);
-    const fcEffectiveEnd = fcHasManualDate
-      ? (fcEndDate || fcStartDate || null)
-      : (fcPeriodMode === 'last6m' ? defaultWindow.end : null);
+    const safeReceivable = Array.isArray(receivableTitles) ? receivableTitles : [];
+    const safePayable = Array.isArray(financialTitles) ? financialTitles : [];
+
     return calcularFluxoCaixa({
-      allReceivableTitles,
-      allFinancialTitles,
+      allReceivableTitles: safeReceivable,
+      allFinancialTitles: safePayable,
       buildings,
-      fcSelectedCompany,
-      fcSelectedBuilding,
+      fcSelectedCompany: selectedCompany || 'all',
+      fcSelectedBuilding: fcSelectedBuilding || 'all',
       fcHideInternal,
-      startNumeric: fcEffectiveStart ? parseInt(format(fcEffectiveStart, 'yyyyMMdd')) : null,
-      endNumeric: fcEffectiveEnd ? parseInt(format(fcEffectiveEnd, 'yyyyMMdd')) : null,
+      startNumeric: startDate ? parseInt(format(startDate, 'yyyyMMdd')) : null,
+      endNumeric: endDate ? parseInt(format(endDate, 'yyyyMMdd')) : null,
     });
-  }, [allFinancialTitles, allReceivableTitles, defaultWindow.end, defaultWindow.start, fcEndDate, fcHideInternal, fcPeriodMode, fcSelectedBuilding, fcSelectedCompany, fcStartDate, buildings]);
+  }, [buildings, endDate, fcHideInternal, fcSelectedBuilding, financialTitles, receivableTitles, selectedCompany, startDate]);
 
   const nfeSummary = useMemo(() => {
     const docs = Array.isArray(nfeDocuments) ? nfeDocuments : [];

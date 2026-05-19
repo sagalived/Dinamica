@@ -3,7 +3,7 @@ export type CardPriority = 'low' | 'medium' | 'high' | 'critical';
 
 export const COLUMNS: { id: CardStatus; label: string; emoji: string; color: string; bg: string }[] = [
   { id: 'planned', label: 'Planejado', emoji: '📋', color: 'text-blue-400', bg: 'bg-blue-500/10 border-blue-500/20' },
-  { id: 'in_progress', label: 'Em Execucao', emoji: '🔧', color: 'text-orange-400', bg: 'bg-orange-500/10 border-orange-500/20' },
+  { id: 'in_progress', label: 'Em Execucao', emoji: '🔧', color: 'text-green-400', bg: 'bg-green-500/10 border-green-500/20' },
   { id: 'review', label: 'Em Revisao', emoji: '🔍', color: 'text-purple-400', bg: 'bg-purple-500/10 border-purple-500/20' },
   { id: 'done', label: 'Concluido', emoji: '✅', color: 'text-emerald-400', bg: 'bg-emerald-500/10 border-emerald-500/20' },
   { id: 'blocked', label: 'Bloqueado', emoji: '⛔', color: 'text-red-400', bg: 'bg-red-500/10 border-red-500/20' },
@@ -12,7 +12,7 @@ export const COLUMNS: { id: CardStatus; label: string; emoji: string; color: str
 export const PRIORITIES: { id: CardPriority; label: string; color: string; dot: string }[] = [
   { id: 'low', label: 'Baixa', color: 'text-gray-400', dot: 'bg-gray-400' },
   { id: 'medium', label: 'Media', color: 'text-blue-400', dot: 'bg-blue-400' },
-  { id: 'high', label: 'Alta', color: 'text-orange-400', dot: 'bg-orange-400' },
+  { id: 'high', label: 'Alta', color: 'text-green-400', dot: 'bg-green-400' },
   { id: 'critical', label: 'Critica', color: 'text-red-400', dot: 'bg-red-400' },
 ];
 

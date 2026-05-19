@@ -1,10 +1,12 @@
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, HTTPException, Query
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from backend.database import get_db
 from backend.dependencies import get_current_user, require_database_ready
 from backend.models import AppUser, Building, Client, Company, Creditor, DirectoryUser
+from backend.schemas import BuildingCatalogResponse, BuildingCreateRequest
 
 router = APIRouter(prefix="/api", tags=["catalog"])
 
@@ -68,6 +70,58 @@ def list_buildings(
         }
         for row in rows
     ]
+
+
+@router.post("/buildings")
+def create_building(
+    payload: BuildingCreateRequest,
+    __: None = Depends(require_database_ready),
+    current_user: AppUser = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> dict:
+    name = (payload.name or "").strip()
+    if not name:
+        raise HTTPException(status_code=400, detail="Nome da obra é obrigatório")
+
+    company_name = (payload.company_name or "").strip() or None
+    cnpj = (payload.cnpj or "").strip() or None
+
+    if payload.company_id is not None:
+        company = db.scalar(select(Company).where(Company.id == int(payload.company_id)))
+        if company:
+            # usa o catálogo do Sienge (via sync) como base
+            company_name = company_name or (company.trade_name or company.name)
+            cnpj = cnpj or company.cnpj
+
+    building = Building(
+        name=name,
+        company_id=int(payload.company_id) if payload.company_id is not None else None,
+        company_name=company_name,
+        cnpj=cnpj,
+        address=(payload.address or None),
+        building_type=(payload.building_type or None),
+        active=bool(payload.active),
+        created_by=current_user.email,
+        modified_by=current_user.email,
+    )
+
+    db.add(building)
+    try:
+        db.commit()
+    except IntegrityError as exc:
+        db.rollback()
+        # Se o sequence/PK estiver fora de sincronia (ambiente seedado/importado),
+        # devolve erro explícito para não mascarar como 500.
+        msg = str(getattr(exc, "orig", exc))
+        if "buildings_pkey" in msg or "UniqueViolation" in msg:
+            raise HTTPException(
+                status_code=409,
+                detail="Falha ao criar obra: conflito de chave primária (sequence desincronizado). Reinicie a API para re-sincronizar ou execute o ajuste de sequence no banco.",
+            )
+        raise
+    db.refresh(building)
+
+    return {"building": BuildingCatalogResponse.model_validate(building).model_dump()}
 
 
 @router.get("/creditors")

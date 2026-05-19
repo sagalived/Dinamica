@@ -16,15 +16,9 @@ import { NavigationMenu } from '../components/NavigationMenu';
 import { LogisticsTab } from '../tabs/logistica/LogisticaTab';
 import { DiarioObras as ObrasTab } from '../tabs/obras/ObrasTab';
 import { FluxoProjection } from '../tabs/projecao/ProjecaoTab';
-import { LeandroTab } from '../tabs/financeiro/Leandro';
 import { FinanceiroValores } from '../tabs/financeiro/Valores';
-import { FinanceiroAlerta } from '../tabs/financeiro/Alerta';
 import { FinanceiroFluxoTab } from '../tabs/financeiro/FluxoCaixa';
-import { CentroDeCustoTab } from '../tabs/financeiro/CentroDeCusto';
 import { DashboardGeral } from '../tabs/dashboard/Geral';
-import { DashboardFinanceiro } from '../tabs/dashboard/Financeiro';
-import { DashboardObras } from '../tabs/dashboard/Obras';
-import { DashboardLogistica } from '../tabs/dashboard/Logistica';
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button, buttonVariants } from '@/components/ui/button';
@@ -46,7 +40,7 @@ import { sienge as api, api as baseApi, kanbanApi } from '../lib/api';
 import type { AuthUser, Building, Creditor, PriceAlert, PurchaseOrder, User } from '../lib/types';
 import { cn } from '../lib/utils';
 import { fixText } from '../lib/text';
-import { calcularFluxoCaixa } from '../tabs/financeiro/leandroLogic';
+import { calcularFluxoCaixa } from '../tabs/financeiro/fluxoCaixaLogic';
 import { safeFormat } from '../tabs/dashboard/logic';
 import {
   filtrarBuildingOptionsPorAtividade,
@@ -641,7 +635,7 @@ export function SiengeProvider({ children }: { children: React.ReactNode }) {
       : [
           { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
           { id: 'finance', label: 'Financeiro', icon: DollarSign },
-          { id: 'alerts', label: 'Alertas', icon: Bell },
+          { id: 'obras-alerta', label: 'Alerta (Obras)', icon: Bell },
           { id: 'map', label: 'Mapa de Obras', icon: MapIcon },
           { id: 'logistics', label: 'Logística', icon: Truck },
           { id: 'access', label: 'Acessos', icon: UserIcon },
@@ -649,7 +643,7 @@ export function SiengeProvider({ children }: { children: React.ReactNode }) {
   ), [isRestrictedUser]);
 
   useEffect(() => {
-    if (activeTab === 'alerts' && orders.length > 0) {
+    if (activeTab === 'obras-alerta' && orders.length > 0) {
       const visibleIds = orders.slice(0, 50).map(o => o.id);
       const missingIds = visibleIds.filter(id => !itemsDetailsMap[id] && !requestedItemsRef.current.has(String(id)));
       if (missingIds.length > 0) {

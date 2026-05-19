@@ -17,6 +17,15 @@ UPLOAD_DIR = Path("uploads/attachments")
 UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
 
 
+def _normalize_card_status(status_value: str | None) -> str:
+    raw = (status_value or "").strip().lower()
+    if raw == "todo":
+        return "planned"
+    if raw == "doing":
+        return "in_progress"
+    return status_value or "planned"
+
+
 @router.get("")
 def list_sprints_by_building(
     building_id: int,
@@ -44,6 +53,13 @@ def list_sprints_by_building(
             "createdBy": s.created_by,
             "isActive": s.is_active,
             "createdAt": s.created_at.isoformat(),
+            "updatedAt": s.updated_at.isoformat() if getattr(s, "updated_at", None) else None,
+            "bitrixGroupId": getattr(s, "bitrix_group_id", None),
+            "bitrixLastPullAt": s.bitrix_last_pull_at.isoformat() if getattr(s, "bitrix_last_pull_at", None) else None,
+            "bitrixCrmEntityTypeId": getattr(s, "bitrix_crm_entity_type_id", None),
+            "bitrixCrmCategoryId": getattr(s, "bitrix_crm_category_id", None),
+            "bitrixCrmLastPullAt": s.bitrix_crm_last_pull_at.isoformat() if getattr(s, "bitrix_crm_last_pull_at", None) else None,
+            "contractRef": getattr(s, "contract_ref", None),
             "cards": [
                 {
                     "id": c.id,
@@ -51,7 +67,7 @@ def list_sprints_by_building(
                     "buildingId": c.building_id,
                     "title": c.title,
                     "description": c.description,
-                    "status": c.status,
+                    "status": _normalize_card_status(c.status),
                     "priority": c.priority,
                     "responsible": c.responsible,
                     "dueDate": c.due_date.isoformat() if c.due_date else None,
@@ -59,6 +75,14 @@ def list_sprints_by_building(
                     "createdBy": c.created_by,
                     "order": c.order,
                     "createdAt": c.created_at.isoformat(),
+                    "updatedAt": c.updated_at.isoformat() if getattr(c, "updated_at", None) else None,
+                    "bitrixTaskId": getattr(c, "bitrix_task_id", None),
+                    "bitrixLastPullAt": c.bitrix_last_pull_at.isoformat() if getattr(c, "bitrix_last_pull_at", None) else None,
+                    "bitrixCrmEntityTypeId": getattr(c, "bitrix_crm_entity_type_id", None),
+                    "bitrixCrmCategoryId": getattr(c, "bitrix_crm_category_id", None),
+                    "bitrixCrmItemId": getattr(c, "bitrix_crm_item_id", None),
+                    "bitrixCrmStageId": getattr(c, "bitrix_crm_stage_id", None),
+                    "bitrixCrmLastPullAt": c.bitrix_crm_last_pull_at.isoformat() if getattr(c, "bitrix_crm_last_pull_at", None) else None,
                     "attachments": [
                         {
                             "id": a.id,
@@ -181,6 +205,14 @@ def create_sprint(
         created_by=current_user.email,
         is_active=True,
     )
+    if hasattr(payload, "model_fields_set") and "bitrix_group_id" in payload.model_fields_set:
+        sprint.bitrix_group_id = payload.bitrix_group_id
+    if hasattr(payload, "model_fields_set") and "bitrix_crm_entity_type_id" in payload.model_fields_set:
+        sprint.bitrix_crm_entity_type_id = payload.bitrix_crm_entity_type_id
+    if hasattr(payload, "model_fields_set") and "bitrix_crm_category_id" in payload.model_fields_set:
+        sprint.bitrix_crm_category_id = payload.bitrix_crm_category_id
+    if hasattr(payload, "model_fields_set") and "contract_ref" in payload.model_fields_set:
+        sprint.contract_ref = payload.contract_ref
     db.add(sprint)
     db.commit()
     db.refresh(sprint)
@@ -203,6 +235,14 @@ def update_sprint(
     sprint.start_date = payload.start_date
     sprint.end_date = payload.end_date
     sprint.color = payload.color
+    if hasattr(payload, "model_fields_set") and "bitrix_group_id" in payload.model_fields_set:
+        sprint.bitrix_group_id = payload.bitrix_group_id
+    if hasattr(payload, "model_fields_set") and "bitrix_crm_entity_type_id" in payload.model_fields_set:
+        sprint.bitrix_crm_entity_type_id = payload.bitrix_crm_entity_type_id
+    if hasattr(payload, "model_fields_set") and "bitrix_crm_category_id" in payload.model_fields_set:
+        sprint.bitrix_crm_category_id = payload.bitrix_crm_category_id
+    if hasattr(payload, "model_fields_set") and "contract_ref" in payload.model_fields_set:
+        sprint.contract_ref = payload.contract_ref
     
     db.commit()
     db.refresh(sprint)

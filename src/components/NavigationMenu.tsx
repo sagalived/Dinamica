@@ -31,9 +31,6 @@ export function NavigationMenu({ activeTab, setActiveTab, isRestrictedUser }: Na
       label: 'DASHBOARD',
       options: [
         { id: 'dashboard', label: 'GERAL' },
-        { id: 'dashboard-financeiro', label: 'FINANCEIROS' },
-        { id: 'dashboard-obras', label: 'OBRAS' },
-        { id: 'dashboard-logistica', label: 'LOGISTICA' }
       ]
     },
     {
@@ -42,9 +39,7 @@ export function NavigationMenu({ activeTab, setActiveTab, isRestrictedUser }: Na
       options: [
         { id: 'finance', label: 'VALORES' },
         { id: 'financeiro-fluxo', label: 'FLUXO DE CAIXA' },
-        { id: 'financeiro-leandro', label: 'LEANDRO' },
         { id: 'financeiro-centro-custo', label: 'CENTRO DE CUSTO' },
-        { id: 'alerts', label: 'ALERTA' }
       ]
     },
     {
@@ -53,7 +48,7 @@ export function NavigationMenu({ activeTab, setActiveTab, isRestrictedUser }: Na
       options: [
         { id: 'obras-diario', label: 'DIARIO DE OBRAS' },
         { id: 'map', label: 'VALORES' },
-        { id: 'obras-alerta', label: 'ALERTA' }
+        { id: 'obras-alerta', label: 'ALERTA (OBRAS)' }
       ]
     },
     {
@@ -61,6 +56,13 @@ export function NavigationMenu({ activeTab, setActiveTab, isRestrictedUser }: Na
       label: 'LOGISTICA',
       options: [
         { id: 'logistics', label: 'ACOMPANHAMENTO' }
+      ]
+    },
+    {
+      id: 'juridico',
+      label: 'JURIDICO',
+      options: [
+        { id: 'juridico-contratos', label: 'CONTRATOS' }
       ]
     }
   ];

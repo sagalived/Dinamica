@@ -1,13 +1,24 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
-import { TrendingUp, DollarSign, Building2, Percent } from 'lucide-react';
+import { TrendingUp, DollarSign, Percent } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../../components/ui/card';
-import { Table, TableBody, TableCell, TableFooter, TableHead, TableHeader, TableRow } from '../../components/ui/table';
 import { cn } from '../../lib/utils';
 import { api } from '../../lib/api';
 import {
-  ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, Legend,
-  PieChart, Pie, Cell
+  ResponsiveContainer,
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  Tooltip,
+  Legend,
+  PieChart,
+  Pie,
+  Cell,
+  BarChart,
+  Bar,
+  CartesianGrid,
+  Line,
 } from 'recharts';
 import { useSienge } from '../../contexts/SiengeContext';
 import { addMonths, format, parseISO, startOfDay, endOfDay } from 'date-fns';
@@ -54,7 +65,6 @@ export function DashboardGeral() {
     financialTitles,
     receivableTitles,
     nfeDocuments,
-    activeBuildings,
     fcSelectedBuilding,
     selectedCompany,
     selectedUser,
@@ -62,13 +72,10 @@ export function DashboardGeral() {
     companies,
     buildings,
     dataRevision,
-    activeBuildingCount,
     startDate,
     endDate,
     globalPeriodMode,
   } = useSienge();
-
-  const [activeBuildingsModalOpen, setActiveBuildingsModalOpen] = useState(false);
 
   // Estado dos filtros
   const [currentFilters, setCurrentFilters] = useState<FilterState | null>(null);
@@ -321,15 +328,22 @@ export function DashboardGeral() {
   }, [seriesTotals]);
 
   const resumoPorObra = useMemo(() => {
-    const rows = Array.isArray(mcByBuildingAllTime.rows) ? mcByBuildingAllTime.rows : [];
-    const total = mcByBuildingAllTime.total || { receita: 0, mc: 0, pct: 0 };
+    const allRows = Array.isArray(mcByBuildingAllTime.rows) ? mcByBuildingAllTime.rows : [];
+    const rows = (fcSelectedBuilding && fcSelectedBuilding !== 'all')
+      ? allRows.filter((r) => String(r?.id) === String(fcSelectedBuilding))
+      : allRows;
+
+    const receita = rows.reduce((acc, r) => acc + Number(r?.receita || 0), 0);
+    const mc = rows.reduce((acc, r) => acc + Number(r?.mc || 0), 0);
+    const pct = receita > 0 ? (mc / receita) * 100 : 0;
+    const total = { receita, mc, pct };
     return {
       rows,
       total,
       maxReceita: Math.max(1, ...rows.map((r) => Number(r?.receita || 0))),
       maxMcAbs: Math.max(1, ...rows.map((r) => Math.abs(Number(r?.mc || 0)))),
     };
-  }, [mcByBuildingAllTime.rows, mcByBuildingAllTime.total]);
+  }, [fcSelectedBuilding, mcByBuildingAllTime.rows]);
 
   const orderStatusData = useMemo(() => {
     const map: Record<string, number> = {};
@@ -367,7 +381,7 @@ export function DashboardGeral() {
 
   useEffect(() => {
     setObraPage(1);
-  }, [selectedCompany, resumoPorObra.rows.length]);
+  }, [fcSelectedBuilding, selectedCompany, resumoPorObra.rows.length]);
 
   const printMcReport = () => {
     const escapeHtml = (value: any) => String(value ?? '')
@@ -565,103 +579,6 @@ export function DashboardGeral() {
       {/* Filtros */}
       <FilterBar onFilter={handleFilterApply} onClear={handleFilterClear} />
 
-      {/* KPI Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
-        {[
-          {
-            label: selectedCompany !== 'all'
-              ? `RECEITA — ${companies.find((c: any) => String(c.id) === selectedCompany)?.name || 'Empresa'}`
-              : 'RECEITA OPERACIONAL',
-            value: fmtBRL(kpiReceitaOperacional),
-            icon: TrendingUp,
-            color: 'orange',
-            tooltip: 'Receita Operacional calculada pelos lançamentos filtrados (empresa, obra e período).',
-          },
-          {
-            label: selectedCompany !== 'all'
-              ? `MARGEM — ${companies.find((c: any) => String(c.id) === selectedCompany)?.name || 'Empresa'}`
-              : 'Margem de Contribuição',
-            value: fmtBRL(kpiMargemContribuicao),
-            icon: DollarSign,
-            color: kpiMargemContribuicao >= 0 ? 'green' : 'red',
-            tooltip: 'Margem de Contribuição (MC): Receita Operacional − Custos, respeitando os filtros aplicados.',
-          },
-          { label: 'Obras Ativas', value: activeBuildingCount, icon: Building2, color: 'orange' }
-        ].map((kpi, i) => (
-          <Card key={i} className="bg-[#161618] border-white/5 shadow-2xl overflow-hidden relative group" title={(kpi as any).tooltip || ''}>
-            <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity"><kpi.icon size={40} className="text-orange-500" /></div>
-            <CardHeader className="pb-2 p-4 sm:p-6">
-              <CardDescription className="text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-orange-500/70 leading-tight">{kpi.label}</CardDescription>
-              <CardTitle className={cn("text-xl sm:text-3xl font-black tracking-tighter mt-1", kpi.color === 'red' ? 'text-red-500' : kpi.color === 'green' ? 'text-green-500' : 'text-white')}>{kpi.value}</CardTitle>
-              {i === 2 && (
-                <button
-                  type="button"
-                  onClick={() => setActiveBuildingsModalOpen(true)}
-                  className="mt-2 h-8 px-3 rounded-lg border border-white/10 bg-white/5 text-white text-[11px] font-black uppercase tracking-wide hover:bg-white/10"
-                >
-                  Ver obras
-                </button>
-              )}
-            </CardHeader>
-            <div className="h-1 w-full bg-orange-600/20"><div className="h-full bg-orange-600 w-1/3" /></div>
-          </Card>
-        ))}
-      </div>
-
-      {activeBuildingsModalOpen && (
-        <div
-          className="fixed inset-0 z-[999] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 print:hidden"
-          onClick={() => setActiveBuildingsModalOpen(false)}
-        >
-          <div
-            className="w-full max-w-2xl bg-[#161618] border border-white/10 rounded-2xl shadow-2xl overflow-hidden"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="p-4 sm:p-6 border-b border-white/10 flex items-center justify-between">
-              <div>
-                <h2 className="text-white text-lg sm:text-xl font-black uppercase tracking-widest leading-tight">Obras ativas</h2>
-                <p className="text-gray-400 text-xs mt-1">{(Array.isArray(activeBuildings) ? activeBuildings : []).length} obras</p>
-              </div>
-              <button
-                type="button"
-                onClick={() => setActiveBuildingsModalOpen(false)}
-                className="w-9 h-9 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white flex items-center justify-center"
-                aria-label="Fechar"
-              >
-                ×
-              </button>
-            </div>
-            <div className="max-h-[60vh] overflow-auto">
-              <Table className="text-xs sm:text-sm">
-                <TableHeader className="border-white/10">
-                  <TableRow className="border-white/10 hover:bg-transparent">
-                    <TableHead className="text-gray-300">Obra</TableHead>
-                    <TableHead className="text-gray-300">Código</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {(Array.isArray(activeBuildings) ? activeBuildings : []).map((b: any) => (
-                    <TableRow key={String(b?.id)} className="border-white/10 hover:bg-white/5">
-                      <TableCell className="text-white font-semibold">{String(b?.name || '')}</TableCell>
-                      <TableCell className="text-gray-300">{String(b?.code || b?.id || '')}</TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-            <div className="p-4 sm:p-6 border-t border-white/10 flex justify-end">
-              <button
-                type="button"
-                onClick={() => setActiveBuildingsModalOpen(false)}
-                className="h-9 px-4 rounded-lg border border-white/10 bg-white/5 text-white text-xs font-black uppercase tracking-wide hover:bg-white/10"
-              >
-                Fechar
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* Mini gráficos (estilo referência) */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-8">
         <Card
@@ -795,84 +712,85 @@ export function DashboardGeral() {
             </div>
           </CardHeader>
           <CardContent className="pt-2">
-            <Table className="text-xs sm:text-sm">
-              <TableHeader className="border-white/10">
-                <TableRow className="border-white/10 hover:bg-transparent">
-                  <TableHead className="text-gray-300">Obra</TableHead>
-                  <TableHead className="text-gray-300">Receita Operacional</TableHead>
-                  <TableHead className="text-gray-300">Margem Contribuição</TableHead>
-                  <TableHead className="text-gray-300 text-right">% MC</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {historicalLoading ? (
-                  <TableRow className="border-white/10 hover:bg-white/5">
-                    <TableCell colSpan={4} className="text-gray-300">
-                      Carregando dados históricos por obra...
-                    </TableCell>
-                  </TableRow>
-                ) : resumoPorObra.rows.length === 0 ? (
-                  <TableRow className="border-white/10 hover:bg-white/5">
-                    <TableCell colSpan={4} className="text-gray-300">
-                      Sem dados por obra.
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  obraPagination.pageRows.map((r) => (
-                  <TableRow key={r.id} className="border-white/10 hover:bg-white/5">
-                    <TableCell className="text-white font-semibold max-w-[220px] truncate">{r.name}</TableCell>
+            {historicalLoading ? (
+              <div className="text-gray-300 text-sm px-2 py-6">Carregando dados históricos por obra...</div>
+            ) : resumoPorObra.rows.length === 0 ? (
+              <div className="text-gray-300 text-sm px-2 py-6">Sem dados por obra.</div>
+            ) : (
+              <div className="h-[320px] sm:h-[420px]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart
+                    data={obraPagination.pageRows as any}
+                    margin={{ top: 16, right: 24, left: 0, bottom: 24 }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
+                    <XAxis
+                      dataKey="name"
+                      interval={0}
+                      angle={-20}
+                      textAnchor="end"
+                      height={70}
+                      tick={{ fill: '#94a3b8', fontSize: 11 }}
+                      axisLine={false}
+                      tickLine={false}
+                    />
+                    <YAxis
+                      yAxisId="left"
+                      tick={{ fill: '#94a3b8', fontSize: 11 }}
+                      tickFormatter={(v) => {
+                        const n = Number(v ?? 0);
+                        if (!Number.isFinite(n)) return '';
+                        if (Math.abs(n) >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
+                        if (Math.abs(n) >= 1_000) return `${(n / 1_000).toFixed(0)}k`;
+                        return String(Math.round(n));
+                      }}
+                      axisLine={false}
+                      tickLine={false}
+                    />
+                    <YAxis
+                      yAxisId="right"
+                      orientation="right"
+                      tick={{ fill: '#94a3b8', fontSize: 11 }}
+                      tickFormatter={(v) => `${Number(v ?? 0).toLocaleString('pt-BR', { maximumFractionDigits: 0 })}%`}
+                      domain={[-100, 100]}
+                      axisLine={false}
+                      tickLine={false}
+                    />
+                    <Tooltip
+                      contentStyle={{ backgroundColor: '#161618', border: '1px solid rgba(255,255,255,0.1)' }}
+                      formatter={(value: any, name: any) => {
+                        if (name === 'pct') return [`${Number(value ?? 0).toLocaleString('pt-BR', { maximumFractionDigits: 1 })}%`, '% MC'];
+                        if (name === 'receita') return [fmtBRL(Number(value ?? 0)), 'Receita Operacional'];
+                        if (name === 'mc') return [fmtBRL(Number(value ?? 0)), 'Margem Contribuição'];
+                        return [String(value ?? ''), String(name ?? '')];
+                      }}
+                      labelFormatter={(label) => `Obra: ${String(label ?? '')}`}
+                    />
+                    <Legend />
+                    <Bar yAxisId="left" dataKey="receita" name="Receita" fill="#f97316" radius={[6, 6, 0, 0]} />
+                    <Bar yAxisId="left" dataKey="mc" name="MC" fill="#10b981" radius={[6, 6, 0, 0]} />
+                    <Line yAxisId="right" type="monotone" dataKey="pct" name="% MC" stroke="#8b5cf6" strokeWidth={2} dot={false} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            )}
 
-                    <TableCell>
-                      <div className="relative h-7 rounded bg-white/5 overflow-hidden">
-                        <div className="absolute inset-y-0 left-0 bg-orange-500/30" style={{ width: `${Math.round((r.receita / resumoPorObra.maxReceita) * 100)}%` }} />
-                        <div className="relative z-10 px-2 h-full flex items-center justify-end text-white font-semibold">
-                          {fmtBRL(r.receita)}
-                        </div>
-                      </div>
-                    </TableCell>
-
-                    <TableCell>
-                      <div className="relative h-7 rounded bg-white/5 overflow-hidden">
-                        <div
-                          className={cn('absolute inset-y-0 left-0', r.mc >= 0 ? 'bg-emerald-500/30' : 'bg-red-500/30')}
-                          style={{ width: `${Math.round((Math.abs(r.mc) / resumoPorObra.maxMcAbs) * 100)}%` }}
-                        />
-                        <div className={cn(
-                          'relative z-10 px-2 h-full flex items-center justify-end font-semibold',
-                          r.mc >= 0 ? 'text-emerald-400' : 'text-red-400'
-                        )}>
-                          {fmtBRL(r.mc)}
-                        </div>
-                      </div>
-                    </TableCell>
-
-                    <TableCell className="text-right font-bold">
-                      <span className={cn(
-                        'inline-flex items-center justify-center min-w-[56px] px-2 py-1 rounded',
-                        r.pct >= 0 ? 'bg-violet-500/15 text-violet-300' : 'bg-red-500/15 text-red-300'
-                      )}>
-                        {r.pct.toLocaleString('pt-BR', { maximumFractionDigits: 0 })}%
-                      </span>
-                    </TableCell>
-                  </TableRow>
-                  ))
-                )}
-              </TableBody>
-              <TableFooter className="bg-transparent border-white/10">
-                <TableRow className="border-white/10 hover:bg-transparent">
-                  <TableCell className="text-white font-black">Total</TableCell>
-                  <TableCell className="text-white font-black">
-                    {fmtBRL(resumoPorObra.total.receita)}
-                  </TableCell>
-                  <TableCell className={cn('font-black', resumoPorObra.total.mc >= 0 ? 'text-emerald-400' : 'text-red-400')}>
-                    {fmtBRL(resumoPorObra.total.mc)}
-                  </TableCell>
-                  <TableCell className="text-right text-white font-black">
-                    {resumoPorObra.total.pct.toLocaleString('pt-BR', { maximumFractionDigits: 0 })}%
-                  </TableCell>
-                </TableRow>
-              </TableFooter>
-            </Table>
+            <div className="mt-3 grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
+              <div className="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-gray-300">
+                <div className="text-[10px] uppercase tracking-widest text-gray-400">Total Receita</div>
+                <div className="text-white font-black">{fmtBRL(resumoPorObra.total.receita)}</div>
+              </div>
+              <div className="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-gray-300">
+                <div className="text-[10px] uppercase tracking-widest text-gray-400">Total MC</div>
+                <div className={cn('font-black', resumoPorObra.total.mc >= 0 ? 'text-emerald-400' : 'text-red-400')}>
+                  {fmtBRL(resumoPorObra.total.mc)}
+                </div>
+              </div>
+              <div className="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-gray-300">
+                <div className="text-[10px] uppercase tracking-widest text-gray-400">Total % MC</div>
+                <div className="text-white font-black">{resumoPorObra.total.pct.toLocaleString('pt-BR', { maximumFractionDigits: 0 })}%</div>
+              </div>
+            </div>
             {resumoPorObra.rows.length > 0 && (
               <div className="mt-4 flex flex-wrap items-center justify-between gap-3 text-xs text-gray-400">
                 <span>
